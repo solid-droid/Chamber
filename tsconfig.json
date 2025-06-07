@@ -19,5 +19,6 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"]
+  /* add this to include typescript */
+  // "include": ["src"]
 }
