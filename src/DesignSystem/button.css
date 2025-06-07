@@ -1,0 +1,20 @@
+.iconButton{
+    color: var(--iconButton-color);
+    font-size: 20px;
+    height: 30px;
+    width: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    cursor: pointer;
+    &:hover {
+        text-shadow: 0 0 3px #fff;
+    }
+}
+
+.iconButton.active{
+    background: rgb(68, 68, 68);
+    color: white;
+    text-shadow: white 0 0 1px;
+}

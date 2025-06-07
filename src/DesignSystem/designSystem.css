@@ -1,0 +1,25 @@
+/* Chamber Design System  */
+@import url('./color.css');
+@import url('./button.css');
+@import url('./input.css');
+@import url('./tag.css');
+
+
+::-webkit-scrollbar{
+	width: 10px;
+}
+
+::-webkit-scrollbar-track-piece{
+	background-color: #31313100;
+}
+
+::-webkit-scrollbar-thumb{
+	background-color: #383838;
+	border: .1px solid #484848ba;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover{
+	background-color: #585858;
+    border: .1px solid #757575ba;
+}

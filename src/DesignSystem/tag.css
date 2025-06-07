@@ -1,0 +1,6 @@
+.tag{
+    display: flex;
+    background-color: rgba(132, 132, 132, 0.436);
+    padding: 2px 5px;
+    border-radius: 999px;
+}

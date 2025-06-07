@@ -10,12 +10,25 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "@tauri-apps/api": "^2",
-    "@tauri-apps/plugin-opener": "^2"
+    "@babylonjs/core": "8.9.0",
+    "@babylonjs/gui": "8.9.0",
+    "@babylonjs/inspector": "8.9.0",
+    "@babylonjs/loaders": "8.9.0",
+    "@babylonjs/materials": "8.9.0",
+    "@fortawesome/fontawesome-free": "^6.7.2",
+    "@tauri-apps/api": "^2.5.0",
+    "@tauri-apps/plugin-opener": "^2",
+    "concurrently": "^9.1.2",
+    "cross-env": "^7.0.3",
+    "diff-match-patch": "^1.0.5",
+    "jquery": "^3.7.1",
+    "monaco-editor": "^0.52.2",
+    "split.js": "^1.6.5",
+    "wait-on": "^8.0.3"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2",
-    "vite": "^6.0.3",
-    "typescript": "~5.6.2"
+    "typescript": "~5.6.2",
+    "vite": "^6.0.3"
   }
 }

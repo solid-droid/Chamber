@@ -1,0 +1,100 @@
+.chamberFileBrowser{
+     height: calc(100% - 40px);
+     overflow: hidden;
+    > .file-list{
+         padding-bottom: 50px !important;
+    }
+    .file-list{
+        font-size: 14px;
+        padding: 3px 0;
+        padding-left: 3px;
+        overflow-y: auto;
+        height: -webkit-fill-available;
+        .file-item{
+            .file-details{
+                padding: 5px 5px;
+                padding-right: 15px;
+                cursor: pointer;
+                color: rgb(236, 236, 236);
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                user-select: none;
+                .onHover{
+                    display: none;
+                }
+                &:hover{
+                    background: rgba(59, 59, 59, 0.486);
+                    .onHover{
+                        display: block;
+                    }
+                }
+                .caret{
+                    flex-grow: 0;
+                    width: 13px;
+                }
+                .file-name{
+                    flex-grow: 1;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+                .aliasUsed{
+                    color: rgb(150, 212, 235);
+                }
+
+                .file-icon{
+                    flex-grow: 0;
+                    width: 13px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin-left: -8px;
+                }
+
+                /* Icon Colors */
+                .groupNodeIcon{
+                    color: rgb(204, 132, 39);
+                }
+                .sceneIcon{
+                    color:rgb(109, 171, 197);
+                }
+                .cameraIcon{
+                    color: rgb(166, 184, 223);
+                }
+                .lightIcon{
+                    color: rgb(241, 216, 123);
+                }
+                .meshIcon{
+                    color:rgb(196, 227, 214);
+                }
+                .materialIcon{
+                    color:rgb(208, 190, 214);
+                }
+                .audioIcon{
+                    color:rgb(179, 207, 212);
+                }
+                .modelsIcon{
+                    color:rgb(228, 215, 178)
+                }
+                /* ///////// */
+            }
+
+            .selected{
+                background: rgba(97, 97, 97, 0.486) !important;
+            }
+        }
+        .children{
+            padding-left: 9px;
+            box-sizing: border-box;
+           .file-item{
+                border-left: rgba(142, 142, 142, 0.402) 1px solid;
+                &:last-child{
+                    border-bottom: rgba(142, 142, 142, 0.402) 1px solid;
+                }
+           }
+        }
+        .category{
+        }
+    }
+}

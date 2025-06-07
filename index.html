@@ -2,42 +2,42 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="stylesheet" href="/src/styles.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tauri App</title>
-    <script type="module" src="/src/main.ts" defer></script>
+    <title>Chamber</title>
   </head>
 
+  <link rel="stylesheet" href="/src/style.css" />
   <body>
-    <main class="container">
-      <h1>Welcome to Tauri</h1>
-
-      <div class="row">
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/src/assets/vite.svg" class="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img
-            src="/src/assets/tauri.svg"
-            class="logo tauri"
-            alt="Tauri logo"
-          />
-        </a>
-        <a href="https://www.typescriptlang.org/docs" target="_blank">
-          <img
-            src="/src/assets/typescript.svg"
-            class="logo typescript"
-            alt="typescript logo"
-          />
-        </a>
+    <div id="head-tools"  data-tauri-drag-region>
+      <div class="leftBlock">
+        <span class="appName">CHAMBER</span>
+        <span class="version">v0.0</span>
       </div>
-      <p>Click on the Tauri logo to learn more about the framework</p>
-
-      <form class="row" id="greet-form">
-        <input id="greet-input" placeholder="Enter a name..." />
-        <button type="submit">Greet</button>
-      </form>
-      <p id="greet-msg"></p>
-    </main>
+      <div class="centerBlock">
+        <span id="projectName" title="Project Name"></span>
+      </div>
+      <div class="rightBlock">
+        <i class="fa-solid fa-file-import loadProject" title="Load Project"></i>
+        <i class="fa-solid fa-laptop-code designMode" title="Design Mode"></i>
+        <div class="chamber-devmode">
+          <i class="fa-solid fa-cubes inspectMode" title="Inspect Mode"></i>
+          <i class="fa-solid fa-folder-tree fileBrowser" title="File Browser"></i>
+          <i class="fa-solid fa-hexagon-nodes nodeEditor" title="Node Editor"></i>
+          <i class="fa-solid fa-server signalsButton" title="Datastore"></i>
+          <i class="fa-solid fa-anchor anchorButton"  title="Anchors"></i>
+          <i class="fa-solid fa-floppy-disk saveButton" title="Save"></i>
+          <i class="fa-solid fa-download  exportButton" title="Export"></i>
+        </div>
+        <i class="fa-brands fa-chrome devTools" title="Chrome DevTools"></i>
+        <i class="fa-solid fa-minus minimizeButton" title="Minimize"></i>
+        <i class="fa-solid fa-window-maximize maximizeButton" title="Maximize / Resize"></i>
+        <i class="fa-solid fa-xmark closeButton" title="Close"></i>
+      </div>
+    </div>
+    <div id="container">
+      <canvas id="canvas3D"></canvas>
+    </div>
+    <div id="editor" class="chamber-editor"></div>
+    <script type="module" src="/src/main.js"></script>
   </body>
 </html>

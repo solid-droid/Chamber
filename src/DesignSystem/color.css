@@ -1,0 +1,6 @@
+/* Button color */
+:root {
+    --iconButton-color: #efefef;
+    --iconButton-background: rgba(0, 0, 0, 0);
+    --iconButton-hover-background: rgba(86, 86, 86, 0.651);
+}
