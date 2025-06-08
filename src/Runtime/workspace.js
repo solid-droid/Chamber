@@ -20,15 +20,8 @@ export default class Workspace{
         this.#selectedNodePath = node.path;
     }
     get SelectedNode(){
-        return this.pathMap?.[this.#selectedNodePath];
-    }
-
-    #editorCode = '';
-    set selectedEditor(code){
-        this.#editorCode = code;
-    }
-    get selectedEditor(){
-        return this.#editorCode;
+        const workspace = this.workspace.getData();
+        return workspace?.[this.#selectedNodePath];
     }
     
     constructor(options = {}) {
@@ -53,10 +46,7 @@ export default class Workspace{
         this.onLoadComplete();
     }
 
-    clearAll(){
-
-    }
-
+    /* FileSystem */
     createFileSystem(stage='update'){
         let data = this.workspace.getData();
         const nodeArray = Object.values(data);
@@ -78,20 +68,6 @@ export default class Workspace{
 
         //if no project - create a new project
         !pathMap['Projects'].children.length && this.createProject() && this.createFileSystem();
-    }
-
-    createProject(name = 'New Project'){
-         const workspace = this.workspace.getData();
-         let path = `Projects/${name}`;
-         if(workspace[path]){
-            return false;
-         }
-
-         let projectFiles = projectDefault.map(x => ({...x, path: `${path}/${x.path}`}));
-         workspace[path] = {name, path, type:'Project'};
-         projectFiles.forEach(x => workspace[x.path] = x);
-         this.workspace.commit(`System:create project - ${name}`, workspace);
-         return true;
     }
 
     buildTree(data) {
@@ -121,87 +97,158 @@ export default class Workspace{
                 }
                 existingNode.tree_meta = existingNode.tree_meta || {};
                 this.#selectedNodePath = existingNode.tree_meta.selected ? existingNode.path : this.#selectedNodePath; 
-                if(i === 0){
-                    //component
-                    existingNode.tree_meta.icon ??= icons[existingNode.name];
-                    if(parts[0] === 'Projects'){
-                         existingNode.tree_meta = {
-                            actionButtons: [
-                                {title:'New Project', class:'fa-solid fa-square-plus', hover:true},
-                            ],
-                            icon:icons[parts[0]]
-                        }
-                    }  
-                } else if (i === 1) {
-                    //entity
-                    if(parts[0] === 'Projects'){
-                        existingNode.tree_meta = {
-                            actionButtons: [
-                                {title:'Delete', class:'fa-solid fa-trash', hover:true},
-                            ],
-                            icon:icons[parts[0]]
-                        }
-                    } else {
-                        existingNode.tree_meta = {
-                            ...existingNode.tree_meta,
-                            actionButtons: [
-                                {title:'Add', class:'fa-solid fa-square-plus', hover:true},
-                            ],
-                            icon:icons[existingNode.name]
-                        }
-                    }
-                    
-                } else if ( i < parts.length - 1) {
-                    //group
-                    existingNode.tree_meta = {
-                        ...existingNode.tree_meta,
-                       actionButtons: [
-                                focusTypes.includes(parts[1]) ? {
-                                    title:'Show/Hide', 
-                                    onClass:'fa-solid fa-eye', 
-                                    offClass:'fa-solid fa-eye-slash', 
-                                    class: existingNode.hidden ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye',
-                                    stick:'fa-solid fa-eye-slash', 
-                                    hover:true, 
-                                }:null,
-                                {title:'Add', class:'fa-solid fa-square-plus', hover:true},
-                                {title:'Delete', class:'fa-solid fa-trash', hover:true }
-                            ].filter(x => x),
-                        icon : this.groupNodeIcon,
-                    }
-                    existingNode.type = "Group";
-                } else {
-                    //entity type = leaf node
-                    if(parts[0] === 'Projects'){
-                        //no update needed
-                    } else {
-                        existingNode.tree_meta = {
-                        ...existingNode.tree_meta,
-                        actionButtons: [
-                                focusTypes.includes(parts[1]) ? {
-                                    title:'Show/Hide', 
-                                    onClass:'fa-solid fa-eye', 
-                                    offClass:'fa-solid fa-eye-slash', 
-                                    class: existingNode.workspace_meta?.hidden ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye',
-                                    stick:'fa-solid fa-eye-slash', 
-                                    hover:true, 
-                                } : null,
-                                focusTypes.includes(parts[1]) ? {title:'Focus', class:'fa-solid fa-location-crosshairs', hover: true } : null,
-                                {title:'Delete', class:'fa-solid fa-trash', hover:true }
-                            ].filter(x => x),
-                        icon : icons[parts[1]],
-                     }
-                     existingNode.type = parts[1]; 
-                    }  
-                }
+                existingNode = this.fillNode(parts, existingNode , i);
                 currentLevel = existingNode.children;
             }
         }
         return {tree:root,pathMap};
     }
 
-    getNode(path) {
+    fillComponentNode(parts,existingNode){
+        //component
+        existingNode.tree_meta.icon ??= icons[existingNode.name];
+        if(parts[0] === 'Projects'){
+                existingNode.tree_meta = {
+                actionButtons: [
+                    {title:'New Project', class:'fa-solid fa-square-plus', hover:true},
+                ],
+                icon:icons[parts[0]]
+            }
+        }
+        return existingNode;  
+    }
+
+    fillEntityNode(parts, existingNode){
+         if(parts[0] === 'Projects'){
+            existingNode.tree_meta = {
+                actionButtons: [
+                    {title:'Delete', class:'fa-solid fa-trash', hover:true},
+                ],
+                icon:icons[parts[0]]
+            }
+        } else {
+            existingNode.tree_meta = {
+                ...existingNode.tree_meta,
+                actionButtons: [
+                    {title:'Add', class:'fa-solid fa-square-plus', hover:true},
+                ],
+                icon:icons[existingNode.name]
+            }
+        }
+        return existingNode;
+    }
+
+    fillGroupNode(parts, existingNode){
+        //group
+        existingNode.tree_meta = {
+            ...existingNode.tree_meta,
+            actionButtons: [
+                    focusTypes.includes(parts[1]) ? {
+                        title:'Show/Hide', 
+                        onClass:'fa-solid fa-eye', 
+                        offClass:'fa-solid fa-eye-slash', 
+                        class: existingNode.hidden ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye',
+                        stick:'fa-solid fa-eye-slash', 
+                        hover:true, 
+                    }:null,
+                    {title:'Add', class:'fa-solid fa-square-plus', hover:true},
+                    {title:'Delete', class:'fa-solid fa-trash', hover:true }
+                ].filter(x => x),
+            icon : this.groupNodeIcon,
+        }
+        existingNode.type = "Group";
+        return existingNode;
+    }
+
+    fillLeafNode(parts, existingNode){
+        //entity type = leaf node
+        if(parts[0] === 'Projects'){
+            //no update needed
+        } else {
+            existingNode.tree_meta = {
+            ...existingNode.tree_meta,
+            actionButtons: [
+                    focusTypes.includes(parts[1]) ? {
+                        title:'Show/Hide', 
+                        onClass:'fa-solid fa-eye', 
+                        offClass:'fa-solid fa-eye-slash', 
+                        class: existingNode.workspace_meta?.hidden ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye',
+                        stick:'fa-solid fa-eye-slash', 
+                        hover:true, 
+                    } : null,
+                    focusTypes.includes(parts[1]) ? {title:'Focus', class:'fa-solid fa-location-crosshairs', hover: true } : null,
+                    {title:'Delete', class:'fa-solid fa-trash', hover:true }
+                ].filter(x => x),
+            icon : icons[parts[1]],
+            }
+            existingNode.type = parts[1]; 
+        }  
+        return existingNode;
+    }
+
+    fillNode(parts, existingNode , i){
+        if(i === 0){
+            return this.fillComponentNode(parts, existingNode)
+        }
+
+        if(i === 1){
+            return this.fillEntityNode(parts, existingNode);
+        }
+
+        if ( i < parts.length - 1) {
+           return this.fillGroupNode(parts, existingNode);
+        } 
+
+        if(i == parts.length-1){
+            return this.fillLeafNode(parts, existingNode);
+        }
+    }
+
+    /* createEntity */
+    createProject(name = 'New Project'){
+         const workspace = this.workspace.getData();
+         let path = `Projects/${name}`;
+         if(workspace[path]){
+            return false;
+         }
+
+         let projectFiles = projectDefault.map(x => ({...x, path: `${path}/${x.path}`}));
+         workspace[path] = {name, path, type:'Project'};
+         projectFiles.forEach(x => workspace[x.path] = x);
+         this.workspace.commit(`System:create project - ${name}`, workspace);
+         return true;
+    }
+
+    /* CRUD */
+    get(path){
         this.workspace.getData()[path];
+    }
+
+    update(node, msg, stringDiff = false){
+        let workspace = this.workspace.getData();
+        workspace[node.path] = node;
+        this.workspace.commit(msg,workspace,{stringDiff});
+    }
+
+    delete(node){
+        let workspace = this.workspace.getData();
+        delete workspace[node.path];
+        this.workspace.commit('delete node',workspace);
+    }
+
+    create(node, msg){
+        let workspace = this.workspace.getData();
+        workspace[node.path] = node;
+        this.workspace.commit(msg,workspace);
+    }
+
+    /* utils */
+    clearAll(){
+
+    }
+    
+    resize(){
+        
     }
 
 }

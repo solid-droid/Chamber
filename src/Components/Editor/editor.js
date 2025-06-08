@@ -3,7 +3,7 @@ import { FileBrowser } from "./FileBrowser/fileBrowser";
 import { isolateView, isolateViewMesh } from "./IsolateView/isolateView";
 import './editor.css';
 import Resizable from "../../utils/Resizable";
-import { debounce } from "../../utils/utils";
+import { debounce, getFormat } from "../../utils/utils";
 import Split from 'split.js'
 
 
@@ -95,7 +95,7 @@ export default class Editor {
     }
     debounceEditorUpdate = debounce((editor, project)=> {
         const value = editor.getValue();
-        project.selectedEditor = value;
+        project.SelectedNode = value;
     }, 500);
     showFileBrowser(show = true){
         if(show){
@@ -111,18 +111,17 @@ export default class Editor {
         }
     }
     createFileBrowser(){
-        if(!this.openFilebrowser)
-            this.container.find(`.filebrowserContainer`).hide();
-
+        this.showFileBrowser(this.openFilebrowser);
+        
         let fileBrowser = new FileBrowser(`#chamber-editor-FileBrowser`, {
             groupNodeIcon: this.getWorkspace().groupNodeIcon,
             data: this.getWorkspace().workspaceTree,
             onSelect: e => {
                 const project = this.getWorkspace();
                 project.SelectedNode = e;
-                this.container.find(`.editor-title`).text(e.name);
-                this.container.find(`.entityType`).text(e.type);
-                this.setEditorValue(project);
+                this.container.find(`.editor-title`).text(project.SelectedNode.name);
+                this.container.find(`.entityType`).text(project.SelectedNode.type);
+                this.setEditorValue();
             }
         });
 
@@ -223,78 +222,23 @@ export default class Editor {
             this.container.find(`.editor-title`).text(project.SelectedNode?.name);
             this.container.find(`.entityType`).text(project.SelectedNode?.type);
             this.FileBrowser?.reload(project.workspaceTree);
-            this.setEditorValue(project);
+            this.setEditorValue();
         }
 
     }
 
-    setEditorValue(project){
-        if(project.selectedEditor){
-            this.Editor?.setValue(project.selectedEditor);
-            const fileType = this.getFormat(project.SelectedNode.name);
-            const model = this.Editor.getModel?.();
-            if (model) {
-                monaco.editor.setModelLanguage(model, fileType);
+    setEditorValue(){
+            const project = this.getWorkspace();
+            if(project.SelectedNode){
+                this.Editor?.setValue(project.SelectedNode.script || '');
+                const fileType = project.SelectedNode.fileType || getFormat(project.SelectedNode.name);
+                const model = this.Editor.getModel?.();
+                if (model) {
+                    monaco.editor.setModelLanguage(model, fileType);
+                }
             }
-        }
-    }
 
-    getFormat(path) {
-        if (!path || typeof path !== 'string') return 'plaintext';
-        const ext = path.split('.').pop().toLowerCase();
-        switch (ext) {
-            case 'js':
-            case 'mjs':
-            case 'cjs':
-                return 'javascript';
-            case 'ts':
-                return 'typescript';
-            case 'json':
-                return 'json';
-            case 'css':
-                return 'css';
-            case 'scss':
-                return 'scss';
-            case 'html':
-            case 'htm':
-                return 'html';
-            case 'xml':
-                return 'xml';
-            case 'md':
-                return 'markdown';
-            case 'py':
-                return 'python';
-            case 'java':
-                return 'java';
-            case 'cpp':
-            case 'cc':
-            case 'cxx':
-            case 'hpp':
-            case 'h':
-            case 'c':
-                return 'cpp';
-            case 'cs':
-                return 'csharp';
-            case 'php':
-                return 'php';
-            case 'sh':
-            case 'bash':
-                return 'shell';
-            case 'yml':
-            case 'yaml':
-                return 'yaml';
-            case 'go':
-                return 'go';
-            case 'rs':
-                return 'rust';
-            case 'sql':
-                return 'sql';
-            case 'txt':
-                return 'plaintext';
-            default:
-                return 'plaintext';
         }
-    }
 }
 
 

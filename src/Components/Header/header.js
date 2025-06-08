@@ -9,6 +9,20 @@ export function configueToolbar({
     inspectMode
 }){
 
+    if(window.isDev){
+        $('.devTools').show();
+    }
+
+    setTimeout(()=>{
+        if(devMode.value){
+            showDevMode(getEditor(),devMode.value);
+            if(openFileBrowser.value)
+                showFileBrowser(getEditor(),openFileBrowser.value);
+            if(inspectMode.value)
+                showInspectMode(getEditor(),inspectMode.value);
+        }
+    },1000);
+
     $(document).on('keydown', (e) => {
         if (e.key === 'F11') {
             windowAPI.appWindow.openDevtools();
@@ -45,7 +59,7 @@ export function configueToolbar({
             await getCurrentWindow().unmaximize();
         else
             await getCurrentWindow().maximize();
-        getWorkspace()?.simulation3D.engine.resize();
+        getWorkspace()?.resize();
     });
 
 

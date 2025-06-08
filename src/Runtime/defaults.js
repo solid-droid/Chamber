@@ -22,9 +22,9 @@ const icons = {
 }
 
 const projectDefault = [
-     {name: 'main.js', path: 'main.js', type:'Project Start', tree_meta: {icon: 'fa-solid fa-play'}},
-     {name: 'config.json', path: 'config.json',  type: 'Project Config', tree_meta: { icon:'fa-solid fa-gears'}},
-     {name: 'secure.env', path: 'secure.env', type:'Secure Tokens', tree_meta: { icon:'fa-solid fa-gears'}},
+     {name: 'main.js', path: 'main.js', type:'Project Start', fileType:'javascript', tree_meta: {icon: 'fa-solid fa-play'}},
+     {name: 'config.json', path: 'config.json',  type: 'Project Config',  fileType:'json', tree_meta: { icon:'fa-solid fa-gears'}},
+     {name: 'secure.env', path: 'secure.env', type:'Secure Tokens', fileType:'env', tree_meta: { icon:'fa-solid fa-gears'}},
 ]
 const COMPONENTS = [
     {name: 'Projects', path: 'Projects' },

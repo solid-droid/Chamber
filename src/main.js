@@ -9,13 +9,14 @@ import { State } from "./utils/State";
 import { configueToolbar } from "./Components/Header/header";
 import $ from 'jquery';
 import * as monaco from 'monaco-editor';
+const { invoke } = window.__TAURI__.core;
 
 window.$ = $;
 window.monaco = monaco;
 
 let _editor, _project;
-let devMode = new State(false);
-let openFileBrowser = new State(false); 
+let devMode = new State(true);
+let openFileBrowser = new State(true); 
 let inspectMode = new State(false);
 createElements();
 
@@ -28,8 +29,8 @@ setTimeout(async ()=> {
 
 
 ////////Supporting Methods/////////////
-function createElements() {
-
+async function createElements() {
+    window.isDev = await invoke('is_dev_mode');
     configueToolbar({
         getWorkspace: () => _project,
         getEditor: () => _editor,
