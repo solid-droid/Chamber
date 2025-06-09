@@ -77,9 +77,74 @@ function getFormat(path) {
     }
 }
 
+function downloadFile(filename, content, mimeType) {
+  let processedContent = content;
+  mimeType = mimeType || 'application/octet-stream';
+
+  const fileExtension = filename.split('.').pop().toLowerCase();
+
+  switch (fileExtension) {
+    case 'json':
+      mimeType = 'application/json';
+      if (typeof content === 'object' && content !== null) {
+        processedContent = JSON.stringify(content, null, 2);
+      }
+      break;
+    case 'txt':
+      mimeType = 'text/plain';
+      break;
+    case 'csv':
+      mimeType = 'text/csv';
+      break;
+    case 'html':
+      mimeType = 'text/html';
+      break;
+    case 'xml':
+      mimeType = 'application/xml';
+      break;
+    case 'pdf':
+      mimeType = 'application/pdf';
+      break;
+    case 'png':
+      mimeType = 'image/png';
+      break;
+    case 'jpg':
+    case 'jpeg':
+      mimeType = 'image/jpeg';
+      break;
+    case 'gif':
+      mimeType = 'image/gif';
+      break;
+    default:
+      console.warn(`Unknown file type: .${fileExtension}. Using default 'application/octet-stream'.`);
+  }
+
+  const finalFilename = filename.endsWith(`.${fileExtension}`) ? filename : `${filename}.${fileExtension}`;
+
+  try {
+    const blob = new Blob([processedContent], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = finalFilename;
+    a.style.display = 'none'; 
+    document.body.appendChild(a);
+
+    a.click();
+
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error('Error during file download:', error);
+    alert('Failed to download the file. Please try again.');
+  }
+}
+
 export {
     debounce,
     removeDuplicate,
     saveFile,
-    getFormat
+    getFormat,
+    downloadFile
 }

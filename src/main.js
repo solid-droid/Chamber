@@ -2,17 +2,20 @@
 import Editor from "./Components/Editor/editor";
 import '@fortawesome/fontawesome-free/css/all.css';
 import './DesignSystem/designSystem.css';
-import Workspace from "./Runtime/workspace";
+import Workspace from "./Runtime/Workspace";
 import * as Mesh from './Components/simulation3D/Mesh/mesh';
 
 import { State } from "./utils/State";
 import { configueToolbar } from "./Components/Header/header";
 import $ from 'jquery';
 import * as monaco from 'monaco-editor';
+import { JsonHandler } from "./utils/JsonHandler";
 const { invoke } = window.__TAURI__.core;
 
 window.$ = $;
 window.monaco = monaco;
+window.JsonHandler = new JsonHandler();
+
 
 let _editor, _project;
 let devMode = new State(true);

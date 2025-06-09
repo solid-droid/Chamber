@@ -51,8 +51,8 @@ pub fn run() {
                 if let Some(window) = app.get_webview_window("main") {
                     // Only open devtools if we are in a debug build
 
-                    println!("Debug build detected");
-                    // window.open_devtools();
+                    println!("Debug build detected: Opening DevTools for 'main' window.");
+                    window.open_devtools();
                 }
             }
 

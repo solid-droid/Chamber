@@ -1,59 +1,152 @@
-/**
- * JSONVersioning - Lightweight Git-like version control for JSON objects.
- * Supports: commits (with diff), undo/redo, branching, merging, squashing, and serialization.
- * Now supports fine-grained string-level diffs (toggleable per commit).
- */
-
-import { diff_match_patch } from 'diff-match-patch';
-
-export class JSONVersioning {
+export class JsonVersioning {
     constructor(versionFile = null) {
-        this.dmp = new diff_match_patch();
         if (versionFile) {
             this.setVersionFile(versionFile);
         } else {
             const initialData = {};
             this.branches = {
-                main: [{ full: JSON.parse(JSON.stringify(initialData)), message: "Initial commit", timestamp: Date.now() }]
+                main: [{ full: JSON.parse(JSON.stringify(initialData)), message: "Initial commit", timestamp: Date.now(), save: true, tag: null }]
             };
             this.currentBranch = "main";
             this.currentIndex = 0;
         }
     }
 
-    // --- State Accessors ---
-
     get currentCommit() {
         return this.branches[this.currentBranch][this.currentIndex];
     }
 
     get currentData() {
-        const branch = this.branches[this.currentBranch];
+        return this._getDataAtIndex(this.currentIndex, this.currentBranch);
+    }
+
+    getData() {
+        return JSON.parse(JSON.stringify(this.currentData));
+    }
+
+    getDataAtCommit(id, branchName = this.currentBranch) {
+        if (!this.branches[branchName] || id < 0 || id >= this.branches[branchName].length) {
+            throw new Error("Invalid branch or commit ID");
+        }
+        return this._getDataAtIndex(id, branchName);
+    }
+
+    _getDataAtIndex(index, branchName) {
+        const branch = this.branches[branchName];
         let state = JSON.parse(JSON.stringify(branch[0].full));
-        for (let i = 1; i <= this.currentIndex; i++) {
+        for (let i = 1; i <= index; i++) {
             state = this.applyDiff(state, branch[i].diff);
         }
         return state;
     }
 
-    getData() {
-        return this.currentData;
-    }
+    commit(message = null, newData = null, options = { stringDiff: false, save: false, tag: null, saveByTag: false }) {
+        options ??= {};
+        options.stringDiff = options.stringDiff ?? false;
+        options.save = options.save ?? false;
+        options.tag = options.tag ?? null;
+        options.saveByTag = options.saveByTag ?? false;
 
-    // --- Core Versioning ---
-
-    commit(message = null, newData = null, options = { stringDiff: false }) {
-        const branch = this.branches[this.currentBranch];
-        const current = this.currentData;
+        const current = JSON.parse(JSON.stringify(this.currentData));
         const dataToCommit = newData ? JSON.parse(JSON.stringify(newData)) : current;
         const diff = this.diff(current, dataToCommit, options);
 
         if (Object.keys(diff).length === 0) return;
 
         const autoMessage = message || this.autoGenerateCommitMessage(diff);
+        const branch = this.branches[this.currentBranch];
+
         branch.splice(this.currentIndex + 1);
-        branch.push({ diff, message: autoMessage, timestamp: Date.now(), options });
+
+        const commit = { diff, message: autoMessage, timestamp: Date.now(), options, save: options.save, tag: options.tag };
+        branch.push(commit);
         this.currentIndex++;
+
+        if (options.save) this._squashFalseCommits(options);
+    }
+
+    updateByPath(path, value, options = { save: false, stringDiff: false }) {
+        const data = this.getData();
+        data[path] = value;
+        this.commit(`Updated ${path}`, data, options);
+    }
+
+    deleteByPath(path, options = { save: false }) {
+        const data = this.getData();
+        delete data[path];
+        this.commit(`Deleted ${path}`, data, options);
+    }
+
+    get(path) {
+        return this.getData()[path];
+    }
+
+    getParent(path) {
+        if (!path) return undefined;
+        const parentPath = path.split('/').slice(0, -1).join('/');
+        return this.getData()[parentPath];
+    }
+
+    update(node, msg, stringDiff = false) {
+        const data = this.getData();
+        data[node.path] = node;
+        this.commit(msg, data, { stringDiff });
+    }
+
+    delete(node) {
+        const data = this.getData();
+        delete data[node.path];
+        this.commit(`Deleted ${node.path}`, data);
+    }
+
+    _squashFalseCommits(saveOptions = {}) {
+        const branch = this.branches[this.currentBranch];
+        const trueCommits = [branch[0]];
+        let state = JSON.parse(JSON.stringify(branch[0].full));
+
+        for (let i = 1; i < branch.length; i++) {
+            const commit = branch[i];
+            state = this.applyDiff(state, commit.diff);
+
+            if (commit.save) {
+                if (!saveOptions.saveByTag || commit.tag === saveOptions.tag) {
+                    const prevState = this._getDataFromCommitList(trueCommits);
+                    const squashedDiff = this.diff(prevState, state, commit.options);
+                    trueCommits.push({
+                        diff: squashedDiff,
+                        message: commit.message,
+                        timestamp: commit.timestamp,
+                        options: commit.options,
+                        save: true,
+                        tag: commit.tag
+                    });
+                } else {
+                    trueCommits.push(commit);
+                }
+            }
+        }
+
+        trueCommits[0] = {
+            full: JSON.parse(JSON.stringify(this._getDataFromCommitList(trueCommits))),
+            message: trueCommits[0].message,
+            timestamp: trueCommits[0].timestamp,
+            save: true,
+            tag: trueCommits[0].tag
+        };
+        for (let i = 1; i < trueCommits.length; i++) {
+            delete trueCommits[i].full;
+        }
+
+        this.branches[this.currentBranch] = trueCommits;
+        this.currentIndex = trueCommits.length - 1;
+    }
+
+    _getDataFromCommitList(commitList) {
+        let state = JSON.parse(JSON.stringify(commitList[0].full));
+        for (let i = 1; i < commitList.length; i++) {
+            state = this.applyDiff(state, commitList[i].diff);
+        }
+        return state;
     }
 
     undo() {
@@ -65,12 +158,10 @@ export class JSONVersioning {
         if (this.currentIndex < branch.length - 1) this.currentIndex++;
     }
 
-    // --- Branching ---
-
     createBranch(name) {
         if (this.branches[name]) throw new Error("Branch already exists");
         const full = this.currentData;
-        this.branches[name] = [{ full: JSON.parse(JSON.stringify(full)), message: `Initial branch from ${this.currentBranch}`, timestamp: Date.now() }];
+        this.branches[name] = [{ full: JSON.parse(JSON.stringify(full)), message: `Initial branch from ${this.currentBranch}`, timestamp: Date.now(), save: true, tag: null }];
     }
 
     checkout(name) {
@@ -79,8 +170,6 @@ export class JSONVersioning {
         this.currentIndex = this.branches[name].length - 1;
     }
 
-    // --- Merge and Squash ---
-
     merge(fromBranch) {
         if (!this.branches[fromBranch]) throw new Error("Branch does not exist");
 
@@ -88,26 +177,26 @@ export class JSONVersioning {
         const targetData = this.currentData;
         const merged = this.deepMerge(targetData, fromData);
 
-        this.commit(`Merged from ${fromBranch}`, merged);
+        this.commit(`Merged from ${fromBranch}`, merged, { save: true });
     }
 
     squashToLastCommit(allBranches = false) {
-        const squashBranch = (branch) => {
-            const data = this._getData(branch);
-            const lastMessage = this.branches[branch].at(-1).message;
-            this.branches[branch] = [{ full: data, message: `Squashed: ${lastMessage}`, timestamp: Date.now() }];
+        const squashBranch = (branchName) => {
+            const data = this._getData(branchName);
+            const lastMessage = this.branches[branchName].at(-1).message;
+            this.branches[branchName] = [{ full: data, message: `Squashed: ${lastMessage}`, timestamp: Date.now(), save: true, tag: null }];
         };
 
         if (allBranches) {
-            for (let branch in this.branches) squashBranch(branch);
+            for (let branch in this.branches) {
+                squashBranch(branch);
+            }
             this.currentIndex = 0;
         } else {
             squashBranch(this.currentBranch);
             this.currentIndex = 0;
         }
     }
-
-    // --- Serialization ---
 
     getVersionFile() {
         return {
@@ -118,14 +207,10 @@ export class JSONVersioning {
     }
 
     setVersionFile(versionFile) {
-        if(!versionFile)
-            return;
         this.currentBranch = versionFile.currentBranch;
         this.currentIndex = versionFile.currentIndex;
         this.branches = versionFile.branches;
     }
-
-    // --- Utilities ---
 
     log() {
         const branch = this.branches[this.currentBranch];
@@ -133,7 +218,8 @@ export class JSONVersioning {
         branch.forEach((commit, index) => {
             const prefix = (index === this.currentIndex) ? '👉' : '  ';
             const time = new Date(commit.timestamp).toLocaleString();
-            console.log(`${prefix} [${index}] ${commit.message} (${time})`);
+            const tag = commit.save ? '[true]' : '[false]';
+            console.log(`${prefix} [${index}] ${commit.message} ${tag} (${time})`);
         });
     }
 
@@ -148,34 +234,39 @@ export class JSONVersioning {
     }
 
     _getData(branchName) {
-        const branch = this.branches[branchName];
-        let state = JSON.parse(JSON.stringify(branch[0].full));
-        for (let i = 1; i < branch.length; i++) {
-            state = this.applyDiff(state, branch[i].diff);
-        }
-        return state;
+        return this._getDataAtIndex(this.branches[branchName].length - 1, branchName);
     }
-
-    // --- Diffing Engine ---
 
     diff(oldObj, newObj, options = { stringDiff: false }) {
         const result = {};
         for (const key in newObj) {
             if (!(key in oldObj)) {
                 result[key] = newObj[key];
-            } else if (typeof newObj[key] === 'object' && typeof oldObj[key] === 'object') {
+            } else if (typeof newObj[key] === 'object' && typeof oldObj[key] === 'object' && newObj[key] !== null && oldObj[key] !== null) {
                 const deepDiff = this.diff(oldObj[key], newObj[key], options);
                 if (Object.keys(deepDiff).length) result[key] = deepDiff;
-            } else if (typeof newObj[key] === 'string' && typeof oldObj[key] === 'string' && options.stringDiff) {
-                const diffs = this.dmp.diff_main(oldObj[key], newObj[key]);
-                this.dmp.diff_cleanupSemantic(diffs);
-                result[key] = { __stringDiff__: diffs };
             } else if (newObj[key] !== oldObj[key]) {
-                result[key] = newObj[key];
+                if (options.stringDiff && typeof oldObj[key] === 'string' && typeof newObj[key] === 'string') {
+                    const s1 = oldObj[key];
+                    const s2 = newObj[key];
+                    let prefix = 0;
+                    while (prefix < s1.length && prefix < s2.length && s1[prefix] === s2[prefix]) prefix++;
+                    let suffix = 0;
+                    while (suffix + prefix < s1.length && suffix + prefix < s2.length && s1[s1.length - 1 - suffix] === s2[s2.length - 1 - suffix]) suffix++;
+
+                    const removed = s1.slice(prefix, s1.length - suffix);
+                    const added = s2.slice(prefix, s2.length - suffix);
+                    // Optimized string diff format: store prefix length, removed string, added string, and suffix length.
+                    result[key] = { __diff: { pLen: prefix, r: removed, a: added, sLen: suffix } };
+                } else {
+                    result[key] = newObj[key];
+                }
             }
         }
         for (const key in oldObj) {
-            if (!(key in newObj)) result[key] = null;
+            if (!(key in newObj)) {
+                result[key] = null;
+            }
         }
         return result;
     }
@@ -185,12 +276,13 @@ export class JSONVersioning {
         for (const key in diff) {
             if (diff[key] === null) {
                 delete clone[key];
-            } else if (typeof diff[key] === 'object' && key in clone && typeof clone[key] === 'object' && !('__stringDiff__' in diff[key])) {
+            } else if (typeof diff[key] === 'object' && '__diff' in diff[key]) {
+                // Deconstruct the optimized string diff object
+                const { pLen, r, a, sLen } = diff[key].__diff;
+                // Reconstruct the string using the original object's prefix and suffix parts, and the diff's added string.
+                clone[key] = obj[key].slice(0, pLen) + a + obj[key].slice(obj[key].length - sLen);
+            } else if (typeof diff[key] === 'object' && key in clone && typeof clone[key] === 'object') {
                 clone[key] = this.applyDiff(clone[key], diff[key]);
-            } else if (typeof diff[key] === 'object' && '__stringDiff__' in diff[key]) {
-                const patch = this.dmp.patch_make(clone[key], diff[key].__stringDiff__);
-                const [result] = this.dmp.patch_apply(patch, clone[key]);
-                clone[key] = result;
             } else {
                 clone[key] = diff[key];
             }
@@ -201,7 +293,7 @@ export class JSONVersioning {
     deepMerge(target, source) {
         const result = { ...target };
         for (let key in source) {
-            if (source[key] instanceof Object && key in result) {
+            if (source[key] instanceof Object && key in result && result[key] instanceof Object) {
                 result[key] = this.deepMerge(result[key], source[key]);
             } else {
                 result[key] = JSON.parse(JSON.stringify(source[key]));
@@ -214,63 +306,38 @@ export class JSONVersioning {
         const keys = Object.keys(diff);
         return `Auto: changed ${keys.slice(0, 3).join(', ')}${keys.length > 3 ? '...' : ''}`;
     }
-}
 
-function ExampleApp(){
-        // --- Example Usage ---
+    getDiffBetweenCommits(id1, id2, branchName = this.currentBranch) {
+        const data1 = this.getDataAtCommit(id1, branchName);
+        const data2 = this.getDataAtCommit(id2, branchName);
+        return this.diff(data1, data2);
+    }
 
-    const versioner = new JSONVersioning();
+    patchInto(workspace) {
+        workspace.getData = () => this.getData();
+        workspace.get = (path) => this.get(path);
+        workspace.getParent = (path) => this.getParent(path);
+        workspace.update = (node, msg, stringDiff = false) => {
+            let data = this.getData();
+            data[node.path] = node;
+            this.commit(msg, data, { stringDiff });
+        };
+        workspace.delete = (node) => {
+            let data = this.getData();
+            delete data[node.path];
+            this.commit(`Deleted ${node.path}`, data);
+        };
+    }
 
-    versioner.commit("Add name", { name: "Alice" });
-    versioner.commit("Add age", { name: "Alice", age: 30 });
-    versioner.undo();
-    versioner.redo();
-
-    versioner.createBranch("dev");
-    versioner.checkout("dev");
-    versioner.commit("Add role", { name: "Alice", age: 30, role: "Engineer" });
-
-    versioner.checkout("main");
-    versioner.merge("dev");
-
-    versioner.squashToLastCommit();
-
-    const file = versioner.getData(); // current file content
-    const versionFile = versioner.getVersionFile(); // export all versioning
-
-    const newVersioner = new JSONVersioning(versionFile); // load from file
-    newVersioner.log();
-
-    console.log("All commits:", newVersioner.getCommitList());
-    newVersioner.gotoCommit(0); // jump to specific commit by ID
-    console.log("After jumping to commit 0:", newVersioner.getData());
-
-
-    const diffCommit = versioner.diffCommits(0, 2, "main");
-    console.log("Diff between commit 0 and 2 on main branch:", diffCommit);
-
-    // Diff between latest commits on main and feature branches
-    const diffBranches = versioner.diffBranches("main", "feature");
-    console.log("Diff between main and feature branch heads:", diffBranches);
-
-    const oldData = {
-        name: "Alice",
-        age: 30,
-        address: {
-            city: "NY",
-            zip: "10001",
-        },
-    };
-
-    const newData = {
-        name: "Alice",
-        age: 31,
-        address: {
-            city: "Boston",
-        },
-        role: "Engineer",
-    };
-
-    const diff = versioner.diff(oldData, newData);
-    versioner.prettyPrintDiff(diff);
+    revertToSavedCommit(tag = null, branchName = this.currentBranch) {
+        const commits = this.branches[branchName];
+        for (let i = commits.length - 1; i >= 0; i--) {
+            const commit = commits[i];
+            if (commit.save && (tag === null || commit.tag === tag)) {
+                this.currentIndex = i;
+                return;
+            }
+        }
+        throw new Error("No matching saved commit found");
+    }
 }

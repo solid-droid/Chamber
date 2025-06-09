@@ -87,6 +87,11 @@ export default class Editor {
             this.isolateView = !this.isolateView;
             await this.showIsolateView();
         });
+
+        this.container.find(`.saveButton`).on('click', () => {
+            this.getWorkspace().saveNode();
+        });
+
         let editor = codeEditor('chamber-editor-CodeEditor');
         editor?.onDidChangeModelContent(() => {
             this.debounceEditorUpdate(this.Editor,this.getWorkspace())          
@@ -94,8 +99,15 @@ export default class Editor {
         return editor;
     }
     debounceEditorUpdate = debounce((editor, project)=> {
+        const workspace = this.getWorkspace();
         const value = editor.getValue();
-        project.SelectedNode = value;
+        const node = workspace.SelectedNode;
+        const script = node.script || '';
+        if(script !== value){
+            node.script = value;
+            workspace.updateNode(node, 'update script');
+        }
+
     }, 500);
     showFileBrowser(show = true){
         if(show){

@@ -23,6 +23,7 @@
     "diff-match-patch": "^1.0.5",
     "jquery": "^3.7.1",
     "monaco-editor": "^0.52.2",
+    "pako": "^2.1.0",
     "split.js": "^1.6.5",
     "wait-on": "^8.0.3"
   },

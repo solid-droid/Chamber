@@ -1,5 +1,6 @@
-import { JSONVersioning } from "../utils/JSONVersioning";
-import { removeDuplicate } from "../utils/utils";
+import { JsonVersioning } from "../utils/JsonVersioning";
+import { downloadFile, removeDuplicate } from "../utils/utils";
+import { buildTree } from "./TreeManager";
 import {
     icons,
     projectDefault,
@@ -20,8 +21,7 @@ export default class Workspace{
         this.#selectedNodePath = node.path;
     }
     get SelectedNode(){
-        const workspace = this.workspace.getData();
-        return workspace?.[this.#selectedNodePath];
+        return this.treeMap?.[this.#selectedNodePath];
     }
     
     constructor(options = {}) {
@@ -33,22 +33,21 @@ export default class Workspace{
         this.onLoadStart = options.onLoadStart || (() => {});
         this.onLoadComplete = options.onLoadComplete || (() => {});
         this.onChange = options.onChange || (() => {});
-        this.workspace = new JSONVersioning();
+        this.workspace = new JsonVersioning();
     }
-    async init(workspaceData = {}, filePath = null) {
+    async init(workspaceData, filePath = null) {
         this.filePath = filePath;
-        this.data = workspaceData?.data;
-        this.meta = workspaceData?.meta;
+        this.data = workspaceData;
         this.onLoadStart();
         this.clearAll();
-        this.workspace.setVersionFile(this.data);
-        this.createFileSystem('initial');
+        this.data && this.workspace.setVersionFile(this.data);
+        this.createFileSystem();
         this.onLoadComplete();
     }
 
     /* FileSystem */
-    createFileSystem(stage='update'){
-        let data = this.workspace.getData();
+    createFileSystem(){
+        let data = this.workspace.getData() || {};
         const nodeArray = Object.values(data);
         const systemNodes = [
             ...COMPONENTS.map(x => ({...x, type:'Component'})),
@@ -61,47 +60,18 @@ export default class Workspace{
             ...Agent_entries.map(x => ({...x, type:'Entity'})),
         ];
         let allNodes = [...nodeArray,...systemNodes];
-        allNodes = removeDuplicate(allNodes, 'path');
-        const {tree, pathMap} = this.buildTree(allNodes);
-        this.workspaceTree = tree;
-        this.workspace.commit(`System:create FileSystem ${stage}`, pathMap);
-
-        //if no project - create a new project
-        !pathMap['Projects'].children.length && this.createProject() && this.createFileSystem();
-    }
-
-    buildTree(data) {
-        const root = [];
-        const pathMap = {};
-
-        for (const item of data) {
-            const parts = item.path.split('/');
-            let currentLevel = root;
-            let currentPath = '';
-
-            for (let i = 0; i < parts.length; i++) {
-                const part = parts[i];
-                currentPath = currentPath ? `${currentPath}/${part}` : part;
-
-                let existingNode = pathMap[currentPath];
-
-                if (!existingNode) {
-                    existingNode = {
-                        ...item,
-                        name: i === parts.length - 1 ? item.name : part,
-                        path: currentPath,
-                        children: []
-                    };
-                    currentLevel.push(existingNode);
-                    pathMap[currentPath] = existingNode;
-                }
-                existingNode.tree_meta = existingNode.tree_meta || {};
-                this.#selectedNodePath = existingNode.tree_meta.selected ? existingNode.path : this.#selectedNodePath; 
-                existingNode = this.fillNode(parts, existingNode , i);
-                currentLevel = existingNode.children;
-            }
+        if(!data['Projects']){
+            allNodes = [...allNodes, ...this.createInitialProject()]
         }
-        return {tree:root,pathMap};
+        allNodes = removeDuplicate(allNodes, 'path');
+        
+        
+
+        const {tree, treeMap,selectedNodePath} = buildTree(allNodes, this.fillNode, this);
+        this.#selectedNodePath = selectedNodePath;
+        this.workspaceTree = tree;
+        this.treeMap = treeMap;
+        this.workspace.commit(`System:create FileSystem`, this.cleanUp(this.treeMap));
     }
 
     fillComponentNode(parts,existingNode){
@@ -186,69 +156,112 @@ export default class Workspace{
         return existingNode;
     }
 
-    fillNode(parts, existingNode , i){
+    fillNode(parts, existingNode , i, self = this){
         if(i === 0){
-            return this.fillComponentNode(parts, existingNode)
+            return self.fillComponentNode(parts, existingNode)
         }
 
         if(i === 1){
-            return this.fillEntityNode(parts, existingNode);
+            return self.fillEntityNode(parts, existingNode);
         }
 
         if ( i < parts.length - 1) {
-           return this.fillGroupNode(parts, existingNode);
+           return self.fillGroupNode(parts, existingNode);
         } 
 
         if(i == parts.length-1){
-            return this.fillLeafNode(parts, existingNode);
+            return self.fillLeafNode(parts, existingNode);
         }
     }
 
     /* createEntity */
-    createProject(name = 'New Project'){
-         const workspace = this.workspace.getData();
+    createInitialProject(name = 'New Project'){
+         let data = [];
          let path = `Projects/${name}`;
-         if(workspace[path]){
-            return false;
-         }
-
          let projectFiles = projectDefault.map(x => ({...x, path: `${path}/${x.path}`}));
-         workspace[path] = {name, path, type:'Project'};
-         projectFiles.forEach(x => workspace[x.path] = x);
-         this.workspace.commit(`System:create project - ${name}`, workspace);
-         return true;
+         let projectRoot = {name, path, type:'Project'};
+         data = [projectRoot, ...projectFiles];
+         return data;
     }
 
     /* CRUD */
-    get(path){
-        this.workspace.getData()[path];
+    get = path => this.treeMap[path];
+    
+    getParent = path => this.treeMap[path?.split('/').slice(0, -1).join('/')];
+
+    update = (node, msg, options = {} ) => {
+        options.stringDiff = options.stringDiff ?? false;
+        options.save = options.save ?? false;
+        options.tag = options.tag ?? node.path;
+        options.saveByTag = options.saveByTag ?? false;
+        this.treeMap[node.path] = node;
+        this.workspace.commit(msg, this.cleanUp(this.treeMap), options);
     }
 
-    update(node, msg, stringDiff = false){
-        let workspace = this.workspace.getData();
-        workspace[node.path] = node;
-        this.workspace.commit(msg,workspace,{stringDiff});
+    delete = (node,  options = {}) => {
+        options.stringDiff = options.stringDiff ?? false;
+        options.save = options.save ?? false;
+        options.tag = options.tag ?? node.path;
+        options.saveByTag = options.saveByTag ?? false;
+        delete this.treeMap[node.path];
+        this.workspace.commit('delete node', this.cleanUp(this.treeMap), options);
     }
 
-    delete(node){
-        let workspace = this.workspace.getData();
-        delete workspace[node.path];
-        this.workspace.commit('delete node',workspace);
-    }
+    create = (node, msg, options = {}) => {
+        options.stringDiff = options.stringDiff ?? false;
+        options.save = options.save ?? false;
+        options.tag = options.tag ?? node.path;
+        options.saveByTag = options.saveByTag ?? false;
+        this.treeMap[node.path] = node;
+        let parent = this.getParent(node.path);
+        parent.children ??= [];
+        parent.children.push(node);
 
-    create(node, msg){
-        let workspace = this.workspace.getData();
-        workspace[node.path] = node;
-        this.workspace.commit(msg,workspace);
+        this.workspace.commit(msg, this.cleanUp(this.treeMap), options); 
     }
-
     /* utils */
+    syncVersionFile(){
+        this.treeMap = this.workspace.getData(true);
+    }
+
+    updateNode(node, msg){
+        this.update(node,msg,{stringDiff:true});
+    }
+    
+    saveNode(node = this.treeMap[this.#selectedNodePath]){
+        this.update(node,'save node',{ stringDiff: true, save: true, tag: node.path, saveByTag: true });
+    }
+
     clearAll(){
 
     }
     
     resize(){
         
+    }
+
+    cleanUp(treeMap){ 
+        let _treeMap = {}
+        Object.entries(treeMap).forEach(([key, value]) => {
+            _treeMap[key] = {
+                name: value.name,
+                path: value.path,
+                type: value.type,
+                fileType: value.fileType
+            };
+            value.script && (_treeMap[key].script = value.script);
+        });
+        return _treeMap;
+    }
+
+    async export(squash = false){
+        let _versionFile = this.workspace.getVersionFile();
+        let data = (await window.JsonHandler.compress('chamber.json',_versionFile,'chamber')).data;
+        downloadFile('chamber.chmbr',data, 'application/x-chamber-workspace')
+    }
+
+    import(versionFile){
+        this.init(versionFile);
     }
 
 }

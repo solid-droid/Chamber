@@ -31,15 +31,22 @@ export function configueToolbar({
     });
 
     $('#head-tools .loadProject').on('click',async ()=>{
-        // let files = await window.electronAPI.pickFile();
-        // try{
-        //     let jsonData = JSON.parse(files[0].content);
-        //     await getWorkspace()?.init(jsonData, files[0].path);
-        // }catch(e){
-        //     console.log(e)
-        //     alert('File import failed');
-        // }
+         $('#versionFileInput').trigger('click')
 
+    });
+
+     $('#versionFileInput').on('change', async () => {
+        const file = $('#versionFileInput')[0].files[0];
+        if (!file) return;
+        
+        console.log("📄 Filename:", file.name);
+        
+        const content = await file.arrayBuffer(); // or file.arrayBuffer() for binary
+        const uint8Array = new Uint8Array(content);
+        const workspaceData = await window.JsonHandler.extract(uint8Array, {isEncrypted:true, seed:'chamber'});
+        getWorkspace().import(workspaceData);
+
+        $('#versionFileInput').val('');
     });
 
     $('#head-tools .devTools').on('click',async () => {
@@ -83,6 +90,10 @@ export function configueToolbar({
      $('#head-tools .fileBrowser').on('click', ()=>{
         openFileBrowser.value  = !openFileBrowser.value ;
         showFileBrowser(getEditor(),openFileBrowser.value);
+     });
+
+     $('#head-tools .exportButton').on('click',()=>{
+        getWorkspace().export();
      });
 }
 
