@@ -9,19 +9,27 @@ import { getEditor, setEditor, setNodeTree } from "../../Runtime/global";
 
 class Editor{
     codeEditor;
-    constructor(selector,  options = {} ){
-        this.selector = selector;
+    constructor(element,  options = {} ){
+        this.element = $(element);
+        this.element.append($('#editorTemplate').html());
+        this.editorBody = this.element.find('#chamber-editor-CodeEditor');
+        this.titleDOM = this.element.find('.editor-title');
+        this.typeDOM = this.element.find('.entityType')
         this.options = options;
         this.codeEditor = this.createCodeEditor();
     }
 
     createCodeEditor(){
-        let editor = codeEditor(this.selector);
-        let onChangeDebounce = debounce(options?.code?.onChange || (() => {}), 500);
+        let editor = codeEditor(this.editorBody[0]);
+        let onChangeDebounce = debounce(this.options?.code?.onChange || (() => {}), 500);
         editor.onDidChangeModelContent(onChangeDebounce);
         return editor;
     }
 
+    updateEditor(node){
+        this.titleDOM.text(node.name);
+        this.typeDOM.text(node.type);
+    }
 }
 
 class DebugView{
@@ -37,14 +45,13 @@ class DebugView{
     }
 }
 
-function createEditor(node, element){
+function createEditor(element, node){
     let _editor = getEditor();
     if(!_editor){
         _editor  = new Editor(element);
         setEditor(_editor);
     }
-
-    console.log(node);
+    _editor.updateEditor(node)
 }
 
 function createNodeTree(element, options = {}){   

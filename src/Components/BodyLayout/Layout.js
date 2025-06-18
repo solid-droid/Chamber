@@ -134,7 +134,7 @@ export function createLayout(){
                         layout.add('root', editorStackConfig)
                     }
                     await new Promise(r => setTimeout(r, 200));
-                    // createEditor(getEditorTabContainer(), e)
+                    createEditor(getEditorTabContainer()[0], e)
                 }
             });
             return;

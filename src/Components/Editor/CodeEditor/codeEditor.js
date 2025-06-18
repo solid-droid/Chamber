@@ -4,9 +4,7 @@ import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker';
 import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
 import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
 
-export function codeEditor(id) {
-
-     const editorContainer = document.getElementById(id);
+export function codeEditor(editorContainer) {
 
     if (!editorContainer) {
         console.error('Monaco editor container not found');
