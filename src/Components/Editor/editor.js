@@ -4,7 +4,14 @@ import { isolateView} from "./IsolateView/isolateView";
 import './editor.css';
 import { debounce } from "../../utils/utils";
 import Split from 'split.js'
-import { getEditor, setEditor, setNodeTree } from "../../Runtime/global";
+import { 
+    getCodeEditor, 
+    setCodeEditor, 
+    getConfigEditor,
+    setConfigEditor, 
+    setNodeTree 
+} from "../../Runtime/global";
+import { editor } from "monaco-editor";
 
 
 class Editor{
@@ -14,7 +21,11 @@ class Editor{
         this.element.append($('#editorTemplate').html());
         this.editorBody = this.element.find('#chamber-editor-CodeEditor');
         this.titleDOM = this.element.find('.editor-title');
-        this.typeDOM = this.element.find('.entityType')
+        this.typeDOM = this.element.find('.entityType');
+        this.focusButton = this.element.find('.focusButton');
+        if(!options.editor){
+            this.focusButton.hide();
+        }
         this.options = options;
         this.codeEditor = this.createCodeEditor();
     }
@@ -28,9 +39,19 @@ class Editor{
 
     updateEditor(node){
         this.titleDOM.text(node.name);
-        this.typeDOM.text(node.type);
+        if(this.options.typeOveride){
+            this.typeDOM.text(this.options.typeOveride);
+        } else {
+            this.typeDOM.text(node.type);
+        }
+    }
+
+    destroy(){
+        this.codeEditor.dispose();
+        this.codeEditor.getModel()?.dispose();
     }
 }
+
 
 class DebugView{
     constructor(selector, options = {}){
@@ -45,13 +66,16 @@ class DebugView{
     }
 }
 
-function createEditor(element, node){
-    let _editor = getEditor();
-    if(!_editor){
-        _editor  = new Editor(element);
-        setEditor(_editor);
-    }
-    _editor.updateEditor(node)
+function createEditor(element){
+    setCodeEditor(new Editor(element, {
+        editor:true
+    }));
+}
+
+function createConfigEditor(element){
+    setConfigEditor(new Editor(element,{
+        typeOveride : 'Config'
+    }));
 }
 
 function createNodeTree(element, options = {}){   
@@ -82,5 +106,6 @@ export {
     createNodeTree,
     createEditor,
     createDebugView,
-    createVerticalSplit
+    createVerticalSplit,
+    createConfigEditor
 }

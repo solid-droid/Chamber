@@ -123,6 +123,7 @@ function showDevMode(value){
             $('#head-tools .chamber-devmode').css({'display':'flex'});
             $('#head-tools .designMode').addClass('active');
             BodyLayout = createLayout();
+            $('#ViewPortContainer').hide();
         } else {
             $('#head-tools .chamber-devmode').hide();
             $('#head-tools .designMode').removeClass('active');

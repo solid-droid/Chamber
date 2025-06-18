@@ -15,3 +15,8 @@
     box-shadow: none;
     border-right: 1px solid rgb(65, 65, 65);
 }
+
+.lm_header{
+    border-right: 1px solid rgb(65, 65, 65);
+    border-left: 1px solid rgb(65, 65, 65);
+}

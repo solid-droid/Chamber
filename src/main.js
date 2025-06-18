@@ -1,7 +1,7 @@
 
 import '@fortawesome/fontawesome-free/css/all.css';
 import './DesignSystem/designSystem.css';
-
+import $ from 'jquery';
 import * as monaco from 'monaco-editor';
 import { JsonHandler } from "./utils/JsonHandler";
 import { State } from "./utils/State";
@@ -16,6 +16,7 @@ import { getNodeTree, getWorkspace } from './Runtime/global';
 /* Window Variables */
 const { invoke } = window.__TAURI__.core;
 
+window.$ = $;
 window.monaco = monaco;
 window.JsonHandler = new JsonHandler();
 

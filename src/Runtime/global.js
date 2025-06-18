@@ -1,4 +1,4 @@
-let nodeTree, workspace, editor;
+let nodeTree, workspace, editor, configEditor;
 function getNodeTree(){
     return nodeTree
 }
@@ -15,12 +15,21 @@ function setWorkspace(data){
     workspace = data;
 }
 
-function getEditor(){
+function getCodeEditor(){
     return editor;
 }
 
-function setEditor(data){
+function setCodeEditor(data){
     editor = data;
+}
+
+
+function getConfigEditor(){
+    return configEditor;
+}
+
+function setConfigEditor(data){
+    configEditor = data;
 }
 
 export {
@@ -28,6 +37,8 @@ export {
     setNodeTree,
     getWorkspace,
     setWorkspace,
-    getEditor,
-    setEditor,
+    getCodeEditor,
+    setCodeEditor,
+    getConfigEditor,
+    setConfigEditor
 }
