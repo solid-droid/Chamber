@@ -1,5 +1,6 @@
 import { JsonVersioning } from "../utils/JsonVersioning";
 import { downloadFile, removeDuplicate } from "../utils/utils";
+import {setWorkspace} from '../Runtime/global';
 import { buildTree } from "./TreeManager";
 import {
     icons,
@@ -15,7 +16,7 @@ import {
     focusTypes
 } from './defaults';
 
-export default class Workspace{
+export class Workspace{
     #selectedNodePath = '';
     set SelectedNode(node){
         this.#selectedNodePath = node.path;
@@ -92,6 +93,8 @@ export default class Workspace{
          if(parts[0] === 'Projects'){
             existingNode.tree_meta = {
                 actionButtons: [
+                    {title:'Export', class:'fa-solid fa-download ', hover:true},
+                    {title:'Anchor', class:'fa-solid fa-anchor', hover:true},
                     {title:'Delete', class:'fa-solid fa-trash', hover:true},
                 ],
                 icon:icons[parts[0]]
@@ -264,4 +267,15 @@ export default class Workspace{
         this.init(versionFile);
     }
 
+}
+
+export function createWorkspace(options = {}){
+    let _workspace =  new Workspace({
+        onCanvasClick: options?.onCanvasClick,
+        onLoadStart: options?.onLoadStart,
+        onLoadComplete:options?.onLoadComplete,
+        onChange: options?.change,
+    });
+    setWorkspace(_workspace);
+    return _workspace;
 }

@@ -1,16 +1,15 @@
 import './fileBrowser.css';
 export class FileBrowser {
-    constructor(id, options = {}) {
-        this.id = id;
+    constructor(element, options = {}) {
+        this.containerElement = $(element);
+        this.containerElement.append($('#fileBrowserTemplate').html());
         this.data = options.data || [];
 
-        this.groupNodeIcon = options.groupNodeIcon;
         this.allowMultiSelect = options.allowMultiSelect || false;
         this.allowCheckbox = options.allowCheckbox || false;
         this.onSelect = options.onSelect || (()=>{});
 
-
-        this.container = $(id);
+        this.container = this.containerElement.find('.fileTree');
         this.container.addClass('chamberFileBrowser');
         this.dataMap = {};
         

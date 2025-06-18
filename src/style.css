@@ -3,6 +3,7 @@
 }
 
 body{
+    background-color: black;
     margin: 0;
     padding: 0;
     overflow: hidden;
@@ -70,7 +71,7 @@ body{
                 padding-right: 5px;
             }
             i{
-                padding: 5px 10px;
+                padding: 5px 8px;
                 cursor: pointer;
                 color: rgb(223, 223, 223);
                 margin: 0 1px;
@@ -117,4 +118,23 @@ body{
     background-color: #000;
     outline: none;
     z-index: 0;
+}
+
+#EditorContainer{
+    height: 100%;
+    width: 100%;
+}
+#ViewPortContainer{
+    height: calc(100% - 5px);
+    width: calc(100% - 5px);
+    border: 2px #393939;
+    border-style: double;
+    background: black;
+}
+
+#BodyContainer{
+    position: fixed;
+    top: var(--toolbarHeight);
+    height: calc(100vh - var(--toolbarHeight));
+    width: 100vw;
 }

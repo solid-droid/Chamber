@@ -5,8 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Chamber</title>
   </head>
-
+  <link rel="stylesheet" href="/src/Assets/lib/goldenlayout-base.css" />
+  <link rel="stylesheet" href="/src/Assets/lib/goldenlayout-dark-theme.css" />
   <link rel="stylesheet" href="/src/style.css" />
+  <script src="src/Assets/lib/jquery.min.js"></script>
+  <script src="src/Assets/lib/goldenlayout.js"></script>
   <body>
     <div id="head-tools"  data-tauri-drag-region>
       <div class="leftBlock">
@@ -17,16 +20,19 @@
         <span id="projectName" title="Project Name"></span>
       </div>
       <div class="rightBlock">
-        <i class="fa-solid fa-file-import loadProject" title="Load Project"></i>
+        <i class="fa-solid fa-file-import loadWorkspace" title="Load Workspace"></i>
         <i class="fa-solid fa-laptop-code designMode" title="Design Mode"></i>
         <div class="chamber-devmode">
-          <i class="fa-solid fa-cubes inspectMode" title="Inspect Mode"></i>
-          <i class="fa-solid fa-folder-tree fileBrowser" title="File Browser"></i>
-          <i class="fa-solid fa-hexagon-nodes nodeEditor" title="Node Editor"></i>
-          <i class="fa-solid fa-server signalsButton" title="Datastore"></i>
-          <i class="fa-solid fa-anchor anchorButton"  title="Anchors"></i>
-          <i class="fa-solid fa-floppy-disk saveButton" title="Save"></i>
-          <i class="fa-solid fa-download  exportButton" title="Export"></i>
+          <!-- <i class="fa-solid fa-cubes inspectMode" title="Inspect Mode"></i> -->
+          <!-- <i class="fa-solid fa-folder-tree fileBrowser" title="File Browser"></i> -->
+          <!-- <i class="fa-solid fa-hexagon-nodes nodeEditor" title="Node Editor"></i>  -->
+          <!-- <i class="fa-solid fa-server signalsButton" title="Datastore"></i> -->
+          <!-- <i class="fa-solid fa-anchor anchorButton"  title="Anchors"></i> -->
+          <i class="fa-solid fa-circle-arrow-down pullWorkspace" title="Pull Workspace"></i>
+          <i class="fa-solid fa-circle-arrow-up pushWorkspace" title="Push Workspace"></i>
+          <i class="fa-solid fa-floppy-disk saveButton" title="Save Workspace"></i>
+          <i class="fa-solid fa-download  exportButton" title="Export Workspace"></i>
+          <i class="fa-solid fa-gear settingsButton"  title="Settings"></i>
         </div>
         <i class="fa-brands fa-chrome devTools" title="Chrome DevTools" style="display: none;"></i>
         <i class="fa-solid fa-minus minimizeButton" title="Minimize"></i>
@@ -34,11 +40,56 @@
         <i class="fa-solid fa-xmark closeButton" title="Close"></i>
       </div>
     </div>
-    <div id="container">
-      <canvas id="canvas3D"></canvas>
+    <div id="BodyContainer">
+      <div id="ViewPortContainer">
+        Hello World
+      </div>
+      <div id="EditorContainer"></div>
     </div>
-    <div id="editor" class="chamber-editor"></div>
     <script type="module" src="/src/main.js"></script>
     <input type="file" id="versionFileInput" style="display: none" />
   </body>
+  <template id="fileBrowserTemplate">
+        <div class="filebrowserContainer glassEditor">
+            <!-- Header -->
+            <div class="filebrowser-toolbar">    
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="search" class="search-input" placeholder="Search..." />
+                <!-- <i class="iconButton fa-solid fa-anchor"></i> -->
+            </div>
+            <!-- Body - tree -->
+            <div class="fileTree"></div>
+        </div>
+  </template>
+  <template id="editorTemplate">
+    <div class="editorContainer glassEditor">
+          <!-- Header -->
+          <div class="editor-options">
+              <div class="editor-info">
+                  <span class="editor-title">----</span>
+              </div>
+              <div class="editor-buttons">
+                  <div class="entityType tag">-----</div>
+                  <i class="iconButton fa-solid fa-cube  isolateViewButton" title="Isolate View"></i>
+                  <i class="iconButton fa-solid fa-layer-group visualEditor" title="Visual Editor"></i>
+                  <i class="iconButton fa-solid fa-anchor anchorButton" title="Anchor"></i>
+                  <i class="iconButton fa-solid fa-floppy-disk saveButton" title="Save"></i>
+              </div>
+          </div>
+          <!-- Body -->
+          <div class="editor-body">
+            <!-- DebugView -->
+            <div id="isolateViewContainer">
+                <canvas id="chamber-editor-Canvas"></canvas>
+            </div>
+            <!-- Editor View -->
+            <div id="EditorContainer">
+                <div id="chamber-editor-CodeEditor"></div>
+            </div>
+          </div>
+        </div>
+  </template>
+  <template id="canvasTemplate">
+      <canvas id="canvas3D"></canvas>
+  </template>
 </html>

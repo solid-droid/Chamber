@@ -21,7 +21,6 @@
     "concurrently": "^9.1.2",
     "cross-env": "^7.0.3",
     "diff-match-patch": "^1.0.5",
-    "jquery": "^3.7.1",
     "monaco-editor": "^0.52.2",
     "pako": "^2.1.0",
     "split.js": "^1.6.5",

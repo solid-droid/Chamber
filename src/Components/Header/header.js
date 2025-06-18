@@ -1,41 +1,63 @@
 import { getCurrentWindow } from '@tauri-apps/api/window';
+import { createLayout } from '../BodyLayout/Layout';
+import { getWorkspace } from '../../Runtime/global';
 const { invoke } = window.__TAURI__.core;
 
-export function configueToolbar({
-    getWorkspace,
-    getEditor,
+let BodyLayout;
+
+export async function attachHeaderEvents({
     devMode,
-    openFileBrowser,
     inspectMode
 }){
-
-    if(window.isDev){
-        $('.devTools').show();
-    }
-
-    setTimeout(()=>{
-        if(devMode.value){
-            showDevMode(getEditor(),devMode.value);
-            if(openFileBrowser.value)
-                showFileBrowser(getEditor(),openFileBrowser.value);
-            if(inspectMode.value)
-                showInspectMode(getEditor(),inspectMode.value);
-        }
-    },1000);
-
-    $(document).on('keydown', (e) => {
-        if (e.key === 'F11') {
-            windowAPI.appWindow.openDevtools();
-            e.preventDefault();
+    attachVersionFileInput();
+    attachWindowButtons();
+    // attachDevTools();
+    attachDesignMode(devMode, ()=>{
+        if(!devMode.value){
+            inspectMode.value = false;
+            showInspectMode(inspectMode.value);
         }
     });
+    attachInspectMode(inspectMode);
+    attachExportButton();
 
+    if(!devMode.value)
+        return;
+
+    //Devmode / Designmode code
+    await new Promise(r => setTimeout(r, 1000))
+    showDevMode(devMode.value);
+    showInspectMode(inspectMode.value);   
+}
+
+function attachExportButton(){
+    $('#head-tools .exportButton').on('click',()=>{
+       getWorkspace().export();
+    });
+}
+
+function attachInspectMode(inspectMode){
+    $('#head-tools .inspectMode').on('click', ()=>{
+        inspectMode.value = !inspectMode.value;
+        showInspectMode(inspectMode.value);
+    });
+}
+
+
+function attachDesignMode(devMode, callback){
+    $('#head-tools .designMode').on('click', ()=>{
+        devMode.value  = !devMode.value ;
+        showDevMode(devMode.value);
+        callback();
+    });
+}
+
+function attachVersionFileInput(){
     $('#head-tools .loadProject').on('click',async ()=>{
          $('#versionFileInput').trigger('click')
-
     });
 
-     $('#versionFileInput').on('change', async () => {
+    $('#versionFileInput').on('change', async () => {
         const file = $('#versionFileInput')[0].files[0];
         if (!file) return;
         
@@ -48,11 +70,9 @@ export function configueToolbar({
 
         $('#versionFileInput').val('');
     });
+}
 
-    $('#head-tools .devTools').on('click',async () => {
-            invoke('open_devtools_command');
-    });
-
+function attachWindowButtons(){
     $('#head-tools .closeButton').on('click', async() => {
             await getCurrentWindow().close();
     });
@@ -68,63 +88,44 @@ export function configueToolbar({
             await getCurrentWindow().maximize();
         getWorkspace()?.resize();
     });
-
-
-    
-    $('#head-tools .inspectMode').on('click', ()=>{
-        inspectMode.value = !inspectMode.value;
-        showInspectMode(getEditor(),inspectMode.value);
-     });
-
-     $('#head-tools .designMode').on('click', ()=>{
-        devMode.value  = !devMode.value ;
-        showDevMode(getEditor(),devMode.value);
-        if(!devMode.value){
-            openFileBrowser.value  = false ;
-            inspectMode.value = false;
-            showFileBrowser(getEditor(),openFileBrowser.value);
-            showInspectMode(getEditor(),inspectMode.value);
-        }
-     });
-
-     $('#head-tools .fileBrowser').on('click', ()=>{
-        openFileBrowser.value  = !openFileBrowser.value ;
-        showFileBrowser(getEditor(),openFileBrowser.value);
-     });
-
-     $('#head-tools .exportButton').on('click',()=>{
-        getWorkspace().export();
-     });
 }
 
-function showInspectMode(editor, value){
+function attachDevTools(){
+    if(!window.isDev){
+        $('.devTools').hide();
+        return;
+    }
+    $('.devTools').show();
+    $(document).on('keydown', (e) => {
+        if (e.key === 'F11') {
+            windowAPI.appWindow.openDevtools();
+            e.preventDefault();
+        }
+    });
+
+    $('#head-tools .devTools').on('click',async () => {
+        invoke('open_devtools_command');
+    });
+}
+
+function showInspectMode(value){
      if(value){
             $('#head-tools .inspectMode').addClass('active');
-            editor.showInspectMode(value);
+            // showInspectMode(value);
     } else {
         $('#head-tools .inspectMode').removeClass('active');
-        editor.showInspectMode(value);
+        // editor.showInspectMode(value);
     }
 }
 
-function showFileBrowser(editor, value){
-    if(value){
-            $('#head-tools .fileBrowser').addClass('active');
-            editor.showFileBrowser(value);
-    } else {
-        $('#head-tools .fileBrowser').removeClass('active');
-        editor.showFileBrowser(value);
-    }
-}
-
-function showDevMode(editor, value){
+function showDevMode(value){
         if(value){
             $('#head-tools .chamber-devmode').css({'display':'flex'});
             $('#head-tools .designMode').addClass('active');
-            editor.activateDevMode(value);
+            BodyLayout = createLayout();
         } else {
             $('#head-tools .chamber-devmode').hide();
             $('#head-tools .designMode').removeClass('active');
-            editor.activateDevMode(value);
+            BodyLayout?.destroy();
         }
 }

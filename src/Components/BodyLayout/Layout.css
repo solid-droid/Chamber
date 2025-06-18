@@ -1,0 +1,17 @@
+.lm_header .lm_tab.lm_active.lm_focused{
+    background-color: rgb(27, 27, 27);
+    outline: none;
+    box-shadow: none;
+}
+
+.lm_header .lm_tab.lm_active{
+    background-color: rgb(27, 27, 27);
+    outline: none;
+    box-shadow: none;
+}
+.lm_header .lm_tab{
+    background-color: black;
+    outline: none;
+    box-shadow: none;
+    border-right: 1px solid rgb(65, 65, 65);
+}
