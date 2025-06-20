@@ -139,10 +139,12 @@ export class WindowPane {
         this.header.find('.w_leftHeader').append(`<div class="w_title">${this.config.title}</div>`)
         if (this.ParentPane.type !== 'stack') {
             this.header.css({ display: 'flex' });
+            this.header.addClass('drop-zone');
         }
     }
 
     if(this.type === 'stack'){
+        this.header.addClass('drop-zone')
         let stackHead = this.header.find('.w_leftHeader');
         this.children.forEach((x, idx) => {
             stackHead.append(x.header);
@@ -159,6 +161,8 @@ export class WindowPane {
 
   createBody() {
     this.body.empty();
+    if(!['row', 'column'].includes(this.type))
+      this.body.addClass('drop-zone')
   }
 
   getRootPane() {
@@ -188,25 +192,56 @@ export class WindowPane {
 
   }
 
-  attachDroppable() {
-    this.droppable = new Droppable(this.element.find('.w_header'), {
-        dragStart({ source }) {
+attachDroppable() {
+  const self = this;
 
-        },
-        drag({ source, target }) {
+  this.droppable = new Droppable(this.element.find('.w_header'), {
+    dragStart({ source }) {
+      self.droppable.updateGhostContent(`<strong>${$(source).text()}</strong>`);
+    },
 
-        },
-        drop({ source, target }) {
+    drag({ source, target, event }) {
+      const $target = $(target);
+      const dropZone = $target.hasClass('drop-zone') ? $target : $target.closest('.drop-zone');
 
-            $(target).removeClass('drop-highlight');
-        },
-        createGhost($el) {
-            return $('<div>')
-            .text('Dragging...')
-            .css({ padding: '10px', background: '#eee', border: '1px dashed #333' });
+      if (dropZone.length) {
+        if (dropZone.hasClass('w_header')) {
+          self.droppable.showTargetGhost(dropZone[0], 'center');
+        } else if (dropZone.hasClass('w_body')) {
+          const rect = dropZone[0].getBoundingClientRect();
+          const x = event.clientX;
+          const y = event.clientY;
+
+          const relX = x - rect.left;
+          const relY = y - rect.top;
+
+          const horizontal = rect.width / 3;
+          const vertical = rect.height / 3;
+
+          let side = 'center';
+          if (relX < horizontal) side = 'left';
+          else if (relX > 2 * horizontal) side = 'right';
+          else if (relY < vertical) side = 'top';
+          else if (relY > 2 * vertical) side = 'bottom';
+
+          self.droppable.showTargetGhost(dropZone[0], side);
         }
-    });
-  }
+      } else {
+        self.droppable.removeTargetGhost();
+      }
+    },
+
+    drop({ source, target, event }) {
+      self.droppable.removeTargetGhost();
+    },
+
+    createGhost($el) {
+      return $('<div>')
+        .text('Dragging...')
+        .css({ padding: '10px', background: '#eee', border: '1px dashed #333' });
+    }
+  });
+}
 
   addSplitter() {
     this.splitter?.destroy()

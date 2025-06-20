@@ -2,11 +2,13 @@ export class Droppable {
   constructor(elements, options = {}) {
     this.elements = elements;
     this.ghost = null;
+    this.targetGhost = null;
     this.activeElement = null;
     this.options = options;
     this.hasDragged = false;
 
     this.init();
+    return this;
   }
 
   init() {
@@ -92,9 +94,62 @@ export class Droppable {
     });
   }
 
+  updateGhostContent(htmlOrElement) {
+    if (!this.ghost) return;
+    this.ghost.empty().append(htmlOrElement);
+  }
+
+  showTargetGhost(targetElement, position = 'center') {
+    this.removeTargetGhost();
+
+    const rect = targetElement.getBoundingClientRect();
+    const ghost = $('<div class="target-ghost"></div>').css({
+      position: 'fixed',
+      background: 'rgba(0, 128, 255, 0.3)',
+      zIndex: 9999,
+      pointerEvents: 'none',
+    });
+
+    let thickness = 4;
+    const width = rect.width;
+    const height = rect.height;
+
+    switch (position) {
+      case 'top':
+        thickness = height/3;
+        ghost.css({ left: rect.left + 'px', top: rect.top + 'px', width: width + 'px', height: thickness + 'px' });
+        break;
+      case 'bottom':
+        thickness = height/3;
+        ghost.css({ left: rect.left + 'px', top: rect.bottom - thickness + 'px', width: width + 'px', height: thickness + 'px' });
+        break;
+      case 'left':
+        thickness = width/3;
+        ghost.css({ left: rect.left + 'px', top: rect.top + 'px', width: thickness + 'px', height: height + 'px' });
+        break;
+      case 'right':
+        thickness = width/3;
+        ghost.css({ left: rect.right - thickness + 'px', top: rect.top + 'px', width: thickness + 'px', height: height + 'px' });
+        break;
+      case 'center':
+      default:
+        ghost.css({ left: rect.left + 'px', top: rect.top + 'px', width: width + 'px', height: height + 'px' });
+        break;
+    }
+
+    $('body').append(ghost);
+    this.targetGhost = ghost;
+  }
+
+  removeTargetGhost() {
+    this.targetGhost?.remove();
+    this.targetGhost = null;
+  }
+
   cleanup() {
     this.ghost?.remove();
     this.ghost = null;
+    this.removeTargetGhost();
     this.activeElement = null;
     this.hasDragged = false;
     $(document).off('.draggable');

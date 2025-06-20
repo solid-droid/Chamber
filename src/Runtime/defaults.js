@@ -86,18 +86,20 @@ const Datastore_entries = [
 ]
 
 const Scripts_entries = [
-    {name: 'Workers', path: 'Scripts/Worker'},
     {name: 'Functions', path: 'Scripts/Functions'},
-    {name: 'Events', path: 'Scripts/Events'},
+    {name: 'Workers', path: 'Scripts/Worker'},
     {name: 'WASM', path: 'Scripts/WASM'},
+    {name: 'Events', path: 'Scripts/Events'},
     {name: 'Network', path:'Scripts/Network'}
 ]
 
 const Agent_entries = [
-    {name: 'Workflow ', path: 'Agent/Workflow'},
+    {name: 'Cognition', path: 'Agent/Cognition'},
+    {name: 'Workflow', path: 'Agent/Workflow'},
     {name: 'Transformer', path: 'Agent/Transformer'},
     {name: 'Crawler', path: 'Agent/Crawlers'},
     {name: 'Scrapper', path: 'Agent/Scrappers'},
+    {name: 'Plugin', path: 'Agent/Plugin'},
 ]
 
 const focusTypes = ['Mesh']
