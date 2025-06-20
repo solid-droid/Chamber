@@ -121,8 +121,9 @@ body{
 }
 
 #EditorContainer{
-    height: 100%;
-    width: 100%;
+    height: calc(100% - 3px);
+    width: calc(100% - 3px);
+    overflow: hidden;
 }
 #ViewPortContainer{
     height: calc(100% - 5px);

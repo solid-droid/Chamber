@@ -1,6 +1,6 @@
 import { getCurrentWindow } from '@tauri-apps/api/window';
-import { createLayout } from '../BodyLayout/Layout';
-import { getWorkspace } from '../../Runtime/global';
+import { getWorkspace } from '../Runtime/global';
+import { createLayout } from '../Components/WindowLayout/create';
 const { invoke } = window.__TAURI__.core;
 
 let BodyLayout;

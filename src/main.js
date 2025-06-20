@@ -7,10 +7,8 @@ import { JsonHandler } from "./utils/JsonHandler";
 import { State } from "./utils/State";
 
 
-import { attachHeaderEvents } from "./Components/Header/header";
+import { attachHeaderEvents } from "./Header/header";
 import { createWorkspace } from "./Runtime/Workspace";
-
-import * as Mesh from './Components/simulation3D/Mesh/mesh';
 import { getNodeTree, getWorkspace } from './Runtime/global';
 
 /* Window Variables */
@@ -34,7 +32,7 @@ async function init() {
     });
 
     createWorkspace({
-        onCanvasClick: e => onCanvasClick(e),
+        onCanvasClick: e => {},
         onLoadStart: () => {},
         onLoadComplete: () => {
             getNodeTree()?.reload(getWorkspace().workspaceTree)
@@ -43,14 +41,5 @@ async function init() {
     });   
 
     getWorkspace().init();
-}
-
-function onCanvasClick(pickResult) {
-    if(_editor.inspectMode){
-        _editor.showIsolateView(true,pickResult.pickedMesh);
-    } else {
-        let box = Mesh.Box('box1', _project.simulation3D.scene);
-        box.position = pickResult.pickedPoint;
-    }
 }
 

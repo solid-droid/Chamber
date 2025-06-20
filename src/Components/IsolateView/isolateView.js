@@ -1,9 +1,9 @@
-import { createEngine } from "../../simulation3D/core/engine";
-import * as Light from '../../simulation3D/Light/light';
-import * as Camera from '../../simulation3D/Camera/camera';
-import * as Scene from '../../simulation3D/Scene/scene';
+import { createEngine } from "../simulation3D/core/engine";
+import * as Light from '../simulation3D/Light/light';
+import * as Camera from '../simulation3D/Camera/camera';
+import * as Scene from '../simulation3D/Scene/scene';
 import {Vector3, Color4, SceneSerializer, SceneLoader} from '@babylonjs/core';
-import { debounce } from "../../../utils/utils";
+import { debounce } from "../../utils/utils";
 
 export async function isolateView(id) {
     let engine = await createEngine(id, true);

@@ -1,0 +1,114 @@
+.w_container{
+    width: calc(100% - 1px);
+    height: calc(100% - 1px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    .w_header{
+        display: flex;
+        justify-content: space-between;
+        height: 30px;
+        gap:20px;
+        flex-shrink: 1;
+        overflow: hidden;
+        color:rgb(179, 179, 179);
+        .w_leftHeader{
+            overflow: hidden;
+            display: flex;
+            justify-content: left;
+            align-items: center;
+        }
+        .w_rightHeader{
+            display: flex;
+            gap: 8px;
+            justify-content: right;
+            align-items: center;
+            padding-right: 5px;
+            font-size: 12px;
+            i{
+                cursor: pointer;
+                &:hover{
+                    color: aliceblue;
+                }
+            }
+            .closeBtn{
+                font-size: 16px;
+                &:hover{
+                    color: rgb(172, 101, 101);
+                }
+            }
+        }
+    }
+    .w_body{
+        flex-grow: 1;
+        flex-shrink: 1;
+        background-color: rgb(27, 27, 27);
+    }
+
+    .hide{
+        display: none;
+    }
+}
+/* component */
+.w_container .w_header .w_leftHeader{
+    cursor: pointer;
+    .w_title{
+        padding-left: 5px;
+        font-size: 15px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+.w_container .w_header{
+    background-color: rgb(34, 34, 34);
+}
+.w_container .w_leftHeader>.w_header{
+    background-color: rgb(34, 34, 34);
+    border-right: 1px solid rgb(75, 75, 75);
+    padding-left: 5px;
+}
+
+.w_container .w_leftHeader>.w_header.active{
+    background-color: rgb(22, 22, 22);
+    border-top: solid 1px rgb(92, 159, 227);
+}
+.w_stack_container >.w_header{
+    background-color: rgb(22, 22, 22);
+}
+
+.w_row_container .w_body{
+    display: flex;
+    flex-direction: row;
+}
+
+.w_column_container .w_body{
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* Gutter (Split.js) */
+.gutter {
+  background-color: #3a3a3a;
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+.gutter.gutter-horizontal {
+  cursor: col-resize;
+  width: 6px;
+}
+
+.gutter.gutter-vertical {
+  cursor: row-resize;
+  height: 6px;
+}
+
+.draggable-ghost {
+  border: 1px dashed #aaa;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
