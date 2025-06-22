@@ -5,6 +5,7 @@
     flex-direction: column;
     overflow: hidden;
     .w_header{
+        user-select: none;
         display: flex;
         justify-content: space-between;
         height: 30px;

@@ -43,8 +43,11 @@ export function createLayout() {
         type: 'component', 
         name: 'ViewPort', 
         title: 'View Port', 
+        active:true,
         parent: center, 
-        onLoad: el => el.text('ViewPort') 
+        onLoad: el =>{
+            $('#ViewPortContainer').appendTo(el); 
+        }
     });
      const focusView = new WindowPane({ 
         type: 'component', 
@@ -76,7 +79,7 @@ export function createLayout() {
     });
 
     root.render();
-
+    return root;
 }
 
 

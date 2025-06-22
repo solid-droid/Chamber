@@ -6,6 +6,8 @@ export class Droppable {
     this.activeElement = null;
     this.options = options;
     this.hasDragged = false;
+    this.dragStarted = false;
+    this.dragThreshold = 5; // px
 
     this.init();
     return this;
@@ -25,6 +27,7 @@ export class Droppable {
     this.startX = event.clientX;
     this.startY = event.clientY;
     this.hasDragged = false;
+    this.dragStarted = false;
 
     $(document)
       .on('mousemove.draggable touchmove.draggable', (e) => this.onDrag(e))
@@ -34,8 +37,14 @@ export class Droppable {
   onDrag(e) {
     const event = e.type === 'touchmove' ? e.touches[0] : e;
 
-    if (!this.hasDragged) {
-      this.hasDragged = true;
+    const dx = event.clientX - this.startX;
+    const dy = event.clientY - this.startY;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+
+    if (!this.dragStarted && dist < this.dragThreshold) return;
+
+    if (!this.dragStarted) {
+      this.dragStarted = true;
       this.ghost = this.createGhost(this.activeElement);
       $('body').append(this.ghost);
       this.options.dragStart?.({
@@ -45,6 +54,7 @@ export class Droppable {
       });
     }
 
+    this.hasDragged = true;
     this.updateGhostPosition(event);
 
     if (this.options.drag) {
@@ -58,6 +68,11 @@ export class Droppable {
 
   onDrop(e) {
     const event = e.type === 'touchend' ? (e.changedTouches ? e.changedTouches[0] : e) : e;
+    if (!this.dragStarted) {
+      this.cleanup();
+      return;
+    }
+
     const data = {
       source: this.activeElement.get(0),
       target: document.elementFromPoint(event.clientX, event.clientY),
@@ -152,6 +167,7 @@ export class Droppable {
     this.removeTargetGhost();
     this.activeElement = null;
     this.hasDragged = false;
+    this.dragStarted = false;
     $(document).off('.draggable');
   }
 

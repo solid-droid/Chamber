@@ -1,10 +1,11 @@
-import { Droppable } from './Dropable';
+import { Droppable } from './Droppable';
 import './WindowLayout.css';
 import Split from './Split';
 
 export class WindowPane {
   static panes = {};
   static splits = {};
+  static maximized = false;
 
   constructor(config = {}) {
     this.config = config;
@@ -59,7 +60,8 @@ export class WindowPane {
     ref.length ? el.insertBefore(ref) : parent.append(el);
   }
   
-  addChild(pane, index = this.children.length, force = false) {
+  addChild(pane, index , force = false) {
+    let _index = index ?? this.children.length;
     if (!this.children.length) {
       pane.active = true;
     }
@@ -70,11 +72,11 @@ export class WindowPane {
     if(pane.type === 'component' || pane.type === 'stack'){
       let parentInSync= $(this.body).is(pane.element.parent());
       if(!parentInSync || force){
-        if(index === this.children.length){
+        if(_index === this.children.length){
           $(pane.element).detach().appendTo(this.body);
         } else {
           WindowPane.destroySplitter(this);
-          const $ref = this.body.children().eq(index);
+          const $ref = this.body.children().eq(_index);
           $(pane.element).detach().insertAfter($ref);
         }  
         pane.element.css({height:'calc(100% - 1px)', width:'calc(100% - 1px)'});
@@ -82,15 +84,19 @@ export class WindowPane {
       }
     }
 
-    this.children.splice(index+1, 0, pane);
+    this.children.splice(_index+1, 0, pane);
     if(this.type === 'stack'){
       this.children.forEach(x => x.hide());
+      const activeIndex = this.children.findIndex(x => x.config.active);
+      index = index ?? (activeIndex < 0 ? _index : activeIndex);
       this.children[index].show();
     }
     this.createHeader();
   }
 
   removeChild(pane, index, done = true) {
+    if(!pane.element) return;
+
     index = index ?? this.children.findIndex(x => x.name === pane.name);
     if (index < 0 && index > this.children.length)
       return; 
@@ -103,11 +109,23 @@ export class WindowPane {
     }
         
     if(!this.children.length){
+      //children verification (brute force - can improve in addChild)
+      if(this.body.children().length){
+        [...this.body.children()].forEach(x => {
+          let parent = WindowPane.panes[x.dataset.name].ParentPane;
+          let index = parent.children.findIndex(y => y.name === x.dataset.name)
+          WindowPane.insertAtIndex(x, parent.body, index) 
+        });
+      }
       this.destroy();
       return;
     }
 
-    if(done && this.children.length < 2 && ['column','row'].includes(this.type)){
+    if(done && 
+      this.children.length < 2 && 
+      ['column','row'].includes(this.type) &&
+      this.ParentPane
+    ){
       let side = this.ParentPane.type === 'column' ? 'bottom' : 'right';
       this.children[0].moveTo(this,side);
     }
@@ -138,22 +156,78 @@ export class WindowPane {
     this.element.append(this.body);
   }
 
+  closePane(){
+    this.children?.slice().forEach(x => x.destroy());
+    this.ParentPane.removeChild(this);
+  }
+  getRoot(){
+    if(this.ParentPane.root)
+      return this.ParentPane;
+
+    return this.ParentPane.getRoot();
+  }
+  minMaxPane(){
+    this.state = this.state ?? 1;
+    if(this.state === 1){
+      // normal -> expander
+      this.state = 2
+      WindowPane.maximized = true;
+      Object.values(WindowPane.panes).forEach(x => x.element.hide());
+      let container = this.getRoot().element.parent();
+      this.minMaxCOnfig ??= {};
+      this.minMaxCOnfig.index = this.ParentPane.children.findIndex(x => x.name === this.name);
+      container.append(this.element);
+      this.element.show();
+      this.element.css({
+        'height':'100%',
+        'width': '100%'
+      });
+      this.header.find('.closeBtn').hide();
+    } else if(this.state = 2){
+      //expand -> normal
+      this.state = 1;
+      WindowPane.maximized = false;
+      WindowPane.destroySplitter(this.ParentPane);
+      Object.values(WindowPane.panes).forEach(x => x.element.show());
+      this.header.find('.closeBtn').show();
+      if(this.minMaxCOnfig.index === 0){
+        this.element.prependTo(this.ParentElement);
+      } else {
+        this.element.insertAfter(this.ParentPane.children[this.minMaxCOnfig.index-1].element);
+      }
+      this.render();
+      this.ParentPane.render();
+    }
+  }
+
   attachEvents() {
     if((['row', 'column'].includes(this.type)))
         return;
 
     this.header.off('click').on('click', (e) => {
       if ($(e.target).hasClass('closeBtn')) {
-        // close logic
+        e.stopPropagation();
+        this.closePane(e);
         return;
       }
+      if ($(e.target).hasClass('minMaxBtn')) {
+        e.stopPropagation();
+        this.minMaxPane(e);
+        return;
+      }
+      
     });
 
     this.header.off('click', '.w_leftHeader>.w_header').on('click', '.w_leftHeader>.w_header', (e) => {
-    //   e.stopPropagation();
+      e.stopPropagation();
       let selectedPane = this.children.find(x => x.name === $(e.currentTarget).data().name);
       if ($(e.target).hasClass('closeBtn')) {
-        // close logic
+        this.closePane(e);
+        return;
+      }
+
+      if ($(e.target).hasClass('minMaxBtn')) {
+        this.closePane(e);
         return;
       }
       this.children.forEach(x => x.hide());
@@ -162,10 +236,11 @@ export class WindowPane {
   }
 
   createHeaderContent(headerElem,name){
+    let resizeIcon = this.ParentPane?.type === 'stack' ? false : this.resizeIcon
     const headerRight = `
       <div class="w_rightHeader">
-          ${this.resizeIcon ? '<i class="fa-solid fa-window-maximize minMaxBtn"></i>' : ''}
-          ${this.closeIcon ? '<i class="fa-solid fa-xmark closeBtn"></i>' : '' }
+          ${resizeIcon ? '<i class="fa-solid fa-window-maximize headerButton minMaxBtn"></i>' : ''}
+          ${this.closeIcon ? '<i class="fa-solid fa-xmark headerButton closeBtn"></i>' : '' }
       </div>`;
       const headerLeft = `
         <div class="w_leftHeader"></div>
@@ -297,6 +372,9 @@ attachDroppable() {
 
     drop({ source, target, event }) {
       self.droppable.removeTargetGhost();
+      
+      if($(event.target).hasClass('headerButton'))
+        return;
 
       if(!target?.dataset?.name){
         target = $(target).closest('.drop-zone')[0];
@@ -542,20 +620,11 @@ attachDroppable() {
   destroy() {
     if (this.element) {
       this.onDestroy();
-      //children verification (brute force - can improve in addChild)
-      if(this.children.length !== this.body.children().length){
-        [...this.body.children()].forEach(x => {
-          let parent = WindowPane.panes[x.dataset.name].ParentPane;
-          let index = parent.children.findIndex(y => y.name === x.dataset.name)
-          WindowPane.insertAtIndex(x, parent.body, index) 
-        });
-      }
-
       this.children.forEach(child => child.destroy());
       this.ParentPane?.removeChild(this);
-      this.element.remove();
+      this.element?.remove();
       this.element = null;
-      this.ParentPane.render();
+      this.ParentPane?.render();
     }
   }
 }
