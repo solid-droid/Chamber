@@ -13,7 +13,9 @@ export function createLayout() {
 
     /* left */
     const left = new WindowPane({ 
-        type: 'stack', 
+        type: 'stack',
+        closeIcon:false,
+        resizeIcon:false, 
         name: 'left', 
         parent: root ,
     });
@@ -21,6 +23,8 @@ export function createLayout() {
         type: 'component', 
         name: 'explorer', 
         title: 'Explorer', 
+        closeIcon:false,
+        resizeIcon:false, 
         parent: left, 
         onLoad: el => {
             createNodeTree(el, {

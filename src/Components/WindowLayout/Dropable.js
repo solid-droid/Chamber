@@ -116,19 +116,19 @@ export class Droppable {
 
     switch (position) {
       case 'top':
-        thickness = height/3;
+        thickness = height / 3;
         ghost.css({ left: rect.left + 'px', top: rect.top + 'px', width: width + 'px', height: thickness + 'px' });
         break;
       case 'bottom':
-        thickness = height/3;
+        thickness = height / 3;
         ghost.css({ left: rect.left + 'px', top: rect.bottom - thickness + 'px', width: width + 'px', height: thickness + 'px' });
         break;
       case 'left':
-        thickness = width/3;
+        thickness = width / 3;
         ghost.css({ left: rect.left + 'px', top: rect.top + 'px', width: thickness + 'px', height: height + 'px' });
         break;
       case 'right':
-        thickness = width/3;
+        thickness = width / 3;
         ghost.css({ left: rect.right - thickness + 'px', top: rect.top + 'px', width: thickness + 'px', height: height + 'px' });
         break;
       case 'center':
@@ -153,5 +153,10 @@ export class Droppable {
     this.activeElement = null;
     this.hasDragged = false;
     $(document).off('.draggable');
+  }
+
+  destroy() {
+    this.cleanup();
+    this.elements.css('cursor', '').off('mousedown touchstart');
   }
 }
