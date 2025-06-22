@@ -174,7 +174,7 @@ export class WindowPane {
       this.state = 2
       WindowPane.maximized = this;
       let activeChild = this.children.find(x => x.active);
-      Object.values(WindowPane.panes).forEach(x => x?.element.hide() );
+      Object.values(WindowPane.panes).forEach(x => x?.element?.hide() );
       let container = this.getRoot().element.parent();
       this.minMaxCOnfig ??= {};
       this.minMaxCOnfig.index = this.ParentPane.children.findIndex(x => x.name === this.name);
@@ -191,7 +191,7 @@ export class WindowPane {
       this.state = 1;
       WindowPane.maximized = null;
       WindowPane.destroySplitter(this.ParentPane);
-      Object.values(WindowPane.panes).forEach(x => x.element.show());
+      Object.values(WindowPane.panes).forEach(x => x?.element?.show());
       this.header.find('.closeBtn').show();
       if(this.minMaxCOnfig.index === 0){
         this.element.prependTo(this.ParentElement);
