@@ -1,6 +1,8 @@
 import { WindowPane } from "./WindowLayout";
 import { FileBrowser } from "../FileBrowser/fileBrowser";
-import { getWorkspace, setNodeTree } from "../../Runtime/global";
+import { getWorkspace, setCodeEditor, setNodeTree } from "../../Runtime/global";
+import { codeEditor } from "../CodeEditor/codeEditor";
+import { debounce } from "../../utils/utils";
 
 export function createLayout() {
     const root = new WindowPane({
@@ -63,12 +65,25 @@ export function createLayout() {
         name: 'rightCol', 
         parent: root,
     });
-    const codeEditor = new WindowPane({ 
+    new WindowPane({ 
         type: 'component', 
         name: 'CodeEditor', 
         title: 'Editor',
         parent: right,
-        onLoad: el => el.text('CodeEditor')
+        onLoad: async el => {
+            el.append(`<div id="Chamber_codeEditor_container">
+                  <div id="Chamber_codeEditor"></div>
+                </div>`);
+            const Chamber_codeEditor = el.find('#Chamber_codeEditor');
+            while(Chamber_codeEditor.is(':hidden'))
+                await new Promise(r => setTimeout(r, 50));
+            let editor = codeEditor(Chamber_codeEditor[0]);
+            setCodeEditor(editor);
+            let onChangeDebounce = debounce((e)=>{
+                console.log(e);
+            }, 500);
+            editor.onDidChangeModelContent(onChangeDebounce);
+        }
     });
     const configEditor = new WindowPane({ 
         type: 'component', 

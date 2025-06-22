@@ -6,6 +6,36 @@ function debounce(fn, delay) {
     };
 }
 
+function throttle(func, delay) {
+  let lastCallTime = 0;
+  let timeoutId = null;
+  let lastArgs;
+  let lastContext;
+
+  return function (...args) {
+    const now = Date.now();
+    lastArgs = args;
+    lastContext = this;
+
+    const remaining = delay - (now - lastCallTime);
+
+    if (remaining <= 0) {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+        timeoutId = null;
+      }
+      lastCallTime = now;
+      func.apply(lastContext, lastArgs);
+    } else if (!timeoutId) {
+      timeoutId = setTimeout(() => {
+        lastCallTime = Date.now();
+        timeoutId = null;
+        func.apply(lastContext, lastArgs);
+      }, remaining);
+    }
+  };
+}
+
 function removeDuplicate(arr, field) {
     const seen = new Set();
     return arr.filter(item => {
@@ -143,6 +173,7 @@ function downloadFile(filename, content, mimeType) {
 
 export {
     debounce,
+    throttle,
     removeDuplicate,
     saveFile,
     getFormat,

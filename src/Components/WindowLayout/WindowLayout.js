@@ -27,6 +27,7 @@ export class WindowPane {
     this.onDrag = config.onDrag || (() => {});
     this.onLoad = config.onLoad || (() => {});
     this.onDestroy = config.onDestroy || (() => {});
+    this.onResize = config.onResize || (() => {})
 
     this.load();
   }
@@ -171,13 +172,15 @@ export class WindowPane {
     if(this.state === 1){
       // normal -> expander
       this.state = 2
-      WindowPane.maximized = true;
-      Object.values(WindowPane.panes).forEach(x => x.element.hide());
+      WindowPane.maximized = this;
+      let activeChild = this.children.find(x => x.active);
+      Object.values(WindowPane.panes).forEach(x => x?.element.hide() );
       let container = this.getRoot().element.parent();
       this.minMaxCOnfig ??= {};
       this.minMaxCOnfig.index = this.ParentPane.children.findIndex(x => x.name === this.name);
       container.append(this.element);
       this.element.show();
+      activeChild?.element.show();
       this.element.css({
         'height':'100%',
         'width': '100%'
@@ -186,7 +189,7 @@ export class WindowPane {
     } else if(this.state = 2){
       //expand -> normal
       this.state = 1;
-      WindowPane.maximized = false;
+      WindowPane.maximized = null;
       WindowPane.destroySplitter(this.ParentPane);
       Object.values(WindowPane.panes).forEach(x => x.element.show());
       this.header.find('.closeBtn').show();
@@ -593,12 +596,16 @@ attachDroppable() {
     this.splitter = Split(panels, {
       direction: this.type === 'row' ? 'horizontal' : 'vertical',
       sizes: this.config.sizes,
-      gutterSize: 6,
+      gutterSize: 6
     });
     this.splitter.pairs.forEach(x => $(x.gutter).attr('data-name',this.name));
+    let self = this;
     this.splitter.onResize(ctx => {
        if(ctx.sizes.find(x => x < 10)) {
-        ctx.cancel()
+        ctx.cancel();
+       } else {
+        self.onResize();
+        self.children.forEach(x => x.onResize());
        }
       
     });
@@ -618,6 +625,7 @@ attachDroppable() {
   }
 
   destroy() {
+    WindowPane.maximized?.minMaxPane?.();
     if (this.element) {
       this.onDestroy();
       this.children.forEach(child => child.destroy());

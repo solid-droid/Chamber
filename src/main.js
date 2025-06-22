@@ -19,7 +19,8 @@ window.monaco = monaco;
 window.JsonHandler = new JsonHandler();
 
 /* State Variables */
-let devMode = new State(true);
+let remoteAccess = new State(false);
+let devMode = new State(false);
 let inspectMode = new State(false);
 
 init();
@@ -29,6 +30,7 @@ async function init() {
     attachHeaderEvents({
         devMode,
         inspectMode,
+        remoteAccess
     });
 
     createWorkspace({

@@ -7,11 +7,13 @@ let BodyLayout;
 
 export async function attachHeaderEvents({
     devMode,
-    inspectMode
+    inspectMode,
+    remoteAccess
 }){
     attachVersionFileInput();
     attachWindowButtons();
     // attachDevTools();
+    attachRemoteAccess(remoteAccess);
     attachDesignMode(devMode, ()=>{
         if(!devMode.value){
             inspectMode.value = false;
@@ -43,6 +45,17 @@ function attachInspectMode(inspectMode){
     });
 }
 
+function attachRemoteAccess(remoteAccess){
+     $('#head-tools .remoteAccess').on('click', ()=>{
+        remoteAccess.value  = !remoteAccess.value ;
+        if(remoteAccess.value ){
+            $('#head-tools .remoteAccess').addClass('active activeGreen');
+        } else {
+            $('#head-tools .remoteAccess').removeClass('active activeGreen');
+        }
+
+    });
+}
 
 function attachDesignMode(devMode, callback){
     $('#head-tools .designMode').on('click', ()=>{

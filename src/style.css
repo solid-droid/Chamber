@@ -84,7 +84,11 @@ body{
             .active{
                 background: rgb(68, 68, 68);
                 color: white;
-                text-shadow: white 0 0 3px;
+                text-shadow: rgb(137, 137, 137) 0 0 10px;
+            }
+            .activeGreen{
+                /* background: rgb(16, 103, 55); */
+                /* text-shadow: rgba(25, 195, 67, 0.616) 0 0 10px; */
             }
         }
     }
@@ -124,6 +128,24 @@ body{
     height: calc(100% - 3px);
     width: calc(100% - 3px);
     overflow: hidden;
+
+    #Chamber_codeEditor_container{
+        height: calc(100% - 1px);
+        width: 100%;
+        overflow: hidden;
+        display: flex;
+        #Chamber_codeEditor{
+            height: 100%;
+            width: 100%;
+            .monaco-editor{
+                border: none;
+                outline: none;
+                .margin {
+                    padding-left: 2px !important;
+                }
+            }
+        }
+    }
 }
 #ViewPortContainer{
     height: calc(100% - 5px);

@@ -9,6 +9,7 @@
         display: flex;
         justify-content: space-between;
         height: 30px;
+        min-height: 30px;
         gap:20px;
         flex-shrink: 1;
         overflow: hidden;
@@ -44,7 +45,7 @@
         flex-grow: 1;
         flex-shrink: 1;
         background-color: rgb(27, 27, 27);
-        /* border: solid 1px red; */
+        overflow: hidden;
     }
 
     .hide{
