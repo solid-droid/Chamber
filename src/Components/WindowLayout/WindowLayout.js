@@ -463,7 +463,7 @@ attachDroppable() {
         type:'row',
         name: crypto.randomUUID(),
         parent: isStack ? _root : targetPane.ParentPane,
-        index:  isStack ? (next ? 1 : 0) : tIndex
+        index:  tIndex
       });
       (isStack ? targetPane.ParentPane : targetPane).moveToRowOrColumn(_row, 0 - !next , false);
       this.moveToRowOrColumn(_row, 1 - !next);
@@ -475,7 +475,7 @@ attachDroppable() {
         type:'column',
         name: crypto.randomUUID(),
         parent: isStack ? _root : targetPane.ParentPane,
-        index:  isStack ? (next ? 1 : 0) : tIndex
+        index:  tIndex
       });
       (isStack ? targetPane.ParentPane : targetPane).moveToRowOrColumn(_column, 0 - !next , false);
       this.moveToRowOrColumn(_column, 1 - !next);
