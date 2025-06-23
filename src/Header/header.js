@@ -7,21 +7,15 @@ let BodyLayout;
 
 export async function attachHeaderEvents({
     devMode,
-    inspectMode,
     remoteAccess
 }){
     attachVersionFileInput();
     attachWindowButtons();
     // attachDevTools();
     attachRemoteAccess(remoteAccess);
-    attachDesignMode(devMode, ()=>{
-        if(!devMode.value){
-            inspectMode.value = false;
-            showInspectMode(inspectMode.value);
-        }
-    });
-    attachInspectMode(inspectMode);
+    attachDesignMode(devMode);
     attachExportButton();
+    attachPackagesButton();
 
     if(!devMode.value)
         return;
@@ -29,7 +23,6 @@ export async function attachHeaderEvents({
     //Devmode / Designmode code
     await new Promise(r => setTimeout(r, 1000))
     showDevMode(devMode.value);
-    showInspectMode(inspectMode.value);   
 }
 
 function attachExportButton(){
@@ -38,10 +31,9 @@ function attachExportButton(){
     });
 }
 
-function attachInspectMode(inspectMode){
-    $('#head-tools .inspectMode').on('click', ()=>{
-        inspectMode.value = !inspectMode.value;
-        showInspectMode(inspectMode.value);
+function attachPackagesButton(){
+     $('#head-tools .packagesButton').on('click',()=>{
+       alert('Plugins, Components, Workspaces')
     });
 }
 
@@ -57,11 +49,10 @@ function attachRemoteAccess(remoteAccess){
     });
 }
 
-function attachDesignMode(devMode, callback){
+function attachDesignMode(devMode){
     $('#head-tools .designMode').on('click', ()=>{
         devMode.value  = !devMode.value ;
         showDevMode(devMode.value);
-        callback();
     });
 }
 
@@ -119,16 +110,6 @@ function attachDevTools(){
     $('#head-tools .devTools').on('click',async () => {
         invoke('open_devtools_command');
     });
-}
-
-function showInspectMode(value){
-     if(value){
-            $('#head-tools .inspectMode').addClass('active');
-            // showInspectMode(value);
-    } else {
-        $('#head-tools .inspectMode').removeClass('active');
-        // editor.showInspectMode(value);
-    }
 }
 
 function showDevMode(value){

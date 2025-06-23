@@ -459,35 +459,37 @@ attachDroppable() {
     } else if(createRowChild){
 
       const isStack = targetPane.ParentPane.type === 'stack';
+      const prevParent = targetPane.ParentPane;
       let _row = new WindowPane({
         type:'row',
         name: crypto.randomUUID(),
-        parent: isStack ? _root : targetPane.ParentPane,
+        parent: isStack ? _root : prevParent,
         index:  tIndex
       });
       if(next){
-       (isStack ? targetPane.ParentPane : targetPane).moveToRowOrColumn(_row, 0 , false);
+       (isStack ? prevParent : targetPane).moveToRowOrColumn(_row, 0 , false);
         this.moveToRowOrColumn(_row, 1); 
       } else {  
        this.moveToRowOrColumn(_row, 0);
-       (isStack ? targetPane.ParentPane : targetPane).moveToRowOrColumn(_row, 1 , false);
+       (isStack ? prevParent : targetPane).moveToRowOrColumn(_row, 1 , false);
       }
       
     } else if(createColChild){
 
       const isStack = targetPane.ParentPane.type === 'stack';
+      const prevParent = targetPane.ParentPane;
       let _column = new WindowPane({
         type:'column',
         name: crypto.randomUUID(),
-        parent: isStack ? _root : targetPane.ParentPane,
+        parent: isStack ? _root : prevParent,
         index:  tIndex
       });
       if(next){
-        (isStack ? targetPane.ParentPane : targetPane).moveToRowOrColumn(_column, 0 , false);
+        (isStack ? prevParent : targetPane).moveToRowOrColumn(_column, 0 , false);
         this.moveToRowOrColumn(_column, 1);
       } else {
         this.moveToRowOrColumn(_column, 0);
-        (isStack ? targetPane.ParentPane : targetPane).moveToRowOrColumn(_column, 1 , false);
+        (isStack ? prevParent : targetPane).moveToRowOrColumn(_column, 1 , false);
       }
       
     

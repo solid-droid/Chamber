@@ -21,12 +21,13 @@ export function createLayout() {
         name: 'left', 
         parent: root ,
     });
-    const explorer = new WindowPane({ 
+    new WindowPane({ 
         type: 'component', 
         name: 'explorer', 
         title: 'Explorer', 
         closeIcon:false,
         resizeIcon:false, 
+        active:true,
         parent: left, 
         onLoad: el => {
             createNodeTree(el, {
@@ -34,41 +35,65 @@ export function createLayout() {
             });
         } 
     });
+    new WindowPane({ 
+        type: 'component', 
+        name: 'blueprint', 
+        title: 'Blueprint', 
+        closeIcon:false,
+        resizeIcon:false, 
+        parent: left, 
+        onLoad: el => el.text('Blueprint - create state machines using existing nodes')
+    });
+    new WindowPane({ 
+        type: 'component', 
+        name: 'datastore', 
+        title: 'Datastore', 
+        closeIcon:false,
+        resizeIcon:false, 
+        parent: left, 
+        onLoad: el => el.text('Datastore - global data CRUD , local, remote, system data monitoring')
+    });
 
     /* center */
     const center = new WindowPane({ 
         type: 'stack', 
         name: 'center',
         parent: root,
+        closeIcon:false,
     });
-    const viewPort = new WindowPane({ 
+    new WindowPane({ 
         type: 'component', 
         name: 'ViewPort', 
-        title: 'View Port', 
+        title: 'View Port',
+        closeIcon:false, 
         active:true,
         parent: center, 
         onLoad: el =>{
             $('#ViewPortContainer').appendTo(el); 
         }
     });
-     const focusView = new WindowPane({ 
+    new WindowPane({ 
         type: 'component', 
         name: 'FocusView', 
         title: 'Focus View', 
+        closeIcon:false,
         parent: center, 
         onLoad: el => el.text('FocusView')
     });
 
     /* right */
     const right = new WindowPane({ 
-        type: 'column', 
-        name: 'rightCol', 
+        type: 'stack', 
+        name: 'rightCol',
+        closeIcon:false, 
         parent: root,
     });
     new WindowPane({ 
         type: 'component', 
-        name: 'CodeEditor', 
+        name: 'CodeEditor',
+        closeIcon:false, 
         title: 'Editor',
+        active:true,
         parent: right,
         onLoad: async el => {
             el.append(`<div id="Chamber_codeEditor_container">
@@ -85,10 +110,11 @@ export function createLayout() {
             editor.onDidChangeModelContent(onChangeDebounce);
         }
     });
-    const configEditor = new WindowPane({ 
+   new WindowPane({ 
         type: 'component', 
         name: 'ConfigEditor', 
         title: 'Config', 
+        closeIcon:false,
         parent: right, 
         onLoad: el => el.text('ConfigEditor') 
     });

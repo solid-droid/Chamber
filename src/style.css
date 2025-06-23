@@ -20,7 +20,7 @@ body{
         width: 100vw;
         height: var(--toolbarHeight);
         overflow: hidden;
-        background: rgb(36, 36, 36);
+        background: rgb(27 27 27);
         display: grid;
         grid-template-columns: 200px 1fr auto;
         align-items: center;
