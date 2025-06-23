@@ -465,9 +465,14 @@ attachDroppable() {
         parent: isStack ? _root : targetPane.ParentPane,
         index:  tIndex
       });
-      (isStack ? targetPane.ParentPane : targetPane).moveToRowOrColumn(_row, 0 - !next , false);
-      this.moveToRowOrColumn(_row, 1 - !next);
-
+      if(next){
+       (isStack ? targetPane.ParentPane : targetPane).moveToRowOrColumn(_row, 0 , false);
+        this.moveToRowOrColumn(_row, 1); 
+      } else {  
+       this.moveToRowOrColumn(_row, 0);
+       (isStack ? targetPane.ParentPane : targetPane).moveToRowOrColumn(_row, 1 , false);
+      }
+      
     } else if(createColChild){
 
       const isStack = targetPane.ParentPane.type === 'stack';
@@ -477,8 +482,14 @@ attachDroppable() {
         parent: isStack ? _root : targetPane.ParentPane,
         index:  tIndex
       });
-      (isStack ? targetPane.ParentPane : targetPane).moveToRowOrColumn(_column, 0 - !next , false);
-      this.moveToRowOrColumn(_column, 1 - !next);
+      if(next){
+        (isStack ? targetPane.ParentPane : targetPane).moveToRowOrColumn(_column, 0 , false);
+        this.moveToRowOrColumn(_column, 1);
+      } else {
+        this.moveToRowOrColumn(_column, 0);
+        (isStack ? targetPane.ParentPane : targetPane).moveToRowOrColumn(_column, 1 , false);
+      }
+      
     
     } else if(this.ParentElement.is(_root.body)){
         //move inside same row/column
