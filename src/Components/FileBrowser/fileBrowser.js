@@ -38,7 +38,7 @@ export class FileBrowser {
         let fileList = this.createFileList(dataList , isRoot);
         parent.append(fileList);
         dataList.forEach(node => {
-            if (node.expanded) {
+            if (node.tree_meta?.expanded) {
                 this.loadFiles(node.path, fileList.find('.file-item[data-path="' + node.path + '"]'), false);
             }
         });
