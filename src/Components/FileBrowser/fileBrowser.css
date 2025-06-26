@@ -1,6 +1,6 @@
 .chamberFileBrowser{
      height: calc(100% - 40px);
-     overflow: hidden;
+     overflow: auto;
     > .file-list{
          padding-bottom: 50px !important;
     }
@@ -8,8 +8,6 @@
         font-size: 14px;
         padding: 3px 0;
         padding-left: 3px;
-        overflow-y: auto;
-        height: -webkit-fill-available;
         .file-item{
             .file-details{
                 padding: 5px 5px;
