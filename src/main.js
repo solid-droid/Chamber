@@ -11,11 +11,6 @@ import { attachHeaderEvents } from "./Header/header";
 import { createWorkspace } from "./Runtime/Workspace";
 import { getNodeTree, getWorkspace } from './Runtime/global';
 
-import { checkForAppUpdates } from "./updater";
-document.addEventListener("DOMContentLoaded", async () => {
-  await checkForAppUpdates();
-});
-
 /* Window Variables */
 const { invoke } = window.__TAURI__.core;
 
