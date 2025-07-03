@@ -37,15 +37,6 @@ export function createLayout() {
     });
     new WindowPane({ 
         type: 'component', 
-        name: 'blueprint', 
-        title: 'Blueprint', 
-        closeIcon:false,
-        resizeIcon:false, 
-        parent: left, 
-        onLoad: el => el.text('Blueprint - create state machines using existing nodes')
-    });
-    new WindowPane({ 
-        type: 'component', 
         name: 'datastore', 
         title: 'Datastore', 
         closeIcon:false,
@@ -79,6 +70,15 @@ export function createLayout() {
         closeIcon:false,
         parent: center, 
         onLoad: el => el.text('FocusView')
+    });
+      new WindowPane({ 
+        type: 'component', 
+        name: 'blueprint', 
+        title: 'Blueprint', 
+        closeIcon:false,
+        resizeIcon:false, 
+        parent: center, 
+        onLoad: el => el.text('Blueprint - create state machines using existing nodes')
     });
 
     /* right */

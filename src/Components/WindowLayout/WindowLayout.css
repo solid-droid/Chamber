@@ -8,8 +8,8 @@
         user-select: none;
         display: flex;
         justify-content: space-between;
-        height: 30px;
-        min-height: 30px;
+        height: 25px;
+        min-height: 25px;
         gap:20px;
         flex-shrink: 1;
         overflow: hidden;
