@@ -1,15 +1,15 @@
 
 import '@fortawesome/fontawesome-free/css/all.css';
-import '@/DesignSystem/designSystem.css';
+import './DesignSystem/designSystem.css';
 import $ from 'jquery';
 import * as monaco from 'monaco-editor';
-import { JsonHandler } from "@/utils/JsonHandler";
-import { State } from "@/utils/State";
+import { JsonHandler } from "./utils/JsonHandler";
+import { State } from "./utils/State";
 
-import { checkForAppUpdates } from "@/updater";
-import { attachHeaderEvents } from "@/Header/header";
-import { createWorkspace } from "@/Runtime/Workspace";
-import { getNodeTree, getWorkspace } from '@/Runtime/global';
+import { checkForAppUpdates } from "./updater";
+import { attachHeaderEvents } from "./Header/header";
+import { createWorkspace } from "./Runtime/Workspace.js";
+import { getNodeTree, getWorkspace } from './Runtime/global';
 
 /* Window Variables */
 const { invoke } = window.__TAURI__.core;
