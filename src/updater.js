@@ -2,7 +2,7 @@ import { check } from '@tauri-apps/plugin-updater';
 import { ask, message } from '@tauri-apps/plugin-dialog';
 const { invoke } = window.__TAURI__.core;
 
-async function checkForAppUpdates(onUserClick = true) {
+export async function checkForAppUpdates(onUserClick = true) {
   const update = await check();
   if (update === null) {
     await message('Failed to check for updates.\nPlease try again later.', { 
@@ -32,13 +32,4 @@ async function checkForAppUpdates(onUserClick = true) {
       okLabel: 'OK'
     });
   }
-}
-
-
-function invoke(command) {
-  return tauriInvoke(command);
-}
-
-function invoke(arg0) {
-  throw new Error('Function not implemented.');
 }

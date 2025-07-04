@@ -6,7 +6,7 @@ import * as monaco from 'monaco-editor';
 import { JsonHandler } from "./utils/JsonHandler";
 import { State } from "./utils/State";
 
-
+import { checkForAppUpdates } from "./updater";
 import { attachHeaderEvents } from "./Header/header";
 import { createWorkspace } from "./Runtime/Workspace";
 import { getNodeTree, getWorkspace } from './Runtime/global';
@@ -26,6 +26,10 @@ init();
 
 async function init() {
     window.isDev = await invoke('is_dev_mode');
+
+
+    await checkForAppUpdates();
+
     attachHeaderEvents({
         devMode,
         inspectMode,
