@@ -35,23 +35,23 @@ export default defineConfig(async () => ({
       '@': path.resolve(__dirname, 'src'),
     },
   },
-  build: {
-    rollupOptions: {
-      plugins: [
-        {
-          name: 'append-js-extension',
-          resolveId(source:any) {
-            // This is a simplified example and might require more robust logic
-            // to handle various import scenarios and relative paths correctly.
-            if (source.startsWith('./') || source.startsWith('../')) {
-              if (!source.endsWith('.js') && !source.endsWith('.ts') && !source.includes('.')) {
-                return `${source}.js`;
-              }
-            }
-            return null; // Let other plugins or Rollup handle it
-          },
-        },
-      ],
-    },
-  },
+  // build: {
+  //   rollupOptions: {
+  //     plugins: [
+  //       {
+  //         name: 'append-js-extension',
+  //         resolveId(source:any) {
+  //           // This is a simplified example and might require more robust logic
+  //           // to handle various import scenarios and relative paths correctly.
+  //           if (source.startsWith('./') || source.startsWith('../')) {
+  //             if (!source.endsWith('.js') && !source.endsWith('.ts') && !source.includes('.')) {
+  //               return `${source}.js`;
+  //             }
+  //           }
+  //           return null; // Let other plugins or Rollup handle it
+  //         },
+  //       },
+  //     ],
+  //   },
+  // },
 }));
