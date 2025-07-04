@@ -1,5 +1,5 @@
 // lib.rs file
-use tauri::{Manager, AppHandle, Runtime}; // Ensure Runtime is imported for v2 setup
+use tauri::{AppHandle, Manager, Runtime}; // Ensure Runtime is imported for v2 setup
 
 // Command to greet a name (already present)
 #[tauri::command]
@@ -31,13 +31,14 @@ fn open_devtools_command<R: Runtime>(_app_handle: AppHandle<R>) {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_opener::init()) // Your existing plugin
         .invoke_handler(tauri::generate_handler![
             greet,
-            is_dev_mode,        // Add our new command here
+            is_dev_mode, // Add our new command here
             open_devtools_command
         ])
-        .setup(|app| {
+        .setup(|_app| {
             // This setup block runs after the app is initialized but before windows are shown.
             // It's a great place for initial setup logic.
 
@@ -48,7 +49,7 @@ pub fn run() {
                 // If you only want it for `tauri dev`, you could combine with `cfg!(dev)`
                 // or expose a more granular flag via a command as shown with `is_dev_mode`.
 
-                if let Some(window) = app.get_webview_window("main") {
+                if let Some(window) = _app.get_webview_window("main") {
                     // Only open devtools if we are in a debug build
 
                     println!("Debug build detected: Opening DevTools for 'main' window.");
