@@ -2,16 +2,9 @@ import { check } from '@tauri-apps/plugin-updater';
 import { ask, message } from '@tauri-apps/plugin-dialog';
 import { relaunch } from '@tauri-apps/plugin-process';
 
-export async function checkForAppUpdates(onUserClick = true) {
+export async function checkForAppUpdates(onUserClick = false) {
   const update = await check();
-  if (update === null) {
-    await message('Failed to check for updates.\nPlease try again later.', { 
-      title: 'Error',
-      kind: 'error',
-      okLabel: 'OK'
-    });
-    return;
-  } else if (update) {
+  if (update) {
     const yes = await ask(`Chamber ${update.version} is available!\n\nRelease notes: ${update.body}`, { 
       title: 'Update Available',
       kind: 'info',
