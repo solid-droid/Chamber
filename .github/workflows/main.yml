@@ -1,8 +1,10 @@
 name: 'publish'
+
 on:
   push:
-    branches:
-      - release
+    tags:
+      - 'v*'  # Only run on tag pushes like v1.0.0, v2.3.4, etc.
+
 env:
   APP_NAME: "Chamber"
 
@@ -23,6 +25,7 @@ jobs:
           echo "changelog=$(git log $PREV_TAG...${{ github.ref_name }} --pretty=format:"- %s")" >> $GITHUB_OUTPUT
     outputs:
       changelog: ${{ steps.build_changelog.outputs.changelog }}
+
   release:
     environment: production
     permissions:
@@ -66,7 +69,7 @@ jobs:
 
       - name: Build Tauri app
         uses: tauri-apps/tauri-action@v0
-        if: ${{ github.ref_type == 'tag' }}
+        # only runs because trigger is restricted to tags
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
