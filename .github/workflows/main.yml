@@ -3,7 +3,7 @@ name: 'publish'
 on:
   push:
     tags:
-      - 'v*'  # Only run on tag pushes like v1.0.0, v2.3.4, etc.
+      - '*'  # Only run on tag pushes.
 
 env:
   APP_NAME: "Chamber"
