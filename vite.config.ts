@@ -31,6 +31,7 @@ export default defineConfig(async () => ({
     },
   },
   resolve: {
+    extensions: ['.mjs', '.js', '.ts', '.json'],
     alias: {
       '@': path.resolve(__dirname, 'src'),
     },
