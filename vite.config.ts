@@ -1,6 +1,9 @@
 import { defineConfig } from "vite";
+import { fileURLToPath } from 'url';
+import path, { dirname } from 'path';
 
-// @ts-expect-error process is a nodejs global
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 const host = process.env.TAURI_DEV_HOST;
 
 // https://vitejs.dev/config/
@@ -28,6 +31,8 @@ export default defineConfig(async () => ({
     },
   },
   resolve: {
-    extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json']
-  }
+    alias: {
+      '@': path.resolve(__dirname, 'src'),
+    },
+  },
 }));
