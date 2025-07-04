@@ -1,6 +1,6 @@
 import { check } from '@tauri-apps/plugin-updater';
 import { ask, message } from '@tauri-apps/plugin-dialog';
-const { invoke } = window.__TAURI__.core;
+import { relaunch } from '@tauri-apps/plugin-process';
 
 export async function checkForAppUpdates(onUserClick = true) {
   const update = await check();
@@ -11,19 +11,33 @@ export async function checkForAppUpdates(onUserClick = true) {
       okLabel: 'OK'
     });
     return;
-  } else if (update?.available) {
-    const yes = await ask(`Update to ${update.version} is available!\n\nRelease notes: ${update.body}`, { 
+  } else if (update) {
+    const yes = await ask(`Chamber ${update.version} is available!\n\nRelease notes: ${update.body}`, { 
       title: 'Update Available',
       kind: 'info',
       okLabel: 'Update',
       cancelLabel: 'Cancel'
     });
     if (yes) {
-      await update.downloadAndInstall();
-      // Restart the app after the update is installed by calling the Tauri command that handles restart for your app
-      // It is good practice to shut down any background processes gracefully before restarting
-      // As an alternative, you could ask the user to restart the app manually
-      await invoke("graceful_restart");
+       let downloaded = 0;
+       let contentLength = 0;
+       await update.downloadAndInstall((event) => {
+        switch (event.event) {
+          case 'Started':
+            contentLength = event.data.contentLength;
+            console.log(`started downloading ${event.data.contentLength} bytes`);
+            break;
+          case 'Progress':
+            downloaded += event.data.chunkLength;
+            console.log(`downloaded ${downloaded} from ${contentLength}`);
+            break;
+          case 'Finished':
+            console.log('download finished');
+            break;
+        }
+      });
+      console.log('update installed');
+      await relaunch();
     }
   } else if (onUserClick) {
     await message('You are on the latest version. Stay awesome!', { 
