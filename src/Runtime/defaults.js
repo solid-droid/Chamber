@@ -102,7 +102,7 @@ const Agent_entries = [
     {name: 'Plugin', path: 'Agent/Plugin'},
 ]
 
-const focusTypes = ['Mesh']
+const showHideTypes = ['Mesh']
 
 export {
     icons,
@@ -115,5 +115,5 @@ export {
     Datastore_entries,
     Scripts_entries,
     Agent_entries,
-    focusTypes
+    showHideTypes
 }

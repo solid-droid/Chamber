@@ -6,7 +6,7 @@
     <title>Chamber</title>
   </head>
   <link rel="stylesheet" href="/src/style.css" />
-  <body>
+  <body oncontextmenu="return false;">
     <div id="head-tools"  data-tauri-drag-region>
       <div class="leftBlock">
         <span class="appName">CHAMBER</span>
@@ -18,12 +18,11 @@
       <div class="rightBlock">
         <i class="fa-solid fa-laptop-code designMode" title="Design Mode"></i>
         <div class="chamber-devmode">
-          <i class="fa-solid fa-folder-plus newWorkspaceButton" title="New Workspace"></i>
+          <i class="fa-solid fa-circle-plus newWorkspaceButton" title="New Workspace"></i>
           <i class="fa-solid fa-code-branch branchButton" title="Create Branch"></i>
           <i class="fa-solid fa-circle-arrow-down pullWorkspace" title="Pull Workspace"></i>
           <i class="fa-solid fa-circle-arrow-up pushWorkspace" title="Push Workspace"></i>
           <i class="fa-solid fa-code-merge mergeButton" title="Merge Branch"></i>
-          <i class="fa-solid fa-floppy-disk saveButton" title="Save Workspace"></i>
           <i class="fa-solid fa-download exportButton" title="Export Workspace"></i>
           <i class="fa-solid fa-box packagesButton" title="Packages"></i>
         </div>

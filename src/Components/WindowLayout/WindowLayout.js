@@ -5,7 +5,7 @@ import Split from './Split';
 export class WindowPane {
   static panes = {};
   static splits = {};
-  static maximized = false;
+  static maximized = {};
 
   constructor(config = {}) {
     this.config = config;
@@ -28,10 +28,22 @@ export class WindowPane {
     this.onLoad = config.onLoad || (() => {});
     this.onDestroy = config.onDestroy || (() => {});
     this.onResize = config.onResize || (() => {})
+    this.layoutID = this.root ? (config.layoutID || crypto.randomUUID()) : this.getRoot().layoutID;
+    if(this.root){
+      WindowPane.panes[this.layoutID] = {};
+      WindowPane.splits[this.layoutID] = {};
+      WindowPane.maximized[this.layoutID] = false;
+    }
 
     this.load();
   }
 
+  getLayoutID() {
+    return this.root ? this.layoutID : this.ParentPane.getLayoutID();
+  }
+  getRoot(){
+    return this.root ? this : this.ParentPane?.getRoot() || this.config.parent.getRoot();
+  }
   load() {
     this.ParentElement = $(this.root ? $(this.config.parent) : this.config.parent.body);
     this.ParentPane = this.root ? null : this.config.parent;
@@ -50,7 +62,7 @@ export class WindowPane {
     this.createBody();
     this.attachEvents();
     this.onLoad(this.body);
-    WindowPane.panes[this.name] = this;
+    WindowPane.panes[this.getLayoutID()][this.name] = this;
   }
 
   static insertAtIndex(el, parent, index) {
@@ -113,7 +125,7 @@ export class WindowPane {
       //children verification (brute force - can improve in addChild)
       if(this.body.children().length){
         [...this.body.children()].forEach(x => {
-          let parent = WindowPane.panes[x.dataset.name].ParentPane;
+          let parent = WindowPane.panes[this.getLayoutID()][x.dataset.name].ParentPane;
           let index = parent.children.findIndex(y => y.name === x.dataset.name)
           WindowPane.insertAtIndex(x, parent.body, index) 
         });
@@ -161,20 +173,14 @@ export class WindowPane {
     this.children?.slice().forEach(x => x.destroy());
     this.ParentPane.removeChild(this);
   }
-  getRoot(){
-    if(this.ParentPane.root)
-      return this.ParentPane;
-
-    return this.ParentPane.getRoot();
-  }
   minMaxPane(){
     this.state = this.state ?? 1;
     if(this.state === 1){
       // normal -> expander
       this.state = 2
-      WindowPane.maximized = this;
+      WindowPane.maximized[this.getLayoutID()] = this;
       let activeChild = this.children.find(x => x.active);
-      Object.values(WindowPane.panes).forEach(x => x?.element?.hide() );
+      Object.values(WindowPane.panes[this.getLayoutID()]).forEach(x => x?.element?.hide() );
       let container = this.getRoot().element.parent();
       this.minMaxCOnfig ??= {};
       this.minMaxCOnfig.index = this.ParentPane.children.findIndex(x => x.name === this.name);
@@ -189,9 +195,9 @@ export class WindowPane {
     } else if(this.state = 2){
       //expand -> normal
       this.state = 1;
-      WindowPane.maximized = null;
+      WindowPane.maximized[this.getLayoutID()] = null;
       WindowPane.destroySplitter(this.ParentPane);
-      Object.values(WindowPane.panes).forEach(x => x?.element?.show());
+      Object.values(WindowPane.panes[this.getLayoutID()]).forEach(x => x?.element?.show());
       this.header.find('.closeBtn').show();
       if(this.minMaxCOnfig.index === 0){
         this.element.prependTo(this.ParentElement);
@@ -386,7 +392,7 @@ attachDroppable() {
       if(!(source && target?.dataset?.name))
         return;
 
-      WindowPane.panes[source.dataset.name].moveTo(target.dataset, side);
+      WindowPane.panes[self.getLayoutID()][source.dataset.name].moveTo(target.dataset, side);
     },
 
     createGhost($el) {
@@ -420,7 +426,7 @@ attachDroppable() {
       return;
     }
 
-    const targetPane = WindowPane.panes[target.name];
+    const targetPane = WindowPane.panes[this.getLayoutID()][target.name];
     //find closest row/column
     let panePath = this.getPanePath(targetPane);
     let _root = panePath[0];
@@ -622,7 +628,7 @@ attachDroppable() {
        }
       
     });
-    WindowPane.splits[this.name] = this.splitter;
+    WindowPane.splits[this.getLayoutID()][this.name] = this.splitter;
   }
 
   hide() {
@@ -638,7 +644,7 @@ attachDroppable() {
   }
 
   destroy() {
-    WindowPane.maximized?.minMaxPane?.();
+    WindowPane.maximized[this.getLayoutID()]?.minMaxPane?.();
     if (this.element) {
       this.onDestroy();
       this.children.forEach(child => child.destroy());

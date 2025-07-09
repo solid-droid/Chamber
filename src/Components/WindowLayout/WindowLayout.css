@@ -55,6 +55,7 @@
 /* component */
 .w_container .w_header .w_leftHeader{
     cursor: pointer;
+    border-top: 1px solid #2c2c2c;
     .w_title{
         padding-left: 5px;
         font-size: 15px;
@@ -75,7 +76,7 @@
 
 .w_container .w_leftHeader>.w_header.active{
     background-color: rgb(22, 22, 22);
-    border-top: solid 1px rgb(92, 159, 227);
+    border-top: solid 3px rgb(92, 159, 227);
 }
 .w_stack_container >.w_header{
     background-color: rgb(22, 22, 22);

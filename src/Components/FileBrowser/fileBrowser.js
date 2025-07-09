@@ -8,6 +8,7 @@ export class FileBrowser {
         this.allowMultiSelect = options.allowMultiSelect || false;
         this.allowCheckbox = options.allowCheckbox || false;
         this.onSelect = options.onSelect || (()=>{});
+        this.onExpandCollapse = options.onExpandCollapse || (()=>{});
 
         this.container = this.containerElement.find('.fileTree');
         this.container.addClass('chamberFileBrowser');
@@ -135,6 +136,7 @@ export class FileBrowser {
             item.children('.file-details').children('.caret').addClass('fa-caret-right');
             item.children('.file-details').children('.caret').removeClass('fa-caret-down');
         }
+        this.onExpandCollapse?.(this.dataMap[item.data('path')], item);
     }
     createFileList(list = [], isRoot = false) {
         let fileList = $(`<div class="file-list ${!isRoot ? 'children' : ''}"></div>`);
@@ -146,9 +148,9 @@ export class FileBrowser {
             let _nodeIcon = node.tree_meta.icon ? `<i class="file-icon ${node.tree_meta.icon}"></i>` : '';
             let _caretIcon = node.children?.length ? !node.tree_meta.expanded ? '<i class="fa-solid fa-caret-right caret"></i>'  : '<i class="fa-solid fa-caret-down caret"></i>' : '<i class="caret"></i>';
             
-            let _actionButtons = '';
+            let _actionButtons = [];
             node.tree_meta.actionButtons?.forEach(x => {
-                _actionButtons += this.createActionButton(x);
+                _actionButtons.push(this.createActionButton(x));
             });
 
             const fileItem = $(`
@@ -156,18 +158,30 @@ export class FileBrowser {
                 <div class="file-details  ${_expanded} ${_selected}">
                     ${_caretIcon} 
                     ${_nodeIcon}${_nodeName}  
-                    ${_actionButtons}
                 </div>
             </div>`);
+
+            _actionButtons.forEach(btn => {
+                fileItem.find('.file-details').append(btn);
+            });
+
             fileList.append(fileItem);
+
         });
+
         return fileList;
     }
 
 
     createActionButton(button){
         let _hover = button.hover ? 'onHover' : ''; 
-        let _dom = `<i class="${button.class} ${_hover}" title="${button.title}"></i>`;
+        let _dom = $(`<i class="${button.class} ${_hover}" title="${button.title}"></i>`);
+        if(button.click) {
+            _dom.off('click').on('click', (e) => {
+                e.stopPropagation();
+                button.click(e, this.dataMap[$(e.currentTarget).closest('.file-item').data('path')]);
+            });
+        }
         return _dom;
     }
 

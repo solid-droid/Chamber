@@ -128,7 +128,6 @@ function createNodeTree(element, options = {}){
     let _nodeTree = new FileBrowser(element, {
         data: options?.data || [],
         onSelect: options?.onSelect || (() => {}),
-        onIconClick: options?.onIconClick || (() => {}),
         onExpandCollapse: options?.onExpandCollapse || (() => {})
     });
     setNodeTree(_nodeTree);

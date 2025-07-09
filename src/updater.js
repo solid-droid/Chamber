@@ -1,19 +1,17 @@
-import { check } from '@tauri-apps/plugin-updater';
-import { ask, message } from '@tauri-apps/plugin-dialog';
-import { relaunch } from '@tauri-apps/plugin-process';
+import { checkForUpdate, relaunchApp, sysMessage } from './utils/tauri';
 
 export async function checkForAppUpdates(onUserClick = false) {
-  const update = await check();
+  const update = await checkForUpdate();
   if (update) {
-    const yes = await ask(`Chamber ${update.version} is available!\n\nRelease notes: ${update.body}`, { 
+    const yes = await sysMessage(`Chamber ${update.version} is available!\n\nRelease notes: ${update.body}`, { 
       title: 'Update Available',
       kind: 'info',
       okLabel: 'Update',
       cancelLabel: 'Cancel'
-    });
+    }, true);
     if (yes) {
        let downloaded = 0;
-       let contentLength = 0;
+       let contentLength = 0;  
        await update.downloadAndInstall((event) => {
         switch (event.event) {
           case 'Started':
@@ -30,10 +28,10 @@ export async function checkForAppUpdates(onUserClick = false) {
         }
       });
       console.log('update installed');
-      await relaunch();
+      await relaunchApp();
     }
   } else if (onUserClick) {
-    await message('You are on the latest version. Stay awesome!', { 
+    await sysMessage('You are on the latest version. Stay awesome!', { 
       title: 'No Update Available',
       kind: 'info',
       okLabel: 'OK'

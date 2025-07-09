@@ -1,6 +1,6 @@
 import { JsonVersioning } from "../utils/JsonVersioning";
 import { downloadFile, removeDuplicate } from "../utils/utils";
-import {setWorkspace} from '../Runtime/global';
+import {getNodeTree, setWorkspace} from '../Runtime/global';
 import { buildTree } from "./TreeManager";
 import {
     icons,
@@ -13,7 +13,7 @@ import {
     Datastore_entries,
     Scripts_entries,
     Agent_entries,
-    focusTypes
+    showHideTypes
 } from './defaults';
 
 export class Workspace{
@@ -25,6 +25,14 @@ export class Workspace{
         return this.treeMap?.[this.#selectedNodePath];
     }
     
+    #anchorProjectPath;
+    set anchorProject(path){
+        this.#anchorProjectPath = path;
+    }
+    get anchorProject(){
+        return this.workspaceTree[this.#anchorProjectPath];
+    }
+
     constructor(options = {}) {
         this.options = options;
         this.groupNodeIcon = options.groupNodeIcon || 'fa-solid fa-layer-group';
@@ -42,12 +50,17 @@ export class Workspace{
         this.onLoadStart();
         this.clearAll();
         this.data && this.workspace.setVersionFile(this.data);
-        this.createFileSystem();
+        this.createFileSystem(null);
+        this.selectDefaultNode();
         this.onLoadComplete();
     }
 
     /* FileSystem */
-    createFileSystem(){
+    selectDefaultNode(){
+        //default node logic is pending, adding anchor project as default node
+        this.treeMap[this.#anchorProjectPath].tree_meta.selected = true;
+    }
+    createFileSystem(oldTreeMap = this.treeMap){
         let data = this.workspace.getData() || {};
         const nodeArray = Object.values(data);
         const systemNodes = [
@@ -68,7 +81,7 @@ export class Workspace{
         
         
 
-        const {tree, treeMap,selectedNodePath} = buildTree(allNodes, this.fillNode, this);
+        const {tree, treeMap,selectedNodePath} = buildTree(allNodes, this.fillNode, oldTreeMap, this);
         this.#selectedNodePath = selectedNodePath;
         this.workspaceTree = tree;
         this.treeMap = treeMap;
@@ -80,9 +93,11 @@ export class Workspace{
         existingNode.tree_meta.icon ??= icons[existingNode.name];
         if(parts[0] === 'Projects'){
                 existingNode.tree_meta = {
+                ...existingNode.tree_meta,
                 actionButtons: [
-                    {title:'New Project', class:'fa-solid fa-square-plus', hover:true},
+                    {title:'New Project', class:'fa-solid fa-square-plus', hover:true, click: () => this.treeEventHandle('add', existingNode)},
                 ],
+                expanded: existingNode.tree_meta?.expanded ?? true,
                 icon:icons[parts[0]]
             }
         }
@@ -92,10 +107,11 @@ export class Workspace{
     fillEntityNode(parts, existingNode){
          if(parts[0] === 'Projects'){
             existingNode.tree_meta = {
+                ...existingNode.tree_meta,
                 actionButtons: [
-                    {title:'Export', class:'fa-solid fa-download ', hover:true},
-                    {title:'Anchor', class:'fa-solid fa-anchor', hover:true},
-                    {title:'Delete', class:'fa-solid fa-trash', hover:true},
+                    {title:'Run', class:'fa-solid fa-play', hover:true, click: () => this.treeEventHandle('run', existingNode)},
+                    {title:'Delete', class:'fa-solid fa-trash', hover:true, click: () => this.treeEventHandle('delete', existingNode)},
+                    {title:'Anchor', class:'fa-solid fa-anchor', hover:true, click: () => this.treeEventHandle('anchor', existingNode)},
                 ],
                 icon:icons[parts[0]]
             }
@@ -103,7 +119,7 @@ export class Workspace{
             existingNode.tree_meta = {
                 ...existingNode.tree_meta,
                 actionButtons: [
-                    {title:'Add', class:'fa-solid fa-square-plus', hover:true},
+                    {title:'Add', class:'fa-solid fa-square-plus', hover:true, click: () => this.treeEventHandle('add', existingNode)},
                 ],
                 icon:icons[existingNode.name]
             }
@@ -116,16 +132,17 @@ export class Workspace{
         existingNode.tree_meta = {
             ...existingNode.tree_meta,
             actionButtons: [
-                    focusTypes.includes(parts[1]) ? {
+                    showHideTypes.includes(parts[1]) ? {
                         title:'Show/Hide', 
                         onClass:'fa-solid fa-eye', 
                         offClass:'fa-solid fa-eye-slash', 
                         class: existingNode.hidden ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye',
                         stick:'fa-solid fa-eye-slash', 
                         hover:true, 
+                        click: () => this.treeEventHandle('showHide', existingNode)
                     }:null,
-                    {title:'Add', class:'fa-solid fa-square-plus', hover:true},
-                    {title:'Delete', class:'fa-solid fa-trash', hover:true }
+                    {title:'Add', class:'fa-solid fa-square-plus', hover:true, click: () => this.treeEventHandle('add', existingNode)},
+                    {title:'Delete', class:'fa-solid fa-trash', hover:true, click: () => this.treeEventHandle('delete', existingNode)}
                 ].filter(x => x),
             icon : this.groupNodeIcon,
         }
@@ -141,16 +158,16 @@ export class Workspace{
             existingNode.tree_meta = {
             ...existingNode.tree_meta,
             actionButtons: [
-                    focusTypes.includes(parts[1]) ? {
+                    showHideTypes.includes(parts[1]) ? {
                         title:'Show/Hide', 
                         onClass:'fa-solid fa-eye', 
                         offClass:'fa-solid fa-eye-slash', 
-                        class: existingNode.workspace_meta?.hidden ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye',
-                        stick:'fa-solid fa-eye-slash', 
-                        hover:true, 
+                        stickOn: true,
+                        show: existingNode.tree_meta?.show ?? existingNode.config?.show ?? true, 
+                        hover:true,
+                        click: (show) => this.treeEventHandle('showHide', existingNode, { show }) 
                     } : null,
-                    focusTypes.includes(parts[1]) ? {title:'Focus', class:'fa-solid fa-location-crosshairs', hover: true } : null,
-                    {title:'Delete', class:'fa-solid fa-trash', hover:true }
+                    {title:'Delete', class:'fa-solid fa-trash', hover:true, click: () => this.treeEventHandle('delete', existingNode) }
                 ].filter(x => x),
             icon : icons[parts[1]],
             }
@@ -182,7 +199,8 @@ export class Workspace{
          let data = [];
          let path = `Projects/${name}`;
          let projectFiles = projectDefault.map(x => ({...x, path: `${path}/${x.path}`}));
-         let projectRoot = {name, path, type:'Project'};
+         let projectRoot = {name, path, type:'Project', anchor:true};
+         this.anchorProject = path;
          data = [projectRoot, ...projectFiles];
          return data;
     }
@@ -192,7 +210,7 @@ export class Workspace{
     
     getParent = path => this.treeMap[path?.split('/').slice(0, -1).join('/')];
 
-    update = (node, msg, options = {} ) => {
+    updateNode = (node, msg, options = {} ) => {
         options.stringDiff = options.stringDiff ?? false;
         options.save = options.save ?? false;
         options.tag = options.tag ?? node.path;
@@ -201,16 +219,21 @@ export class Workspace{
         this.workspace.commit(msg, this.cleanUp(this.treeMap), options);
     }
 
-    delete = (node,  options = {}) => {
+    deleteNode = (node,  options = {}, soft=false) => {
         options.stringDiff = options.stringDiff ?? false;
         options.save = options.save ?? false;
         options.tag = options.tag ?? node.path;
         options.saveByTag = options.saveByTag ?? false;
+        this.treeMap[node.path].children?.forEach(child => {
+            this.deleteNode(child, options, true);
+        });
         delete this.treeMap[node.path];
-        this.workspace.commit('delete node', this.cleanUp(this.treeMap), options);
+        if(!soft){
+            this.workspace.commit('delete node', this.cleanUp(this.treeMap), options);
+        }
     }
 
-    create = (node, msg, options = {}) => {
+    createNode = (node, msg, options = {}) => {
         options.stringDiff = options.stringDiff ?? false;
         options.save = options.save ?? false;
         options.tag = options.tag ?? node.path;
@@ -259,14 +282,72 @@ export class Workspace{
 
     async export(squash = false){
         let _versionFile = this.workspace.getVersionFile();
-        let data = (await window.JsonHandler.compress('chamber.json',_versionFile,'chamber')).data;
-        downloadFile('chamber.chmbr',data, 'application/x-chamber-workspace')
+        // let data = (await window.JsonHandler.compress('chamber.json',_versionFile,'chamber')).data;
+        downloadFile('chamber.json',_versionFile, 'application/json')
     }
 
     import(versionFile){
         this.init(versionFile);
     }
 
+    async treeEventHandle(event, node, options = {}){
+       switch(event){
+            case 'add': Workspace.createNode(this, node); break;
+            case 'run':
+                alert('Run not implemented yet');
+                break;
+            case 'anchor':
+                alert('Anchor not implemented yet');
+                break;
+            case 'delete':
+                let confirmDelete = await confirm(`Are you sure you want to delete ${node.name}?`);
+                if(!confirmDelete){
+                    return;
+                }
+                Workspace.deleteNode(this, node);
+                break;
+            case 'showHide':
+                alert('Show/Hide not implemented yet');
+                break;
+            case 'focus':
+                alert('Focus not implemented yet');
+                break;
+            default:
+                console.warn('Unknown event:', event);
+       }
+    }
+
+}
+
+Workspace.createNode = function(self, node){
+    let newName = node.name === 'Projects' ? 'Project' : node.name;
+    let getUniqueName = (count = 0) => {
+        let name = `New ${newName}${count ? ` (${count})` : ''}`;
+        if(self.get(`${node.path}/${name}`)){
+            return getUniqueName(count + 1);
+        }
+        return name;
+    }
+    let newNode = {
+        name: getUniqueName(),
+        path: node.path + '/' + getUniqueName(),
+        type: node.name,
+    }
+    self.createNode(newNode);
+    if(newNode.type === 'Projects'){
+        projectDefault.forEach(x => {
+            let projectFile = {...x, path: `${newNode.path}/${x.path}`};
+            self.createNode(projectFile, `Create project file ${projectFile.name}`);
+        });
+    }
+    self.createFileSystem();
+    getNodeTree().reload(self.workspaceTree);
+}
+
+Workspace.deleteNode = function(self, node){
+    self.deleteNode(node);
+    self.createFileSystem();
+    getNodeTree().reload(self.workspaceTree);
 }
 
 export function createWorkspace(options = {}){

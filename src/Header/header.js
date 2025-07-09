@@ -1,7 +1,7 @@
-import { getCurrentWindow } from '@tauri-apps/api/window';
 import { getWorkspace } from '../Runtime/global';
 import { createLayout } from '../Components/WindowLayout/create';
-const { invoke } = window.__TAURI__.core;
+import { getWindow } from '../utils/tauri';
+// const { invoke } = window.__TAURI__.core;
 
 let BodyLayout;
 
@@ -57,39 +57,43 @@ function attachDesignMode(devMode){
 }
 
 function attachVersionFileInput(){
-    $('#head-tools .loadProject').on('click',async ()=>{
-         $('#versionFileInput').trigger('click')
+    $('#head-tools .loadWorkspace').on('click',async ()=>{
+         $('#versionFileInput').trigger('click');
     });
 
     $('#versionFileInput').on('change', async () => {
         const file = $('#versionFileInput')[0].files[0];
         if (!file) return;
         
-        console.log("📄 Filename:", file.name);
-        
-        const content = await file.arrayBuffer(); // or file.arrayBuffer() for binary
-        const uint8Array = new Uint8Array(content);
-        const workspaceData = await window.JsonHandler.extract(uint8Array, {isEncrypted:true, seed:'chamber'});
-        getWorkspace().import(workspaceData);
+     
+        if(file.type == 'application/json') {
+            const jsonContent = await file.text();
+            getWorkspace().import(JSON.parse(jsonContent));
+        } else if(file.type == 'application/octet-stream') {
+            const content = await file.arrayBuffer(); // or file.arrayBuffer() for binary
+            const uint8Array = new Uint8Array(content);
+            const workspaceData = await window.JsonHandler.extract(uint8Array, {isEncrypted:true, seed:'chamber'});
+            getWorkspace().import(workspaceData);
+        }
 
-        $('#versionFileInput').val('');
+        // $('#versionFileInput').val('');
     });
 }
 
 function attachWindowButtons(){
     $('#head-tools .closeButton').on('click', async() => {
-            await getCurrentWindow().close();
+            await getWindow().close();
     });
 
     $('#head-tools .minimizeButton').on('click',async () => {
-        await getCurrentWindow().minimize();
+        await getWindow().minimize();
     });
     
     $('#head-tools .maximizeButton').on('click',async () => {
-        if(await getCurrentWindow().isMaximized())
-            await getCurrentWindow().unmaximize();
+        if(await getWindow().isMaximized())
+            await getWindow().unmaximize();
         else
-            await getCurrentWindow().maximize();
+            await getWindow().maximize();
         getWorkspace()?.resize();
     });
 }
@@ -107,9 +111,9 @@ function attachDevTools(){
         }
     });
 
-    $('#head-tools .devTools').on('click',async () => {
-        invoke('open_devtools_command');
-    });
+    // $('#head-tools .devTools').on('click',async () => {
+    //     invoke('open_devtools_command');
+    // });
 }
 
 function showDevMode(value){

@@ -1,4 +1,4 @@
-export function buildTree(data, fillNode, _workspace) {
+export function buildTree(data, fillNode, oldTreeMap, _workspace) {
     const tree = [];
     const treeMap = {};
     let selectedNodePath = null;
@@ -23,7 +23,8 @@ export function buildTree(data, fillNode, _workspace) {
                 currentLevel.push(existingNode);
                 treeMap[currentPath] = existingNode;
             }
-            existingNode.tree_meta = existingNode.tree_meta || {};
+            const oldNode = oldTreeMap?.[existingNode.path];
+            existingNode.tree_meta = oldNode?.tree_meta || existingNode.tree_meta || {};
             selectedNodePath = existingNode.tree_meta.selected ? existingNode.path : selectedNodePath; 
             existingNode = fillNode(parts, existingNode , i, _workspace);
             currentLevel = existingNode.children;
