@@ -125,8 +125,8 @@ body{
 }
 
 #EditorContainer{
-    height: calc(100% - 3px);
-    width: calc(100% - 3px);
+    height: 100%;
+    width: 100%;
     overflow: hidden;
 
     #Chamber_codeEditor_container{
