@@ -251,9 +251,7 @@ export class WindowPane {
           ${resizeIcon ? '<i class="fa-solid fa-window-maximize headerButton minMaxBtn"></i>' : ''}
           ${this.closeIcon ? '<i class="fa-solid fa-xmark headerButton closeBtn"></i>' : '' }
       </div>`;
-      const headerLeft = `
-        <div class="w_leftHeader"></div>
-      `
+      const headerLeft = `<div class="w_leftHeader"></div>`;
      headerElem.attr('data-name', name);
      headerElem.attr('data-element', 'header');
      headerElem.append(headerLeft);

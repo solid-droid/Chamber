@@ -42,7 +42,7 @@ export function createLayout() {
         closeIcon:false,
         resizeIcon:false, 
         parent: left, 
-        onLoad: el => el.text('Datastore - global data CRUD , local, remote, system data monitoring')
+        onLoad: el => el.text('Datastore - Varaiables, Signals and file storage')
     });
 
     /* center */
