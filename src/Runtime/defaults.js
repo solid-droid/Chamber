@@ -49,7 +49,6 @@ const Canvas3D_entries = [
 ];
 
 const Canvas2D_entires = [
-    {name: 'Network', path: 'Canvas2D/Network'},
     {name: 'Scene', path: 'Canvas2D/Scene'},
     {name: 'Camera', path: 'Canvas2D/Camera'},
     {name: 'Light', path: 'Canvas2D/Light'},

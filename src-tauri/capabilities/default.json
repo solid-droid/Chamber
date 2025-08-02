@@ -10,7 +10,27 @@
     "core:window:allow-maximize",  
     "core:window:allow-close",
     "core:window:allow-unmaximize",
-    "core:window:allow-start-dragging"
+    "core:window:allow-start-dragging",
+    "shell:allow-execute",
+    {
+      "identifier": "shell:allow-spawn",
+      "allow": [
+        {
+          "name": "binaries/app",
+          "sidecar": true
+        }
+      ]
+    },
+    {
+      "identifier": "shell:allow-execute",
+      "allow": [
+        {
+          "name": "binaries/app",
+          "sidecar": true
+        }
+      ]
+    },
+    "shell:allow-open"
   ],
   "fileAssociations": [
         {

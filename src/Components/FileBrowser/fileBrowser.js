@@ -162,7 +162,7 @@ export class FileBrowser {
             </div>`);
 
             _actionButtons.forEach(btn => {
-                fileItem.find('.file-details').append(btn);
+                fileItem.find('.file-details').append(btn.addClass('fb-actions'));
             });
 
             fileList.append(fileItem);

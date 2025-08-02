@@ -1,4 +1,4 @@
-let nodeTree, workspace, editor, configEditor;
+let nodeTree, workspace, editor, configEditor, blueprint;
 function getNodeTree(){
     return nodeTree
 }
@@ -32,6 +32,14 @@ function setConfigEditor(data){
     configEditor = data;
 }
 
+function setBlueprint(data){
+    blueprint = data;
+}
+
+function getBlueprint(){
+    return blueprint;
+}
+
 export {
     getNodeTree,
     setNodeTree,
@@ -40,5 +48,7 @@ export {
     getCodeEditor,
     setCodeEditor,
     getConfigEditor,
-    setConfigEditor
+    setConfigEditor,
+    getBlueprint,
+    setBlueprint
 }

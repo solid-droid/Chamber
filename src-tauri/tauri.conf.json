@@ -33,6 +33,7 @@
     }
   },
   "bundle": {
+    "externalBin": ["binaries/app"],
     "createUpdaterArtifacts": true,
     "active": true,
     "targets": "all",

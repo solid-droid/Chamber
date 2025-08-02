@@ -3,14 +3,15 @@ import { FileBrowser } from "../FileBrowser/fileBrowser";
 import { getWorkspace, setCodeEditor, setNodeTree } from "../../Runtime/global";
 import { codeEditor } from "../CodeEditor/codeEditor";
 import { debounce } from "../../utils/utils";
+import { createBlueprint } from "../Blueprint/blueprint";
 
 export function createLayout() {
     const root = new WindowPane({
         root: true,
         type: 'row',
         name: 'root',
-        sizes:[30, 60, 30],
-        parent: '#EditorContainer'
+        sizes:[20, 70, 30],
+        parent: '#EditorContainer',
     });
 
     /* left */
@@ -63,14 +64,6 @@ export function createLayout() {
             $('#ViewPortContainer').appendTo(el); 
         }
     });
-    new WindowPane({ 
-        type: 'component', 
-        name: 'FocusView', 
-        title: 'Focus View', 
-        closeIcon:false,
-        parent: center, 
-        onLoad: el => el.text('FocusView')
-    });
       new WindowPane({ 
         type: 'component', 
         name: 'blueprint', 
@@ -78,23 +71,40 @@ export function createLayout() {
         closeIcon:false,
         resizeIcon:false, 
         parent: center, 
-        onLoad: el => el.text('Blueprint - create state machines using existing nodes')
+        onLoad: el => createBlueprint(el)
     });
 
     /* right */
     const right = new WindowPane({ 
-        type: 'stack', 
+        type: 'column', 
         name: 'rightCol',
         closeIcon:false, 
         parent: root,
+        sizes:[40, 60],
     });
+    new WindowPane({ 
+        type: 'component', 
+        name: 'FocusView', 
+        title: 'Focus View', 
+        closeIcon:false,
+        parent: right, 
+        onLoad: el => el.text('FocusView')
+    });
+
+    const rightBottom = new WindowPane({ 
+        type: 'stack', 
+        name: 'rightBottom',
+        closeIcon:false, 
+        parent: right,
+    });
+
     new WindowPane({ 
         type: 'component', 
         name: 'CodeEditor',
         closeIcon:false, 
-        title: 'Editor',
+        title: 'Code',
         active:true,
-        parent: right,
+        parent: rightBottom,
         onLoad: async el => {
             el.append(`<div id="Chamber_codeEditor_container">
                   <div id="Chamber_codeEditor"></div>
@@ -115,7 +125,7 @@ export function createLayout() {
         name: 'ConfigEditor', 
         title: 'Config', 
         closeIcon:false,
-        parent: right, 
+        parent: rightBottom, 
         onLoad: el => el.text('ConfigEditor') 
     });
 

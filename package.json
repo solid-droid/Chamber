@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "package:nodejs": "npm --prefix src-nodejs run pkg && node src-nodejs/sidecar_relocate.js"
   },
   "dependencies": {
     "@babylonjs/core": "8.9.0",
@@ -20,6 +21,7 @@
     "@tauri-apps/plugin-dialog": "^2.3.0",
     "@tauri-apps/plugin-opener": "^2",
     "@tauri-apps/plugin-process": "^2.3.0",
+    "@tauri-apps/plugin-shell": "^2.3.0",
     "@tauri-apps/plugin-updater": "^2.9.0",
     "concurrently": "^9.1.2",
     "cross-env": "^7.0.3",

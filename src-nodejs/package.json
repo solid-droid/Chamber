@@ -1,0 +1,15 @@
+{
+  "name": "src-nodejs",
+  "version": "1.0.0",
+  "main": "app.js",
+  "bin": "app.js",
+  "scripts": {
+    "pkg": "pkg . --output app"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@yao-pkg/pkg": "^6.6.0"
+  }
+}

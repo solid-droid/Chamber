@@ -1,11 +1,14 @@
 import { Droppable } from './Droppable';
 import './WindowLayout.css';
 import Split from './Split';
+import { Dropdown } from '../Dropdown/dropdown';
+import { dragable } from '../Dragable/Dragable';
 
 export class WindowPane {
   static panes = {};
   static splits = {};
   static maximized = {};
+  static subView = {};
 
   constructor(config = {}) {
     this.config = config;
@@ -185,6 +188,11 @@ export class WindowPane {
       this.minMaxCOnfig ??= {};
       this.minMaxCOnfig.index = this.ParentPane.children.findIndex(x => x.name === this.name);
       container.append(this.element);
+      container.append($(`<div class="w_subView">
+           <div class="gutter gutter-vertical"></div>
+           <div class="gutter gutter-horizontal"></div>
+            <div class="w_subView_content"></div>
+        </div>`));
       this.element.show();
       activeChild?.element.show();
       this.element.css({
@@ -192,6 +200,7 @@ export class WindowPane {
         'width': '100%'
       });
       this.header.find('.closeBtn').hide();
+      this.addSubviewsOnMaximize();
     } else if(this.state = 2){
       //expand -> normal
       this.state = 1;
@@ -204,23 +213,91 @@ export class WindowPane {
       } else {
         this.element.insertAfter(this.ParentPane.children[this.minMaxCOnfig.index-1].element);
       }
+      this.removeSubviewsOnMaximize();
       this.render();
       this.ParentPane.render();
     }
   }
 
+  addSubviewsOnMaximize() {
+    let container = this.getRoot().element.parent();
+    let gutterVertical = container.find('.w_subView').find('.gutter-vertical');
+    let gutterHorizontal = container.find('.w_subView').find('.gutter-horizontal');
+    let maxHeight = container.find('.w_subView').height();
+    let minWidth = container.find('.w_subView').width();
+    new dragable(gutterVertical, {
+      onDrag: (e, { dx, dy }) => {
+        let height = window.innerHeight - e.clientY;
+        if(height < minWidth) height = minWidth;
+        if(height > maxHeight) height = maxHeight;
+        container.find('.w_subView').css('height', height + 'px');
+      }
+    });
+    new dragable(gutterHorizontal, {
+      onDrag: (e, { dx, dy }) => {
+        let width = window.innerWidth - e.clientX;
+        if(width < minWidth) width = minWidth;
+        if(width > window.innerWidth - 100) width = window.innerWidth - 100;
+        container.find('.w_subView').css('width', width + 'px');
+      }
+    });
+    /////////////
+
+    let subviewDropdown = $(`<div class="w_subView_selector"></div>`);
+    this.element.find('.w_rightHeader').prepend(subviewDropdown);
+    let items =  Object.values(WindowPane.panes[this.getLayoutID()])
+                       .filter(x=> x.type === 'component' && x.name !== this.name && !this.children.map(x => x.name).includes(x.name))
+                       .map(x => ({label: x.config.title, value: x.name}));
+    items.unshift({label: 'None', value: null});
+  
+    new Dropdown(subviewDropdown[0], {
+      items: items,
+      selectedItem: items[0],
+      onSelect: (item) => {
+        this.detachSubview();
+        container.find('.w_subView').hide();
+        if(item.value){
+          let subView = WindowPane.panes[this.getLayoutID()][item.value];
+          WindowPane.subView[this.getLayoutID()] = {subView, index: subView.config.parent.children.findIndex(x => x.name === subView.name)};
+          subView.element.detach().appendTo(container.find('.w_subView_content'));
+          subView.render();
+          subView.show();
+          container.find('.w_subView').show();
+        }
+      }
+    });
+  }
+
+  removeSubviewsOnMaximize() {
+    this.element.find('.w_rightHeader').find('.w_subView_selector').remove();
+    this.detachSubview();
+    this.getRoot().element.parent().find('.w_subView').remove();
+  }
+
+  detachSubview(){
+    if(WindowPane.subView?.[this.getLayoutID()]){
+      //reattach subview back to its parent
+      const {subView, index} = WindowPane.subView[this.getLayoutID()];
+      if(index === 0){
+        subView.element.prependTo(subView.ParentElement);
+      } else {
+        subView.element.insertAfter(subView.ParentPane.children[index-1].element);
+      }
+      WindowPane.subView[this.getLayoutID()] = null;
+      subView.render();
+      subView.show();
+    }
+  }
   attachEvents() {
     if((['row', 'column'].includes(this.type)))
         return;
 
     this.header.off('click').on('click', (e) => {
       if ($(e.target).hasClass('closeBtn')) {
-        e.stopPropagation();
         this.closePane(e);
         return;
       }
       if ($(e.target).hasClass('minMaxBtn')) {
-        e.stopPropagation();
         this.minMaxPane(e);
         return;
       }
@@ -228,7 +305,6 @@ export class WindowPane {
     });
 
     this.header.off('click', '.w_leftHeader>.w_header').on('click', '.w_leftHeader>.w_header', (e) => {
-      e.stopPropagation();
       let selectedPane = this.children.find(x => x.name === $(e.currentTarget).data().name);
       if ($(e.target).hasClass('closeBtn')) {
         this.closePane(e);
@@ -236,7 +312,7 @@ export class WindowPane {
       }
 
       if ($(e.target).hasClass('minMaxBtn')) {
-        this.closePane(e);
+        this.minMaxPane(e);
         return;
       }
       this.children.forEach(x => x.hide());

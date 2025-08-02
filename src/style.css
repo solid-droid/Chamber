@@ -125,9 +125,12 @@ body{
 }
 
 #EditorContainer{
-    height: 100%;
-    width: 100%;
+    height: calc(100% - 15px);
+    width: calc(100% - 15px);
+    margin: 5px;
     overflow: hidden;
+    border-radius: 5px;
+    border: solid #2d2d2d;
 
     #Chamber_codeEditor_container{
         height: calc(100% - 1px);
@@ -148,10 +151,8 @@ body{
     }
 }
 #ViewPortContainer{
-    height: calc(100% - 5px);
-    width: calc(100% - 5px);
-    border: 2px #393939;
-    border-style: double;
+    height: 100%;
+    width: 100%;
     background: black;
 }
 
