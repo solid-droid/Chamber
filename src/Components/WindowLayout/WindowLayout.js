@@ -223,10 +223,16 @@ export class WindowPane {
     let container = this.getRoot().element.parent();
     let gutterVertical = container.find('.w_subView').find('.gutter-vertical');
     let gutterHorizontal = container.find('.w_subView').find('.gutter-horizontal');
-    let maxHeight = container.find('.w_subView').height();
-    let minWidth = container.find('.w_subView').width();
+    let minWidth = 350;
+    window.onresize = () => {
+      container.find('.w_subView').css({
+        'max-height': window.innerHeight - 75 + 'px',
+        'max-width': window.innerWidth - 100 + 'px'
+      });
+    };
     new dragable(gutterVertical, {
       onDrag: (e, { dx, dy }) => {
+        let maxHeight = window.innerHeight - 75;
         let height = window.innerHeight - e.clientY;
         if(height < minWidth) height = minWidth;
         if(height > maxHeight) height = maxHeight;
@@ -258,8 +264,17 @@ export class WindowPane {
         container.find('.w_subView').hide();
         if(item.value){
           let subView = WindowPane.panes[this.getLayoutID()][item.value];
-          WindowPane.subView[this.getLayoutID()] = {subView, index: subView.config.parent.children.findIndex(x => x.name === subView.name)};
+          WindowPane.subView[this.getLayoutID()] = {
+            subView, 
+            index: subView.config.parent.children.findIndex(x => x.name === subView.name),
+            headerHidden: ['column', 'row'].includes(subView.ParentPane.type),
+            contentHeight: subView.element.height(),
+          };
           subView.element.detach().appendTo(container.find('.w_subView_content'));
+           if(WindowPane.subView[this.getLayoutID()].headerHidden){
+              subView.header.hide();
+              subView.element.css('height','100%');
+           }
           subView.render();
           subView.show();
           container.find('.w_subView').show();
@@ -283,6 +298,10 @@ export class WindowPane {
       } else {
         subView.element.insertAfter(subView.ParentPane.children[index-1].element);
       }
+      if(WindowPane.subView[this.getLayoutID()].headerHidden){
+        subView.header.show();
+        subView.element.css('height',WindowPane.subView[this.getLayoutID()].contentHeight + 'px');
+      } 
       WindowPane.subView[this.getLayoutID()] = null;
       subView.render();
       subView.show();
