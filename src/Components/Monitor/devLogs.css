@@ -1,0 +1,31 @@
+.devLogs{
+    padding: 2px;
+    
+    .devLogs-commit{
+        color: rgb(199, 199, 199);
+        font-size: 13px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        padding: 3px;
+        cursor: pointer;
+        &:hover{
+            background-color: rgb(41, 41, 41);
+        }
+    }
+
+    .devLogs-branchName{
+        font-size: 15px;
+        color: rgb(199, 199, 199);
+        margin-bottom: 5px;
+        cursor: pointer;
+        &:hover{
+            text-decoration: underline;
+        }
+    }
+
+    .devLogs-currentCommit{
+        border: solid 1px rgb(68 68 68);
+        background: #272727;
+    }
+}

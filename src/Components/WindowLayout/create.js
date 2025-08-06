@@ -4,6 +4,7 @@ import { getWorkspace, setCodeEditor, setNodeTree } from "../../Runtime/global";
 import { codeEditor } from "../CodeEditor/codeEditor";
 import { debounce } from "../../utils/utils";
 import { createBlueprint } from "../Blueprint/blueprint";
+import { createMonitorLogs } from "../Monitor/Monitor";
 
 export function createLayout() {
     const root = new WindowPane({
@@ -32,18 +33,19 @@ export function createLayout() {
         parent: left, 
         onLoad: el => {
             createNodeTree(el, {
-                data: getWorkspace().workspaceTree
+                data: getWorkspace().workspaceTree,
+                onSelect: node => getWorkspace().SelectedNode = node
             });
         } 
     });
     new WindowPane({ 
         type: 'component', 
-        name: 'datastore', 
-        title: 'Datastore', 
+        name: 'monitor', 
+        title: 'Monitor', 
         closeIcon:false,
         resizeIcon:false, 
         parent: left, 
-        onLoad: el => el.text('Datastore - Varaiables, Signals and file storage')
+        onLoad: el => createMonitorLogs(el)
     });
 
     /* center */
@@ -115,7 +117,19 @@ export function createLayout() {
             let editor = codeEditor(Chamber_codeEditor[0]);
             setCodeEditor(editor);
             let onChangeDebounce = debounce((e)=>{
-                console.log(e);
+                let workspace = getWorkspace();
+                let node = workspace.SelectedNode;
+
+                if(workspace.setCodePath && workspace.setCodePath === node.path){
+                    workspace.setCodePath = null;
+                    return;
+                }
+
+                if(node.code === editor.getValue())
+                    return;
+
+                node.code = editor.getValue();
+                workspace.updateNode(node,'code-update',{ stringDiff: true })
             }, 500);
             editor.onDidChangeModelContent(onChangeDebounce);
         }

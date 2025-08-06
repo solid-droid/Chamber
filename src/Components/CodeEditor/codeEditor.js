@@ -3,6 +3,7 @@ import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
 import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker';
 import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
 import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
+import test from 'node:test';
 
 export function codeEditor(editorContainer) {
 
@@ -60,17 +61,31 @@ export function codeEditor(editorContainer) {
             }
         }
     };
-    customPasteMethods(editor);
-    return editor;
-}
 
+    
+    editor.onDidChangeCursorPosition(async () => {
+        while(!document.querySelector('.monaco-editor .suggest-widget'))
+            await new Promise(r => setTimeout(r, 50));
 
-function customPasteMethods(editor) {
-    // electron have issue with clipboard paste, so we use custom method    
-    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyV, function () {
-        const clipboardData = window.electronAPI.getClipboard();
-        if (clipboardData && typeof clipboardData === 'string') {
-            editor.trigger('keyboard', 'type', { text: clipboardData });
+        let suggestWidget = $('.monaco-editor .suggest-widget');
+        const editorCoords = editor.getDomNode().getBoundingClientRect();
+        const top = editorCoords.top;
+        const left = editorCoords.left;
+        if (suggestWidget[0] && top!==0 && left!==0) {
+            suggestWidget.css({
+                'margin-top':`${top}px`,
+                'margin-left':`${left}px`,
+                display:'block'
+            });
         }
     });
+
+    editor.onDidLayoutChange(() => {
+        const suggestWidget = document.querySelector('.monaco-editor .suggest-widget');
+        if (suggestWidget) {
+            suggestWidget.style.display = 'none';
+        }
+    });
+
+    return editor;
 }

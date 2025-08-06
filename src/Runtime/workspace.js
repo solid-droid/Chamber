@@ -1,6 +1,6 @@
 import { JsonVersioning } from "../utils/JsonVersioning";
 import { downloadFile, removeDuplicate } from "../utils/utils";
-import {getNodeTree, setWorkspace} from '../Runtime/global';
+import {getCodeEditor, getDevLog, getNodeTree, setWorkspace} from '../Runtime/global';
 import { buildTree } from "./TreeManager";
 import {
     icons,
@@ -17,12 +17,14 @@ import {
 } from './defaults';
 
 export class Workspace{
-    #selectedNodePath = '';
+    selectedNodePath = '';
+    setCodePath = null;
     set SelectedNode(node){
-        this.#selectedNodePath = node.path;
+        this.selectedNodePath = node.path;
+        this.updateSelectedNode(node);
     }
     get SelectedNode(){
-        return this.treeMap?.[this.#selectedNodePath];
+        return this.treeMap?.[this.selectedNodePath];
     }
     
     #anchorProjectPath;
@@ -59,8 +61,9 @@ export class Workspace{
     selectDefaultNode(){
         //default node logic is pending, adding anchor project as default node
         this.treeMap[this.#anchorProjectPath].tree_meta.selected = true;
+        this.selectedNodePath = this.#anchorProjectPath;
     }
-    createFileSystem(oldTreeMap = this.treeMap){
+    createFileSystem(oldTreeMap = this.treeMap, commit = true){
         let data = this.workspace.getData() || {};
         const nodeArray = Object.values(data);
         const systemNodes = [
@@ -82,10 +85,10 @@ export class Workspace{
         
 
         const {tree, treeMap,selectedNodePath} = buildTree(allNodes, this.fillNode, oldTreeMap, this);
-        this.#selectedNodePath = selectedNodePath;
+        this.selectedNodePath = selectedNodePath;
         this.workspaceTree = tree;
         this.treeMap = treeMap;
-        this.workspace.commit(`System:create FileSystem`, this.cleanUp(this.treeMap));
+        commit && this.workspace.commit(`System:create FileSystem`, this.cleanUp(this.treeMap));
     }
 
     fillComponentNode(parts,existingNode){
@@ -217,6 +220,7 @@ export class Workspace{
         options.saveByTag = options.saveByTag ?? false;
         this.treeMap[node.path] = node;
         this.workspace.commit(msg, this.cleanUp(this.treeMap), options);
+        getDevLog().loadChanges();
     }
 
     deleteNode = (node,  options = {}, soft=false) => {
@@ -231,6 +235,7 @@ export class Workspace{
         if(!soft){
             this.workspace.commit('delete node', this.cleanUp(this.treeMap), options);
         }
+        getDevLog().loadChanges();
     }
 
     createNode = (node, msg, options = {}) => {
@@ -244,18 +249,31 @@ export class Workspace{
         parent.children.push(node);
 
         this.workspace.commit(msg, this.cleanUp(this.treeMap), options); 
+        getDevLog().loadChanges();
+    }
+
+    updateSelectedNode(node){
+        //on selected node change
+        this.setCodePath = node.path;
+        $('#head-tools #projectName').text(node.type + ' : ' +node.name);
+        getCodeEditor()?.setValue(node.code ?? '');
     }
     /* utils */
     syncVersionFile(){
         this.treeMap = this.workspace.getData(true);
-    }
-
-    updateNode(node, msg){
-        this.update(node,msg,{stringDiff:true});
+        getDevLog().loadChanges();
     }
     
-    saveNode(node = this.treeMap[this.#selectedNodePath]){
-        this.update(node,'save node',{ stringDiff: true, save: true, tag: node.path, saveByTag: true });
+    saveNode(node = this.treeMap[this.selectedNodePath]){
+        this.updateNode(node,'save node',{ stringDiff: true, save: true, tag: node.path, saveByTag: true });
+        getDevLog().loadChanges();
+    }
+
+    goToCommit(index){
+        this.workspace.gotoCommit(index);
+        this.createFileSystem(this.treeMap, false);
+        getNodeTree().reload(this.workspaceTree);
+        this.updateSelectedNode(this.treeMap?.[this.selectedNodePath])
     }
 
     clearAll(){
@@ -273,9 +291,9 @@ export class Workspace{
                 name: value.name,
                 path: value.path,
                 type: value.type,
-                fileType: value.fileType
+                fileType: value.fileType,
             };
-            value.script && (_treeMap[key].script = value.script);
+            value.code && (_treeMap[key].code = value.code);
         });
         return _treeMap;
     }

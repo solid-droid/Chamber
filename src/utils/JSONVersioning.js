@@ -214,13 +214,7 @@ export class JsonVersioning {
 
     log() {
         const branch = this.branches[this.currentBranch];
-        console.log(`Branch: ${this.currentBranch}`);
-        branch.forEach((commit, index) => {
-            const prefix = (index === this.currentIndex) ? '👉' : '  ';
-            const time = new Date(commit.timestamp).toLocaleString();
-            const tag = commit.save ? '[true]' : '[false]';
-            console.log(`${prefix} [${index}] ${commit.message} ${tag} (${time})`);
-        });
+        return {branch: this.currentBranch, commits: branch, current: this.currentIndex}
     }
 
     getCommitList(branchName = this.currentBranch) {

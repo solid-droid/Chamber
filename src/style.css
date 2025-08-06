@@ -146,6 +146,10 @@ body{
                 .margin {
                     padding-left: 2px !important;
                 }
+            .suggest-widget {
+                position: fixed !important;
+                z-index: 9999; /* Ensure it's on top */
+            }
             }
         }
     }

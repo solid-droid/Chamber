@@ -121,10 +121,12 @@ function showDevMode(value){
             $('#head-tools .chamber-devmode').css({'display':'flex'});
             $('#head-tools .designMode').addClass('active');
             BodyLayout = createLayout();
+            getWorkspace().updateSelectedNode(getWorkspace().SelectedNode);
         } else {
             $('#head-tools .chamber-devmode').hide();
             $('#head-tools .designMode').removeClass('active');
             $('#ViewPortContainer').prependTo($('#BodyContainer')); 
             BodyLayout?.destroy();
+            $('#head-tools #projectName').text('');
         }
 }
