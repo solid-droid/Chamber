@@ -14,12 +14,14 @@ export class DevLogs{
        let logs = workspace.log();
        let branchName = $(`<div class="devLogs-branchName">Branch: ${logs.branch}</div>`)
        this.element.append(branchName);
+       let commitList = $(`<div class="devLogs-commit-container"></div>`);
+       this.element.append(commitList);
        logs.commits.forEach((commit,i) => {
         let _commit = $(`<div data-index="${i}" class="devLogs-commit ${logs.current === i ? 'devLogs-currentCommit' : ''}">
             <span>[${i}] </span>
             <span>${commit.message}</span>
         </div>`);
-        this.element.append(_commit);
+        commitList.append(_commit);
        });
        $('.devLogs-commit').off('click').on('click', (e)=> {
             let index = parseInt(e.currentTarget.dataset.index);

@@ -129,7 +129,7 @@ export function createLayout() {
                     return;
 
                 node.code = editor.getValue();
-                workspace.updateNode(node,'code-update',{ stringDiff: true })
+                workspace.updateNode(node,`code-update: ${node.name}`,{ stringDiff: true })
             }, 500);
             editor.onDidChangeModelContent(onChangeDebounce);
         }

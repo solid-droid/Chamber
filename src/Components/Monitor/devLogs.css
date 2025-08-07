@@ -1,6 +1,13 @@
 .devLogs{
     padding: 2px;
-    
+    height: 30%;
+    overflow: hidden;
+    .devLogs-commit-container{
+        overflow: auto;
+        height: calc(100% - 30px);
+        border-bottom: solid 1px #525252;
+        border-top: solid 1px #525252;
+    }
     .devLogs-commit{
         color: rgb(199, 199, 199);
         font-size: 13px;
@@ -25,7 +32,7 @@
     }
 
     .devLogs-currentCommit{
-        border: solid 1px rgb(68 68 68);
+        outline: solid 1px rgb(68 68 68);
         background: #272727;
     }
 }

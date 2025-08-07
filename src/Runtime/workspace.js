@@ -238,7 +238,7 @@ export class Workspace{
         getDevLog().loadChanges();
     }
 
-    createNode = (node, msg, options = {}) => {
+    createNode = (node, msg, options = {}, commit = true) => {
         options.stringDiff = options.stringDiff ?? false;
         options.save = options.save ?? false;
         options.tag = options.tag ?? node.path;
@@ -248,7 +248,7 @@ export class Workspace{
         parent.children ??= [];
         parent.children.push(node);
 
-        this.workspace.commit(msg, this.cleanUp(this.treeMap), options); 
+        commit && this.workspace.commit(msg, this.cleanUp(this.treeMap), options); 
         getDevLog().loadChanges();
     }
 
@@ -272,8 +272,14 @@ export class Workspace{
     goToCommit(index){
         this.workspace.gotoCommit(index);
         this.createFileSystem(this.treeMap, false);
+        let selectedNode = this.treeMap?.[this.selectedNodePath];
+        if(!selectedNode){
+            selectedNode = this.treeMap.Projects.children[0];
+            selectedNode.tree_meta.selected = true;
+            this.selectedNodePath = selectedNode.path;
+        }
         getNodeTree().reload(this.workspaceTree);
-        this.updateSelectedNode(this.treeMap?.[this.selectedNodePath])
+        this.updateSelectedNode(selectedNode)
     }
 
     clearAll(){
@@ -351,12 +357,17 @@ Workspace.createNode = function(self, node){
         path: node.path + '/' + getUniqueName(),
         type: node.name,
     }
-    self.createNode(newNode);
+
     if(newNode.type === 'Projects'){
-        projectDefault.forEach(x => {
+        self.createNode(newNode, 'Create Project Node', {}, false);
+        projectDefault.forEach((x,i) => {
             let projectFile = {...x, path: `${newNode.path}/${x.path}`};
-            self.createNode(projectFile, `Create project file ${projectFile.name}`);
+            let last = (i === projectDefault.length-1);
+            let msg = last ? 'Create Project Node':`Create project file ${projectFile.name}`;
+            self.createNode(projectFile, msg, {}, last);
         });
+    } else {
+        self.createNode(newNode, `Create ${newNode.type}`);
     }
     self.createFileSystem();
     getNodeTree().reload(self.workspaceTree);
