@@ -33,18 +33,20 @@ async function sysMessage(msg, options = {}, question = false) {
     });
 }
 
-async function sidecar(message = 'Tauri') {
-    const command = Command.sidecar('binaries/app', [], {env: {ChamberMsg: message}});
+async function nodeJS_service(data={type:'echo', msg:'message',onMessage:()=>{}, onExit:()=>{}, onError:()=>{}}) {
+    const command = Command.sidecar('binaries/app', [], {env: {ChamberMsg: JSON.stringify({type:data.type, msg:data.msg})}});
     command.stderr.on('data', line => {
-        console.error(`command stderr: "${line}"`)
+        console.error(`command stderr: "${line}"`);
+        data?.onError(line);
     });
     command.stdout.on('data', line => {
-        console.log(line);
+        data?.onMessage(line);
     });
     command.on('close', data => {
-         console.log(`command finished with code ${data.code} and signal ${data.signal}`)
+         data?.onExit(data);
      });
     const output = await command.spawn();
+    return output;
 }
 
 export { 
@@ -52,5 +54,5 @@ export {
     checkForUpdate, 
     relaunchApp,
     sysMessage,
-    sidecar
+    nodeJS_service
 };

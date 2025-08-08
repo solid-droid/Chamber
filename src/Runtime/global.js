@@ -1,4 +1,4 @@
-let nodeTree, workspace, editor, configEditor, devlog, blueprint;
+let nodeTree, workspace, editor, configEditor, devlog, blueprint, JSengine;
 function getNodeTree(){
     return nodeTree
 }
@@ -48,6 +48,14 @@ function getDevLog(){
     return devlog;
 }
 
+function getExecutor(){
+    return JSengine;
+}
+
+function setExecutor(data){
+    JSengine = data;
+}
+
 export {
     getNodeTree,
     setNodeTree,
@@ -60,5 +68,7 @@ export {
     getBlueprint,
     setBlueprint,
     setDevLog,
-    getDevLog
+    getDevLog,
+    getExecutor,
+    setExecutor
 }

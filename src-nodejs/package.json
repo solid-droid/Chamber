@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "app.js",
   "bin": "app.js",
+  "type": "module",
   "scripts": {
     "pkg": "pkg . --output app"
   },
