@@ -1,9 +1,7 @@
-import { getWorkspace } from '../Runtime/global';
-import { createLayout } from '../Components/WindowLayout/create';
+import { getLayout, getLayoutOBJ, getWorkspace, setLayout, setLayoutOBJ } from '../Runtime/global';
+import { addView, createLayout, removeView } from '../Components/WindowLayout/create';
 import { getWindow } from '../utils/tauri';
 // const { invoke } = window.__TAURI__.core;
-
-let BodyLayout;
 
 export async function attachHeaderEvents({
     devMode,
@@ -16,6 +14,7 @@ export async function attachHeaderEvents({
     attachDesignMode(devMode);
     attachExportButton();
     attachPackagesButton();
+    attachLayoutButton();
 
     if(!devMode.value)
         return;
@@ -23,6 +22,59 @@ export async function attachHeaderEvents({
     //Devmode / Designmode code
     await new Promise(r => setTimeout(r, 1000))
     showDevMode(devMode.value);
+}
+
+function attachLayoutButton(){
+    let layoutMenuState = false;
+      $('#head-tools .layoutbutton').on('click',()=>{
+        layoutMenuState = !layoutMenuState;
+        if(layoutMenuState){
+            $('#head-tools .layoutSubMenu').show();
+            $('#head-tools .layoutbutton').addClass('active');
+            let layout = getLayout();
+            let views = new Set([    
+                            "explorer", 
+                            "monitor",
+                            "viewPort",
+                            "blueprint",
+                            "focusView",
+                            "codeEditor",
+                            "configEditor"
+                        ]);
+            let list = getActiveViews(layout);
+            let activeViews = list.intersection(views);
+            [...views].forEach(x => {
+                $(`#head-tools .${x}`).removeClass('active');
+                $(`#head-tools .${x}`).off('click').on('click',()=>{
+                    if($(`#head-tools .${x}`).hasClass('active')){
+                        $(`#head-tools .${x}`).removeClass('active');
+                        removeView(x);
+                    } else {
+                        $(`#head-tools .${x}`).addClass('active');
+                        addView(x);
+                    }
+                    
+                })
+            });
+            [...activeViews].forEach(x =>{
+                $(`#head-tools .${x}`).addClass('active');
+            });
+
+        } else {
+            $('#head-tools .layoutSubMenu').hide();
+            $('#head-tools .layoutbutton').removeClass('active');
+        }
+        
+    });
+    
+}
+
+function getActiveViews(layout, list = new Set()){
+    list.add(layout.name);
+    layout.children?.forEach(x => {
+        getActiveViews(x, list);
+    });
+    return list;
 }
 
 function attachExportButton(){
@@ -120,13 +172,17 @@ function showDevMode(value){
         if(value){
             $('#head-tools .chamber-devmode').css({'display':'flex'});
             $('#head-tools .designMode').addClass('active');
-            BodyLayout = createLayout();
+            $('#ViewPortContainer').hide();
+            let BodyLayout = createLayout();
+            setLayoutOBJ(BodyLayout);
             getWorkspace().updateSelectedNode(getWorkspace().SelectedNode);
         } else {
             $('#head-tools .chamber-devmode').hide();
             $('#head-tools .designMode').removeClass('active');
             $('#ViewPortContainer').prependTo($('#BodyContainer')); 
-            BodyLayout?.destroy();
+            $('#ViewPortContainer').show();
+            setLayout(getLayoutOBJ().getLayout());
+            getLayoutOBJ()?.destroy();
             $('#head-tools #projectName').text('');
         }
 }

@@ -1,112 +1,92 @@
 import { WindowPane } from "./WindowLayout";
 import { FileBrowser } from "../FileBrowser/fileBrowser";
-import { getWorkspace, setCodeEditor, setNodeTree } from "../../Runtime/global";
+import { getLayout, getLayoutOBJ, getWorkspace, setCodeEditor, setLayout, setLayoutOBJ, setNodeTree } from "../../Runtime/global";
 import { codeEditor } from "../CodeEditor/codeEditor";
 import { debounce } from "../../utils/utils";
 import { createBlueprint } from "../Blueprint/blueprint";
 import { createMonitorLogs } from "../Monitor/Monitor";
 
-export function createLayout() {
-    const root = new WindowPane({
+
+let configMap = {
+    root: {
         root: true,
         type: 'row',
         name: 'root',
-        sizes:[20, 70, 30],
         parent: '#EditorContainer',
-    });
-
-    /* left */
-    const left = new WindowPane({ 
+    },
+    left:{
         type: 'stack',
         closeIcon:false,
         resizeIcon:false, 
         name: 'left', 
-        parent: root ,
-    });
-    new WindowPane({ 
+    },
+    center:{
+        type: 'stack', 
+        name: 'center',
+        closeIcon:false,
+    },
+    right: {
+        type: 'column', 
+        name: 'rightCol',
+        closeIcon:false, 
+        sizes:[40, 60],
+    },
+    rightBottom:{
+        type: 'stack', 
+        name: 'rightBottom',
+        closeIcon:false,
+    },
+    explorer:{
         type: 'component', 
         name: 'explorer', 
         title: 'Explorer', 
         closeIcon:false,
-        resizeIcon:false, 
         active:true,
-        parent: left, 
         onLoad: el => {
             createNodeTree(el, {
                 data: getWorkspace().workspaceTree,
                 onSelect: node => getWorkspace().SelectedNode = node
             });
         } 
-    });
-    new WindowPane({ 
+    },
+    monitor:{
         type: 'component', 
         name: 'monitor', 
         title: 'Monitor', 
         closeIcon:false,
-        resizeIcon:false, 
-        parent: left, 
         onLoad: el => createMonitorLogs(el)
-    });
-
-    /* center */
-    const center = new WindowPane({ 
-        type: 'stack', 
-        name: 'center',
-        parent: root,
-        closeIcon:false,
-    });
-    new WindowPane({ 
+    },
+    viewPort:{
         type: 'component', 
-        name: 'ViewPort', 
+        name: 'viewPort', 
         title: 'View Port',
         closeIcon:false, 
         active:true,
-        parent: center, 
         onLoad: el =>{
             $('#ViewPortContainer').appendTo(el); 
+            $('#ViewPortContainer').show();
         }
-    });
-      new WindowPane({ 
+    },
+    blueprint:{
         type: 'component', 
         name: 'blueprint', 
         title: 'Blueprint', 
         closeIcon:false,
-        resizeIcon:false, 
-        parent: center, 
         onLoad: el => createBlueprint(el)
-    });
-
-    /* right */
-    const right = new WindowPane({ 
-        type: 'column', 
-        name: 'rightCol',
-        closeIcon:false, 
-        parent: root,
-        sizes:[40, 60],
-    });
-    new WindowPane({ 
+    },
+    focusView:{
         type: 'component', 
-        name: 'FocusView', 
+        name: 'focusView', 
         title: 'Focus View', 
         closeIcon:false,
-        parent: right, 
         onLoad: el => el.text('FocusView')
-    });
-
-    const rightBottom = new WindowPane({ 
-        type: 'stack', 
-        name: 'rightBottom',
-        closeIcon:false, 
-        parent: right,
-    });
-
-    new WindowPane({ 
+    },
+    codeEditor:{
         type: 'component', 
-        name: 'CodeEditor',
+        name: 'codeEditor',
         closeIcon:false, 
         title: 'Code',
         active:true,
-        parent: rightBottom,
         onLoad: async el => {
             el.append(`<div id="Chamber_codeEditor_container">
                   <div id="Chamber_codeEditor"></div>
@@ -133,14 +113,161 @@ export function createLayout() {
             }, 500);
             editor.onDidChangeModelContent(onChangeDebounce);
         }
-    });
-   new WindowPane({ 
+    },
+    configEditor:{
         type: 'component', 
-        name: 'ConfigEditor', 
+        name: 'configEditor', 
         title: 'Config', 
         closeIcon:false,
-        parent: rightBottom, 
         onLoad: el => el.text('ConfigEditor') 
+    }
+
+}
+
+export function addView(view){
+    let layout = getLayoutOBJ().getLayout();
+    layout.children??=[];
+    layout.children.push(configMap[view]);
+    setLayout(layout);
+    redrawWindowPanes();
+}
+
+export function removeView(view){
+    let layout = getLayoutOBJ();
+    const {_view, _parent, _index} = findView(layout, view);
+    _view?.destroy();
+    layout.render();
+    setLayout(layout.getLayout());
+}
+
+
+export function redrawWindowPanes(){
+    $('#ViewPortContainer').hide();
+    $('#ViewPortContainer').prependTo($('#BodyContainer')); 
+    getLayoutOBJ()?.destroy();
+    setLayoutOBJ(createLayout());
+}
+
+function findView(layout, view, _parent = null, _index = null){
+    if(!layout)
+        return {_view:layout, _parent, _index};
+    if(layout.name === view)
+        return {_view:layout, _parent, _index};
+
+    let _view;
+    for (const [index, value] of layout.children?.entries() || []) {
+        _view = findView(value, view, layout, index);
+        if(_view)
+            break;
+    }
+    return _view;
+}
+
+export function createLayout() {
+    let layout = getLayout();
+    if(!layout){
+        layout = configMap.root;
+        // layout = getDefaultLayout();
+        setLayout(layout);
+    }
+    let root =  WindowPane.createFromLayout(layout);
+    root.render();
+    return root;
+}
+
+function getDefaultLayout(){
+  let layout = {
+        ...configMap.root,
+        sizes:[20, 70, 30],
+        children:[
+            {
+               ...configMap.left,
+                children:[
+                    {...configMap.explorer},
+                    {...configMap.monitor}
+                ]
+            },
+            {
+               ...configMap.center,
+                children: [
+                    {...configMap.viewPort},
+                    {...configMap.blueprint}
+                ]
+            },
+            {
+                ...configMap.right,
+                children: [
+                    {...configMap.focusView},
+                    {
+                       ...configMap.rightBottom, 
+                        children:[
+                            {...configMap.codeEditor},
+                            {...configMap.configEditor}
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+    return layout;
+}
+
+function createDefaultLayout(){
+    const root = new WindowPane({
+        ...configMap.root,
+        sizes:[20, 70, 30],
+    });
+
+    /* left */
+    const left = new WindowPane({ 
+        ...configMap.left,
+        parent: root ,
+    });
+    new WindowPane({ 
+        ...configMap.explorer,
+        parent: left, 
+    });
+    new WindowPane({ 
+        ...configMap.monitor,
+        parent: left, 
+    });
+
+    /* center */
+    const center = new WindowPane({ 
+        ...configMap.center,
+        parent: root,
+    });
+    new WindowPane({ 
+        ...configMap.viewPort,
+        parent: center, 
+    });
+      new WindowPane({ 
+        ...configMap.blueprint,
+        parent: center, 
+    });
+
+    /* right */
+    const right = new WindowPane({ 
+        ...configMap.right,
+        parent: root,
+    });
+    new WindowPane({ 
+        ...configMap.focusView,
+        parent: right, 
+    });
+
+    const rightBottom = new WindowPane({ 
+        ...configMap.rightBottom,
+        parent: right,
+    });
+
+    new WindowPane({ 
+       ...configMap.codeEditor,
+       parent:rightBottom
+    });
+   new WindowPane({ 
+        ...configMap.configEditor,
+        parent: rightBottom, 
     });
 
     root.render();

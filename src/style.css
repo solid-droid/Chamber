@@ -19,7 +19,7 @@ body{
         flex-shrink: 0;
         width: 100vw;
         height: var(--toolbarHeight);
-        overflow: hidden;
+        z-index: 1;
         background: rgb(27 27 27);
         display: grid;
         grid-template-columns: 200px 1fr auto;
@@ -89,6 +89,20 @@ body{
             .activeGreen{
                 /* background: rgb(16, 103, 55); */
                 /* text-shadow: rgba(25, 195, 67, 0.616) 0 0 10px; */
+            }
+
+            .layoutSubMenu{
+                position: absolute;
+                margin-top: 30px;
+                margin-left: -35px;
+                height: 30px;
+                background: #222222;
+                border: solid 2px #5f5f5f;
+                border-radius: 6px;
+                box-shadow: 0px 1px 6px 3px #191919;
+                display: flex;
+                align-items: center;
+                padding: 0 1px;
             }
         }
     }

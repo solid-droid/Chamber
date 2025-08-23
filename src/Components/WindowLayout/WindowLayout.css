@@ -124,7 +124,7 @@
 
 /* Gutter (Split.js) */
 .gutter {
-    background-color: #282828;
+  background-color: #0000008c;
   flex-shrink: 0;
   z-index: 10;
 }

@@ -75,6 +75,19 @@ export class WindowPane {
     const ref = parent.children().eq(index);
     ref.length ? el.insertBefore(ref) : parent.append(el);
   }
+
+  static createFromLayout(layout, parent=null){
+    const { children, ...config } = layout;
+    if(parent){
+      config.parent = parent;
+    }
+    let node = new WindowPane(config);
+    console.log(config);
+    children?.forEach(x => {
+      WindowPane.createFromLayout(x, node);
+    });
+    return node;
+  }
   
   addChild(pane, index , force = false) {
     let _index = index ?? this.children.length;
@@ -410,6 +423,16 @@ export class WindowPane {
     }
     return pane;
   }
+  getLayout(layout = {}){
+      const {children, ...config} = this.config;
+      layout = config;
+      this.children.forEach(x => {
+        let child = x.getLayout();
+        layout.children ??= [];
+        layout.children.push(child);
+      });
+      return layout;
+  }
 
   render(deep = true) {
     if(!this.element) return;
@@ -500,7 +523,7 @@ attachDroppable() {
     list.unshift(panel);
     if(['row','column'].includes(panel.type) && panel.children.length > 1){
       return list;
-    } else {
+    } else if(panel.ParentPane){
       return this.getPanePath(panel.ParentPane, list);
     }
   }
@@ -522,6 +545,9 @@ attachDroppable() {
     const targetPane = WindowPane.panes[this.getLayoutID()][target.name];
     //find closest row/column
     let panePath = this.getPanePath(targetPane);
+    if(!panePath)
+      return;
+
     let _root = panePath[0];
     let _paneGroup = panePath[1];
     let tIndex = _root.children.findIndex(x => x.name === _paneGroup.name);
@@ -745,6 +771,9 @@ attachDroppable() {
       this.element?.remove();
       this.element = null;
       this.ParentPane?.render();
+      if(this.root){
+        delete WindowPane.panes[this.layoutID]
+      }
     }
   }
 }

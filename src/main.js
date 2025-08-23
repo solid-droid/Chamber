@@ -26,7 +26,11 @@ init();
 
 async function init() {
     window.isDev = await invoke('is_dev_mode');
-    await checkForAppUpdates();
+    try{
+        await checkForAppUpdates();
+    } catch(e){
+        console.log('check for update: '+e);
+    }
     await loadTools();
 
     attachHeaderEvents({

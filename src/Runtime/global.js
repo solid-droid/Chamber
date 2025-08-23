@@ -1,4 +1,14 @@
-let nodeTree, workspace, editor, configEditor, devlog, blueprint, JSengine;
+let nodeTree, 
+workspace, 
+editor, 
+configEditor, 
+devlog, 
+blueprint, 
+JSengine,
+layout,
+layoutOBJ
+;
+
 function getNodeTree(){
     return nodeTree
 }
@@ -56,6 +66,22 @@ function setExecutor(data){
     JSengine = data;
 }
 
+function getLayout(){
+    return layout;
+}
+
+function setLayout(data){
+    layout = data;
+}
+
+function getLayoutOBJ(){
+    return layoutOBJ; 
+}
+
+function setLayoutOBJ(data){
+    layoutOBJ = data;
+}
+
 export {
     getNodeTree,
     setNodeTree,
@@ -70,5 +96,9 @@ export {
     setDevLog,
     getDevLog,
     getExecutor,
-    setExecutor
+    setExecutor,
+    getLayout,
+    setLayout,
+    getLayoutOBJ,
+    setLayoutOBJ
 }
