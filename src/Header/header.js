@@ -183,6 +183,6 @@ function showDevMode(value){
             $('#ViewPortContainer').show();
             setLayout(getLayoutOBJ().getLayout());
             getLayoutOBJ()?.destroy();
-            $('#head-tools #projectName').text('');
+            $('#head-tools #selectedNode').text('');
         }
 }

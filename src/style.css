@@ -55,6 +55,12 @@ body{
             color:rgb(163, 163, 163);
             white-space: nowrap;
             text-overflow: ellipsis;
+            #selectedNode{
+                background: #252525;
+                padding: 1px 10px;
+                border-radius: 5px;
+                cursor: pointer;
+            }
         }
         .rightBlock{
             overflow: hidden;

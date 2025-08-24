@@ -111,6 +111,7 @@ let configMap = {
                 node.code = editor.getValue();
                 workspace.updateNode(node,`code-update: ${node.name}`,{ stringDiff: true })
             }, 500);
+            getWorkspace().updateSelectedNode();
             editor.onDidChangeModelContent(onChangeDebounce);
         }
     },

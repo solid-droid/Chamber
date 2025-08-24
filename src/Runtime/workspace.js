@@ -220,7 +220,7 @@ export class Workspace{
         options.saveByTag = options.saveByTag ?? false;
         this.treeMap[node.path] = node;
         this.workspace.commit(msg, this.cleanUp(this.treeMap), options);
-        getDevLog().loadChanges();
+        getDevLog()?.loadChanges();
     }
 
     deleteNode = (node,  options = {}, soft=false) => {
@@ -235,7 +235,7 @@ export class Workspace{
         if(!soft){
             this.workspace.commit('delete node', this.cleanUp(this.treeMap), options);
         }
-        getDevLog().loadChanges();
+        getDevLog()?.loadChanges();
     }
 
     createNode = (node, msg, options = {}, commit = true) => {
@@ -249,24 +249,25 @@ export class Workspace{
         parent.children.push(node);
 
         commit && this.workspace.commit(msg, this.cleanUp(this.treeMap), options); 
-        getDevLog().loadChanges();
+        getDevLog()?.loadChanges();
     }
 
-    updateSelectedNode(node){
+    updateSelectedNode(node = this.SelectedNode){
         //on selected node change
+        this.selectedNode = node;
         this.setCodePath = node.path;
-        $('#head-tools #projectName').text(node.type + ' : ' +node.name);
+        $('#head-tools #selectedNode').text(node.type + ' : ' +node.name);
         getCodeEditor()?.setValue(node.code ?? '');
     }
     /* utils */
     syncVersionFile(){
         this.treeMap = this.workspace.getData(true);
-        getDevLog().loadChanges();
+        getDevLog()?.loadChanges();
     }
     
     saveNode(node = this.treeMap[this.selectedNodePath]){
         this.updateNode(node,'save node',{ stringDiff: true, save: true, tag: node.path, saveByTag: true });
-        getDevLog().loadChanges();
+        getDevLog()?.loadChanges();
     }
 
     goToCommit(index){

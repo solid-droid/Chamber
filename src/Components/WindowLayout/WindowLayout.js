@@ -82,7 +82,6 @@ export class WindowPane {
       config.parent = parent;
     }
     let node = new WindowPane(config);
-    console.log(config);
     children?.forEach(x => {
       WindowPane.createFromLayout(x, node);
     });
@@ -213,7 +212,7 @@ export class WindowPane {
         'width': '100%'
       });
       this.header.find('.closeBtn').hide();
-      this.addSubviewsOnMaximize();
+      // this.addSubviewsOnMaximize();
     } else if(this.state = 2){
       //expand -> normal
       this.state = 1;
@@ -226,7 +225,7 @@ export class WindowPane {
       } else {
         this.element.insertAfter(this.ParentPane.children[this.minMaxCOnfig.index-1].element);
       }
-      this.removeSubviewsOnMaximize();
+      // this.removeSubviewsOnMaximize();
       this.render();
       this.ParentPane.render();
     }
