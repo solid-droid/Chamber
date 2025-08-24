@@ -126,6 +126,7 @@ let configMap = {
 }
 
 export function addView(view){
+    $('.designerPlaceholder').hide();
     let layout = getLayoutOBJ().getLayout();
     layout.children??=[];
     layout.children.push(configMap[view]);
@@ -134,9 +135,16 @@ export function addView(view){
 }
 
 export function removeView(view){
+    if(view === 'viewPort'){
+        $('#ViewPortContainer').hide();
+        $('#ViewPortContainer').prependTo($('#BodyContainer')); 
+    }
     let layout = getLayoutOBJ();
     const {_view, _parent, _index} = findView(layout, view);
     _view?.destroy();
+    if(! layout?.children?.length ){
+        $('.designerPlaceholder').show();
+    }
     layout.render();
     setLayout(layout.getLayout());
 }
@@ -167,6 +175,7 @@ function findView(layout, view, _parent = null, _index = null){
 export function createLayout() {
     let layout = getLayout();
     if(!layout){
+        $('.designerPlaceholder').show();
         layout = configMap.root;
         // layout = getDefaultLayout();
         setLayout(layout);

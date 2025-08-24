@@ -102,6 +102,7 @@ function attachRemoteAccess(remoteAccess){
 }
 
 function attachDesignMode(devMode){
+    $('#head-tools #selectedNode').hide();
     $('#head-tools .designMode').on('click', ()=>{
         devMode.value  = !devMode.value ;
         showDevMode(devMode.value);
@@ -170,6 +171,7 @@ function attachDevTools(){
 
 function showDevMode(value){
         if(value){
+            $('#head-tools #selectedNode').show();
             $('#head-tools .chamber-devmode').css({'display':'flex'});
             $('#head-tools .designMode').addClass('active');
             $('#ViewPortContainer').hide();
@@ -183,6 +185,7 @@ function showDevMode(value){
             $('#ViewPortContainer').show();
             setLayout(getLayoutOBJ().getLayout());
             getLayoutOBJ()?.destroy();
+            $('#head-tools #selectedNode').hide();
             $('#head-tools #selectedNode').text('');
         }
 }
