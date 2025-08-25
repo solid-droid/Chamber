@@ -5,7 +5,9 @@
   "bin": "app.js",
   "type": "module",
   "scripts": {
-    "pkg": "pkg . --output app"
+    "pkg": "pkg . --output app",
+    "pkgWindows": "pkg . --output app",
+    "pkgAndroid": "pkg . --targets node18-linux-arm64 --output app"
   },
   "author": "",
   "license": "ISC",

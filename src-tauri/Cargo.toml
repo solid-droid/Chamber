@@ -26,6 +26,9 @@ tauri-plugin-dialog = "2"
 tauri-plugin-process = "2"
 tauri-plugin-shell = "2"
 
-[target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
+# Move this dependency here
 tauri-plugin-updater = "2"
 
+# Remove the entire target block since it's no longer needed
+# [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
+# tauri-plugin-updater = "2"
