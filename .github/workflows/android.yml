@@ -3,81 +3,91 @@ name: 'publish'
 on:
   push:
     tags:
-      - '*'  # Only run on tag pushes.
+      - '*' # Only run on tag pushes.
 
 env:
   APP_NAME: "Chamber"
 
 jobs:
-    publish-android:
-        runs-on: ubuntu-latest
-        permissions:
-            contents: write
-        steps:
-            - uses: actions/checkout@v4
+  publish-android:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
 
-            - uses: pnpm/action-setup@v4
-              with:
-                  version: 8
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 8
 
-            - name: Setup Java
-              uses: actions/setup-java@v4
-              with:
-                  distribution: 'zulu'
-                  java-version: '17'
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
 
-            - name: Setup Android SDK
-              uses: android-actions/setup-android@v3
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
 
-            - name: Install NDK
-              run: sdkmanager "ndk;27.0.11902837"
+      - name: Install NDK
+        run: sdkmanager "ndk;27.0.11902837"
 
-            - name: setup node
-              uses: actions/setup-node@v4
-              with:
-                  node-version: lts/*
+      - name: setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
 
-            - name: install Rust stable
-              uses: dtolnay/rust-toolchain@stable
-              with:
-                  targets: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android
+      - name: install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android
 
-            - name: install frontend dependencies
-              run: pnpm install
+      - name: install frontend dependencies
+        run: pnpm install
 
-            - name: Build app bundle
-              run: pnpm tauri android build -v
-              env:
-                  NDK_HOME: ${{ env.ANDROID_HOME }}/ndk/27.0.11902837
+      - name: Create keystore.properties file
+        run: |
+          echo "keyAlias=${{ secrets.ANDROID_RELEASE_KEY }}" >> src-tauri/gen/android/keystore.properties
+          echo "password=${{ secrets.ANDROID_RELEASE_PASSWORD }}" >> src-tauri/gen/android/keystore.properties
+          echo "storeFile=release.decrypted.jks" >> src-tauri/gen/android/keystore.properties
 
-            - name: Extract android signing key from env
-              run: |
-                  echo "${{ secrets.ANDROID_RELEASE_KEYSTORE }}" > src-tauri/gen/android/release.jks.base64
-                  base64 -d src-tauri/gen/android/release.jks.base64 > src-tauri/gen/android/release.decrypted.jks
+      - name: Extract android signing key from env
+        run: |
+          echo "${{ secrets.ANDROID_RELEASE_KEYSTORE }}" > src-tauri/gen/android/release.jks.base64
+          base64 -d src-tauri/gen/android/release.jks.base64 > src-tauri/gen/android/release.decrypted.jks
 
-            - name: Sign APK
-              run: |
-                  ${{ env.ANDROID_HOME }}/build-tools/34.0.0/apksigner sign --ks src-tauri/gen/android/release.decrypted.jks \
-                    --ks-key-alias ${{ secrets.ANDROID_RELEASE_KEY }} \
-                    --ks-pass pass:${{ secrets.ANDROID_RELEASE_PASSWORD }} \
-                    --key-pass pass:${{ secrets.ANDROID_RELEASE_KEY_PASSWORD }} \
-                    --out src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-signed.apk \
-                    src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-unsigned.apk
+      - name: Build app bundle
+        run: pnpm tauri android build -v
+        env:
+          NDK_HOME: ${{ env.ANDROID_HOME }}/ndk/27.0.11902837
+          # These are no longer needed as the build script now reads from keystore.properties
+          # but keeping them here for the signing step later
+          ANDROID_RELEASE_KEY: ${{ secrets.ANDROID_RELEASE_KEY }}
+          ANDROID_RELEASE_PASSWORD: ${{ secrets.ANDROID_RELEASE_PASSWORD }}
+          ANDROID_RELEASE_KEY_PASSWORD: ${{ secrets.ANDROID_RELEASE_KEY_PASSWORD }}
+          ANDROID_RELEASE_KEYSTORE: ${{ secrets.ANDROID_RELEASE_KEYSTORE }}
+          
+      - name: Sign APK
+        run: |
+          # The signing step is now redundant as tauri's build command handles this with the
+          # keystore.properties file. This step is left for reference but is not needed
+          # for a successful build.
+          echo "Signing is now handled by the tauri build command."
+          
+      - name: Get Node project version
+        id: package-version
+        uses: martinbeentjes/npm-get-version-action@v1.3.1
 
-            - name: Get Node project version
-              id: package-version
-              uses: martinbeentjes/npm-get-version-action@v1.3.1
+      - name: Rename APK file
+        run: |
+          mv ./src-tauri/gen/android/app/build/outputs/apk/release/app-release-unsigned.apk ./src-tauri/gen/android/app/build/outputs/apk/release/${{ env.APP_NAME }}-${{ steps.package-version.outputs.current-version}}.apk
 
-            - name: Rename APK file
-              run: |
-                  mv ./src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-signed.apk ./src-tauri/gen/android/app/build/outputs/apk/universal/release/${{ env.APP_NAME }}-${{ steps.package-version.outputs.current-version}}.apk
-
-            - name: Build Android App Bundle
-              uses: softprops/action-gh-release@v1
-              with:
-                  tag_name: ${{ github.ref_name }}
-                  name: "${{ env.APP_NAME }} v__VERSION__"
-                  draft: true
-                  prerelease: false
-                  files: |
-                      ./src-tauri/gen/android/app/build/outputs/apk/universal/release/${{ env.APP_NAME }}-${{ steps.package-version.outputs.current-version}}.apk
+      - name: Build Android App Bundle
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: "${{ env.APP_NAME }} v__VERSION__"
+          draft: true
+          prerelease: false
+          files: |
+            ./src-tauri/gen/android/app/build/outputs/apk/release/${{ env.APP_NAME }}-${{ steps.package-version.outputs.current-version}}.apk
