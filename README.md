@@ -38,3 +38,10 @@
          `cd Chamber/src-tauri/tauri.conf.json`  
          `"externalBin": [],` 
        
+## Errors and solutions/workaround
+- Binaries not found error ->  
+    - Android Build with sidecar - wont work  
+       quick fix -> remove externalBin from tauri.conf.json
+
+- symlinking  error ->  
+  - Run CMD as administrator
