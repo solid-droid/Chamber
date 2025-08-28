@@ -50,8 +50,8 @@ jobs:
           cd src-tauri/gen/android
           echo "keyAlias=${{ secrets.ANDROID_RELEASE_KEY }}" > keystore.properties
           echo "password=${{ secrets.ANDROID_RELEASE_PASSWORD }}" >> keystore.properties
-          base64 -d <<< "${{ secrets.ANDROID_RELEASE_KEYSTORE }}" > $RUNNER_TEMP/keystore.jks
-          echo "storeFile=$RUNNER_TEMP/keystore.jks" >> keystore.properties
+          base64 -d <<< "${{ secrets.ANDROID_RELEASE_KEYSTORE }}" > $RUNNER_TEMP/upload-keystore.jks
+          echo "storeFile=$RUNNER_TEMP/upload-keystore.jks" >> keystore.properties
 
       - name: Build app bundle
         run: pnpm tauri android build -v
