@@ -12,9 +12,9 @@
  - Build (Desktop)  
  `npm run tauri build`
  - Build (Android)  
- `npm tauri android build`  or  
- `npm tauri android build -- --apk` or  
- `npm tauri android build -- --apk --split-per-abi`
+ `npm run tauri android build`  or  
+ `npm run tauri android build -- --apk` or  
+ `npm run tauri android build -- --apk --split-per-abi`
 
 ## UI
  - Tauri - Webview 
