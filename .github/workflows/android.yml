@@ -45,35 +45,19 @@ jobs:
       - name: install frontend dependencies
         run: pnpm install
 
-      - name: Create keystore.properties file
+      - name: setup Android signing
         run: |
-          echo "keyAlias=${{ secrets.ANDROID_RELEASE_KEY }}" >> src-tauri/gen/android/keystore.properties
-          echo "password=${{ secrets.ANDROID_RELEASE_PASSWORD }}" >> src-tauri/gen/android/keystore.properties
-          echo "storeFile=release.decrypted.jks" >> src-tauri/gen/android/keystore.properties
-
-      - name: Extract android signing key from env
-        run: |
-          echo "${{ secrets.ANDROID_RELEASE_KEYSTORE }}" > src-tauri/gen/android/release.jks.base64
-          base64 -d src-tauri/gen/android/release.jks.base64 > src-tauri/gen/android/release.decrypted.jks
+          cd src-tauri/gen/android
+          echo "keyAlias=${{ secrets.ANDROID_RELEASE_KEY }}" > keystore.properties
+          echo "password=${{ secrets.ANDROID_RELEASE_PASSWORD }}" >> keystore.properties
+          base64 -d <<< "${{ secrets.ANDROID_RELEASE_KEYSTORE }}" > $RUNNER_TEMP/keystore.jks
+          echo "storeFile=$RUNNER_TEMP/keystore.jks" >> keystore.properties
 
       - name: Build app bundle
         run: pnpm tauri android build -v
         env:
           NDK_HOME: ${{ env.ANDROID_HOME }}/ndk/27.0.11902837
-          # These are no longer needed as the build script now reads from keystore.properties
-          # but keeping them here for the signing step later
-          ANDROID_RELEASE_KEY: ${{ secrets.ANDROID_RELEASE_KEY }}
-          ANDROID_RELEASE_PASSWORD: ${{ secrets.ANDROID_RELEASE_PASSWORD }}
-          ANDROID_RELEASE_KEY_PASSWORD: ${{ secrets.ANDROID_RELEASE_KEY_PASSWORD }}
-          ANDROID_RELEASE_KEYSTORE: ${{ secrets.ANDROID_RELEASE_KEYSTORE }}
-          
-      - name: Sign APK
-        run: |
-          # The signing step is now redundant as tauri's build command handles this with the
-          # keystore.properties file. This step is left for reference but is not needed
-          # for a successful build.
-          echo "Signing is now handled by the tauri build command."
-          
+
       - name: Get Node project version
         id: package-version
         uses: martinbeentjes/npm-get-version-action@v1.3.1
