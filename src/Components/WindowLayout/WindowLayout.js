@@ -2,7 +2,7 @@ import { Droppable } from './Droppable';
 import './WindowLayout.css';
 import Split from './Split';
 import { Dropdown } from '../Dropdown/dropdown';
-import { dragable } from '../Dragable/Dragable';
+import { dragable } from '../Dragable/dragable';
 
 export class WindowPane {
   static panes = {};
