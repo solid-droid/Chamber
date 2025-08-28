@@ -28,3 +28,4 @@ myapp.key
 /src-tauri/binaries
 upload-keystore.jks
 src-tauri/gen/android/keystore.properties
+upload-keystore.txt

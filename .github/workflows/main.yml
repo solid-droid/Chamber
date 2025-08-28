@@ -34,12 +34,15 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: 'macos-latest' # for Arm based macs (M1 and above).
-            args: '--target aarch64-apple-darwin'
-          - platform: 'macos-latest' # for Intel based macs.
-            args: '--target x86_64-apple-darwin'
+          # -----------------Mac build is working -- not needed for now ------------
+          # - platform: 'macos-latest' # for Arm based macs (M1 and above).
+          #   args: '--target aarch64-apple-darwin'
+          # - platform: 'macos-latest' # for Intel based macs.
+          #   args: '--target x86_64-apple-darwin'
+          # -----------------Linux build Not working -------------------------------
           # - platform: 'ubuntu-22.04' # build is failing for some reason, so disabled for now. need to debug in linux os.
           #   args: ''
+          #-------------------Windows-----------------------------------------------
           - platform: 'windows-latest'
             args: ''
 
