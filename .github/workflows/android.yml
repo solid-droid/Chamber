@@ -47,9 +47,9 @@ jobs:
 
       - name: Create keystore.properties file
         run: |
-          echo "keyAlias=${{ secrets.ANDROID_RELEASE_KEY }}" >> src-tauri/gen/android/keystore.properties
-          echo "password=${{ secrets.ANDROID_RELEASE_PASSWORD }}" >> src-tauri/gen/android/keystore.properties
-          echo "storeFile=release.decrypted.jks" >> src-tauri/gen/android/keystore.properties
+          echo "keyAlias=${{ secrets.ANDROID_RELEASE_KEY }}" >> src-tauri/gen/android/app/keystore.properties
+          echo "password=${{ secrets.ANDROID_RELEASE_PASSWORD }}" >> src-tauri/gen/android/app/keystore.properties
+          echo "storeFile=../release.decrypted.jks" >> src-tauri/gen/android/app/keystore.properties
 
       - name: Extract android signing key from env
         run: |
@@ -80,7 +80,7 @@ jobs:
 
       - name: Rename APK file
         run: |
-          mv ./src-tauri/gen/android/app/build/outputs/apk/release/app-release-unsigned.apk ./src-tauri/gen/android/app/build/outputs/apk/release/${{ env.APP_NAME }}-${{ steps.package-version.outputs.current-version}}.apk
+          mv ./src-tauri/gen/android/app/build/outputs/apk/release/app-release.apk ./src-tauri/gen/android/app/build/outputs/apk/release/${{ env.APP_NAME }}-${{ steps.package-version.outputs.current-version}}.apk
 
       - name: Build Android App Bundle
         uses: softprops/action-gh-release@v1
