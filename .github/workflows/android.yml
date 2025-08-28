@@ -47,9 +47,9 @@ jobs:
 
       - name: Create keystore.properties file
         run: |
-          echo "keyAlias=${{ secrets.ANDROID_RELEASE_KEY }}" >> src-tauri/gen/android/app/keystore.properties
-          echo "password=${{ secrets.ANDROID_RELEASE_PASSWORD }}" >> src-tauri/gen/android/app/keystore.properties
-          echo "storeFile=../release.decrypted.jks" >> src-tauri/gen/android/app/keystore.properties
+          echo "keyAlias=${{ secrets.ANDROID_RELEASE_KEY }}" >> src-tauri/gen/android/keystore.properties
+          echo "password=${{ secrets.ANDROID_RELEASE_PASSWORD }}" >> src-tauri/gen/android/keystore.properties
+          echo "storeFile=release.decrypted.jks" >> src-tauri/gen/android/keystore.properties
 
       - name: Extract android signing key from env
         run: |
