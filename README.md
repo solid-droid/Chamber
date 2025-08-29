@@ -39,9 +39,18 @@
          `"externalBin": [],` 
        
 ## Errors and solutions/workaround
-- Binaries not found error ->  
+- Binaries not found error 
     - Android Build with sidecar - wont work  
        quick fix -> remove externalBin from tauri.conf.json
 
-- symlinking  error ->  
-  - Run CMD as administrator
+- symlinking/build error 
+  - Run CMD as administrator  
+
+- github actions errors
+  - vite/UI build error - import failed  
+  ` Git registring folder case is messed up`  
+  ` mv folders to a temp folder > commit > move back and commit`  
+  ---
+  - Failed to read key from store "/home/runner/work/_temp/keystore.jks": Tag number over 30 is not supported  
+  `check "java -version"`  
+  `make sure to use JDK 8 or 11 to generate keystore`
