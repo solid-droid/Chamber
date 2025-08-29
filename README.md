@@ -53,4 +53,4 @@
   ---
   - Failed to read key from store "/home/runner/work/_temp/keystore.jks": Tag number over 30 is not supported  
   `check "java -version"`  
-  `make sure to use JDK 8 or 11 to generate keystore`
+  `make sure to use JDK 17 to generate keystore`
