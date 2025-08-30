@@ -57,6 +57,9 @@ jobs:
         run: |
           ls -lh $RUNNER_TEMP
           file $RUNNER_TEMP/upload-keystore.jks
+          echo ${{ secrets.ANDROID_RELEASE_KEY }}
+          echo hello
+          echo ${{ secrets.ANDROID_RELEASE_KEYSTORE }}
 
       - name: Build app bundle
         run: pnpm tauri android build -v
