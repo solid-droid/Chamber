@@ -53,6 +53,11 @@ jobs:
           base64 -d <<< "${{ secrets.ANDROID_RELEASE_KEYSTORE }}" > $RUNNER_TEMP/upload-keystore.jks
           echo "storeFile=$RUNNER_TEMP/upload-keystore.jks" >> keystore.properties
 
+      - name: Verify keystore decoding
+        run: |
+          ls -lh $RUNNER_TEMP
+          file $RUNNER_TEMP/upload-keystore.jks
+
       - name: Build app bundle
         run: pnpm tauri android build -v
         env:
