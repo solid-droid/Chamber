@@ -35,25 +35,25 @@ jobs:
       matrix:
         include:
           # Windows Desktop Build
-          - os: windows-latest
-            rust-target: ''
-            tauri-args: ''
-            type: 'desktop'
-          # macOS ARM Build
-          - os: macos-latest
-            rust-target: 'aarch64-apple-darwin'
-            tauri-args: '--target aarch64-apple-darwin'
-            type: 'desktop'
-          # macOS Intel Build
-          - os: macos-latest
-            rust-target: 'x86_64-apple-darwin'
-            tauri-args: '--target x86_64-apple-darwin'
-            type: 'desktop'
-          # Linux Desktop Build
-          - os: ubuntu-22.04
-            rust-target: ''
-            tauri-args: ''
-            type: 'desktop'
+          # - os: windows-latest
+          #   rust-target: ''
+          #   tauri-args: ''
+          #   type: 'desktop'
+          # # macOS ARM Build
+          # - os: macos-latest
+          #   rust-target: 'aarch64-apple-darwin'
+          #   tauri-args: '--target aarch64-apple-darwin'
+          #   type: 'desktop'
+          # # macOS Intel Build
+          # - os: macos-latest
+          #   rust-target: 'x86_64-apple-darwin'
+          #   tauri-args: '--target x86_64-apple-darwin'
+          #   type: 'desktop'
+          # # Linux Desktop Build
+          # - os: ubuntu-22.04
+          #   rust-target: ''
+          #   tauri-args: ''
+          #   type: 'desktop'
           # Android Build
           - os: ubuntu-latest
             rust-target: 'aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android'
@@ -72,9 +72,8 @@ jobs:
           cd src-tauri/gen/android
           echo "keyAlias=${{ secrets.ANDROID_RELEASE_KEY }}" > keystore.properties
           echo "password=${{ secrets.ANDROID_RELEASE_PASSWORD }}" >> keystore.properties
-          base64 -d <<< "${{ secrets.ANDROID_RELEASE_KEYSTORE }}" > $RUNNER_TEMP/uploadkeystore.jks
+          base64 -d <<< "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" > $RUNNER_TEMP/uploadkeystore.jks
           echo "storeFile=$RUNNER_TEMP/uploadkeystore.jks" >> keystore.properties
-          cat keystore.properties
 
       - name: Verify keystore decoding
         if: matrix.type == 'android'
