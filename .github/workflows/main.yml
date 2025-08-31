@@ -36,23 +36,28 @@ jobs:
         include:
           # Windows Desktop Build
           - os: windows-latest
-            target: ''
+            rust-target: ''
+            tauri-args: ''
             type: 'desktop'
           # macOS ARM Build
           - os: macos-latest
-            target: '--target aarch64-apple-darwin'
+            rust-target: 'aarch64-apple-darwin'
+            tauri-args: '--target aarch64-apple-darwin'
             type: 'desktop'
           # macOS Intel Build
           - os: macos-latest
-            target: '--target x86_64-apple-darwin'
+            rust-target: 'x86_64-apple-darwin'
+            tauri-args: '--target x86_64-apple-darwin'
             type: 'desktop'
           # Linux Desktop Build
           - os: ubuntu-22.04
-            target: ''
+            rust-target: ''
+            tauri-args: ''
             type: 'desktop'
           # Android Build
           - os: ubuntu-latest
-            target: 'aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android'
+            rust-target: 'aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android'
+            tauri-args: ''
             type: 'android'
 
     runs-on: ${{ matrix.os }}
@@ -103,7 +108,7 @@ jobs:
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: ${{ matrix.target }}
+          targets: ${{ matrix.rust-target }}
 
       - name: install dependencies (ubuntu only)
         if: matrix.os == 'ubuntu-22.04'
@@ -129,7 +134,7 @@ jobs:
             See the assets to download this version and install.
           releaseDraft: true
           prerelease: false
-          args: ${{ matrix.target }}
+          args: ${{ matrix.tauri-args }}
       
       - name: Get Node project version
         if: matrix.type == 'android'
