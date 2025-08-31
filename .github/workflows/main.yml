@@ -40,11 +40,11 @@ jobs:
             type: 'desktop'
           # macOS ARM Build
           - os: macos-latest
-            target: 'aarch64-apple-darwin'
+            target: '--target aarch64-apple-darwin'
             type: 'desktop'
           # macOS Intel Build
           - os: macos-latest
-            target: 'x86_64-apple-darwin'
+            target: '--target x86_64-apple-darwin'
             type: 'desktop'
           # Linux Desktop Build
           - os: ubuntu-22.04
@@ -60,6 +60,21 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/v')
     steps:
       - uses: actions/checkout@v4
+
+      - name: setup Android signing
+        if: matrix.type == 'android'
+        run: |
+          cd src-tauri/gen/android
+          echo "keyAlias=${{ secrets.ANDROID_RELEASE_KEY }}" > keystore.properties
+          echo "password=${{ secrets.ANDROID_RELEASE_PASSWORD }}" >> keystore.properties
+          base64 -d <<< "${{ secrets.ANDROID_RELEASE_KEYSTORE }}" > $RUNNER_TEMP/upload-keystore.jks
+          echo "storeFile=$RUNNER_TEMP/upload-keystore.jks" >> keystore.properties
+
+      - name: Verify keystore decoding
+        if: matrix.type == 'android'
+        run: |
+          ls -lh $RUNNER_TEMP
+          file $RUNNER_TEMP/upload-keystore.jks
 
       - uses: pnpm/action-setup@v4
         with:
@@ -99,24 +114,9 @@ jobs:
       - name: install frontend dependencies
         run: pnpm install
 
-      - name: setup Android signing
-        if: matrix.type == 'android'
-        run: |
-          cd src-tauri/gen/android
-          echo "keyAlias=${{ secrets.ANDROID_RELEASE_KEY }}" > keystore.properties
-          echo "password=${{ secrets.ANDROID_RELEASE_PASSWORD }}" >> keystore.properties
-          base64 -d <<< "${{ secrets.ANDROID_RELEASE_KEYSTORE }}" > $RUNNER_TEMP/upload-keystore.jks
-          echo "storeFile=$RUNNER_TEMP/upload-keystore.jks" >> keystore.properties
-
-      - name: Verify keystore decoding
-        if: matrix.type == 'android'
-        run: |
-          ls -lh $RUNNER_TEMP
-          file $RUNNER_TEMP/upload-keystore.jks
-          
       - name: Build Tauri app
         if: matrix.type == 'desktop'
-        uses: tauri-apps/tauri-action@v0
+        uses: tauri-apps/tauri-action@v0.5.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
