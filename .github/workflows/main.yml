@@ -35,25 +35,25 @@ jobs:
       matrix:
         include:
           # Windows Desktop Build
-          # - os: windows-latest
-          #   rust-target: ''
-          #   tauri-args: ''
-          #   type: 'desktop'
-          # # macOS ARM Build
-          # - os: macos-latest
-          #   rust-target: 'aarch64-apple-darwin'
-          #   tauri-args: '--target aarch64-apple-darwin'
-          #   type: 'desktop'
-          # # macOS Intel Build
-          # - os: macos-latest
-          #   rust-target: 'x86_64-apple-darwin'
-          #   tauri-args: '--target x86_64-apple-darwin'
-          #   type: 'desktop'
-          # # Linux Desktop Build
-          # - os: ubuntu-22.04
-          #   rust-target: ''
-          #   tauri-args: ''
-          #   type: 'desktop'
+          - os: windows-latest
+            rust-target: ''
+            tauri-args: ''
+            type: 'desktop'
+          # macOS ARM Build
+          - os: macos-latest
+            rust-target: 'aarch64-apple-darwin'
+            tauri-args: '--target aarch64-apple-darwin'
+            type: 'desktop'
+          # macOS Intel Build
+          - os: macos-latest
+            rust-target: 'x86_64-apple-darwin'
+            tauri-args: '--target x86_64-apple-darwin'
+            type: 'desktop'
+          # Linux Desktop Build
+          - os: ubuntu-22.04
+            rust-target: ''
+            tauri-args: ''
+            type: 'desktop'
           # Android Build
           - os: ubuntu-latest
             rust-target: 'aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android'
@@ -150,7 +150,7 @@ jobs:
       - name: Rename APK file
         if: matrix.type == 'android'
         run: |
-          mv ./src-tauri/gen/android/app/build/outputs/apk/release/app-release.apk ./src-tauri/gen/android/app/build/outputs/apk/release/${{ env.APP_NAME }}-${{ steps.package-version.outputs.current-version}}.apk
+          mv ./src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release.apk ./src-tauri/gen/android/app/build/outputs/apk/universal/release/${{ env.APP_NAME }}-${{ steps.package-version.outputs.current-version}}.apk
       
       - name: Build Android App Bundle
         if: matrix.type == 'android'
@@ -161,4 +161,4 @@ jobs:
           draft: true
           prerelease: false
           files: |
-            ./src-tauri/gen/android/app/build/outputs/apk/release/${{ env.APP_NAME }}-${{ steps.package-version.outputs.current-version}}.apk
+            ./src-tauri/gen/android/app/build/outputs/apk/universal/release/${{ env.APP_NAME }}-${{ steps.package-version.outputs.current-version}}.apk
