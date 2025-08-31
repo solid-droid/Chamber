@@ -13,7 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    if: startsWith(github.ref, 'refs/tags/v') # Added a condition to ensure the workflow runs only for tags starting with 'v'
+    # if: startsWith(github.ref, 'refs/tags/v') 
+    # Added a condition to ensure the workflow runs only for tags starting with 'v'
     steps:
       - uses: actions/checkout@v4
 
