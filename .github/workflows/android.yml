@@ -34,14 +34,16 @@ jobs:
           echo "keyAlias=${{ secrets.ANDROID_RELEASE_KEY }}" > keystore.properties
           echo "password=${{ secrets.ANDROID_RELEASE_PASSWORD }}" >> keystore.properties
           # Save the secret to a temporary file
-          echo "${{ secrets.ANDROID_RELEASE_KEYSTORE }}" > $RUNNER_TEMP/upload-keystore.txt
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" > $RUNNER_TEMP/upload-keystore.txt
           # Decode the file using your preferred command
           base64 --decode $RUNNER_TEMP/upload-keystore.txt > $RUNNER_TEMP/upload-keystore.jks
           echo "storeFile=$RUNNER_TEMP/upload-keystore.jks" >> keystore.properties
+          cat keystore.properties
 
       - name: Verify keystore decoding
         run: |
           ls -lh $RUNNER_TEMP
+          file $RUNNER_TEMP/upload-keystore.jks
           file $RUNNER_TEMP/upload-keystore.jks
 
       - name: Setup Android SDK
