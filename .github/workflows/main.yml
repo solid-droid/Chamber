@@ -72,14 +72,15 @@ jobs:
           cd src-tauri/gen/android
           echo "keyAlias=${{ secrets.ANDROID_RELEASE_KEY }}" > keystore.properties
           echo "password=${{ secrets.ANDROID_RELEASE_PASSWORD }}" >> keystore.properties
-          base64 -d <<< "${{ secrets.ANDROID_RELEASE_KEYSTORE }}" > $RUNNER_TEMP/upload-keystore.jks
-          echo "storeFile=$RUNNER_TEMP/upload-keystore.jks" >> keystore.properties
+          base64 -d <<< "${{ secrets.ANDROID_RELEASE_KEYSTORE }}" > $RUNNER_TEMP/uploadkeystore.jks
+          echo "storeFile=$RUNNER_TEMP/uploadkeystore.jks" >> keystore.properties
+          cat keystore.properties
 
       - name: Verify keystore decoding
         if: matrix.type == 'android'
         run: |
           ls -lh $RUNNER_TEMP
-          file $RUNNER_TEMP/upload-keystore.jks
+          file $RUNNER_TEMP/uploadkeystore.jks
 
       - uses: pnpm/action-setup@v4
         with:
