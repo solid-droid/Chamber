@@ -28,6 +28,22 @@ jobs:
           distribution: 'temurin' 
           java-version: '17' # Updated to Java 17 to fix the sdkmanager error.
 
+      - name: setup Android signing
+        run: |
+          cd src-tauri/gen/android
+          echo "keyAlias=${{ secrets.ANDROID_RELEASE_KEY }}" > keystore.properties
+          echo "password=${{ secrets.ANDROID_RELEASE_PASSWORD }}" >> keystore.properties
+          # Save the secret to a temporary file
+          echo "${{ secrets.ANDROID_RELEASE_KEYSTORE }}" > $RUNNER_TEMP/upload-keystore.txt
+          # Decode the file using your preferred command
+          base64 --decode $RUNNER_TEMP/upload-keystore.txt > $RUNNER_TEMP/upload-keystore.jks
+          echo "storeFile=$RUNNER_TEMP/upload-keystore.jks" >> keystore.properties
+
+      - name: Verify keystore decoding
+        run: |
+          ls -lh $RUNNER_TEMP
+          file $RUNNER_TEMP/upload-keystore.jks
+
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
@@ -46,22 +62,6 @@ jobs:
 
       - name: install frontend dependencies
         run: pnpm install
-
-      - name: setup Android signing
-        run: |
-          cd src-tauri/gen/android
-          echo "keyAlias=${{ secrets.ANDROID_RELEASE_KEY }}" > keystore.properties
-          echo "password=${{ secrets.ANDROID_RELEASE_PASSWORD }}" >> keystore.properties
-          # Save the secret to a temporary file
-          echo "${{ secrets.ANDROID_RELEASE_KEYSTORE }}" > $RUNNER_TEMP/upload-keystore.txt
-          # Decode the file using your preferred command
-          base64 --decode $RUNNER_TEMP/upload-keystore.txt > $RUNNER_TEMP/upload-keystore.jks
-          echo "storeFile=$RUNNER_TEMP/upload-keystore.jks" >> keystore.properties
-
-      - name: Verify keystore decoding
-        run: |
-          ls -lh $RUNNER_TEMP
-          file $RUNNER_TEMP/upload-keystore.jks
 
       - name: Build app bundle
         run: pnpm tauri android build -v
