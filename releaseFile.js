@@ -72,16 +72,20 @@ filesToUpdate.forEach(file => {
     }
 });
 
-// --- Git operations with a 2-second delay ---
-console.log(`\n⏳ Waiting for 2 seconds before running Git commands...`);
+// --- Git operations on file change or after timeout ---
+const cargoLockPath = path.join(projectRoot, 'src-tauri', 'Cargo.lock');
+let isDone = false;
 
-setTimeout(() => {
+function doGitOperations() {
+    if (isDone) return;
+    isDone = true;
+
     try {
         console.log(`\n⏳ Running Git commands...`);
         
         // Add the updated files to the staging area
         const filesToAdd = filesToUpdate.map(file => path.relative(projectRoot, file.path)).join(' ');
-        execSync(`git add ${filesToAdd}`, { cwd: projectRoot, stdio: 'inherit' });
+        execSync(`git add ${filesToAdd} ${path.relative(projectRoot, cargoLockPath)}`, { cwd: projectRoot, stdio: 'inherit' });
         
         // Commit the changes
         execSync(`git commit -m "Release v${newVersion}"`, { cwd: projectRoot, stdio: 'inherit' });
@@ -95,4 +99,22 @@ setTimeout(() => {
         console.error(`❌ An error occurred during Git operations: ${error.message}`);
         process.exit(1);
     }
-}, 2000);
+    // Un-watch the file and exit the process
+    fs.unwatchFile(cargoLockPath);
+}
+
+console.log('\n⏳ Waiting for generation of lock file')
+// Set a timeout to run the git commands after 10 seconds
+setTimeout(() => {
+    console.log(`\n⚠️  Timeout reached (10 seconds). Running Git operations without waiting for ${path.basename(cargoLockPath)}...`);
+    doGitOperations();
+}, 10000); // 10000 milliseconds = 10 seconds
+
+// Watch the Cargo.lock file for changes
+fs.watchFile(cargoLockPath, (curr, prev) => {
+    // Only proceed if the file has actually been modified and we haven't already acted
+    if (curr.mtime.getTime() !== prev.mtime.getTime()) {
+        console.log(`\n✅ ${path.basename(cargoLockPath)} updated. Running Git commands...`);
+        doGitOperations();
+    }
+});
