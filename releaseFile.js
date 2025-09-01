@@ -2,49 +2,97 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import fs from 'fs';
 import path from 'path';
+import { execSync } from 'child_process';
 
-// Get the new version from the environment variables set by npm
+// Find the project root directory by searching for package.json
+function findProjectRoot(startPath) {
+    let currentPath = startPath;
+    while (currentPath !== path.parse(currentPath).root) {
+        if (fs.existsSync(path.join(currentPath, 'package.json'))) {
+            return currentPath;
+        }
+        currentPath = path.dirname(currentPath);
+    }
+    return null;
+}
+
 const newVersion = process.env.npm_config_version_tag;
 if (!newVersion) {
-    console.error('Error: You must provide a new version number using the --version_tag flag (e.g., --version_tag=1.0.1).');
+    console.error('Error: You must provide a new version number using the --version_tag flag.');
     process.exit(1);
 }
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const scriptDir = dirname(__filename);
+const projectRoot = findProjectRoot(scriptDir);
 
-// --- Update package.json ---
-const packageJsonPath = path.join(__dirname, 'package.json');
-try {
-    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
-    packageJson.version = newVersion;
-    fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
-    console.log(`✅ Updated version in package.json to ${newVersion}`);
-} catch (error) {
-    console.error(`❌ Failed to update package.json: ${error}`);
+if (!projectRoot) {
+    console.error('Error: Could not find project root containing package.json.');
+    process.exit(1);
 }
 
-// --- Update src-tauri/tauri.conf.json ---
-const tauriConfPath = path.join(__dirname, 'src-tauri', 'tauri.conf.json');
-try {
-    const tauriConf = JSON.parse(fs.readFileSync(tauriConfPath, 'utf8'));
-    tauriConf.version = newVersion;
-    fs.writeFileSync(tauriConfPath, JSON.stringify(tauriConf, null, 2));
-    console.log(`✅ Updated version in tauri.conf.json to ${newVersion}`);
-} catch (error) {
-    console.error(`❌ Failed to update tauri.conf.json: ${error}`);
-}
+// --- Update configuration files ---
+const filesToUpdate = [
+    {
+        path: path.join(projectRoot, 'package.json'),
+        update: (content) => {
+            const json = JSON.parse(content);
+            json.version = newVersion;
+            return JSON.stringify(json, null, 2);
+        },
+        message: 'package.json'
+    },
+    {
+        path: path.join(projectRoot, 'src-tauri', 'tauri.conf.json'),
+        update: (content) => {
+            const json = JSON.parse(content);
+            json.version = newVersion;
+            return JSON.stringify(json, null, 2);
+        },
+        message: 'src-tauri/tauri.conf.json'
+    },
+    {
+        path: path.join(projectRoot, 'src-tauri', 'Cargo.toml'),
+        update: (content) => {
+            return content.replace(/version = ".*?"/, `version = "${newVersion}"`);
+        },
+        message: 'src-tauri/Cargo.toml'
+    }
+];
 
-// --- Update src-tauri/Cargo.toml ---
-const cargoTomlPath = path.join(__dirname, 'src-tauri', 'Cargo.toml');
-try {
-    let cargoTomlContent = fs.readFileSync(cargoTomlPath, 'utf8');
-    const newContent = cargoTomlContent.replace(
-        /version = ".*?"/,
-        `version = "${newVersion}"`
-    );
-    fs.writeFileSync(cargoTomlPath, newContent);
-    console.log(`✅ Updated version in Cargo.toml to ${newVersion}`);
-} catch (error) {
-    console.error(`❌ Failed to update Cargo.toml: ${error}`);
-}
+filesToUpdate.forEach(file => {
+    try {
+        let content = fs.readFileSync(file.path, 'utf8');
+        content = file.update(content);
+        fs.writeFileSync(file.path, content);
+        console.log(`✅ Updated version in ${file.message} to ${newVersion}`);
+    } catch (error) {
+        console.error(`❌ Failed to update ${file.message}: ${error.message}`);
+        process.exit(1);
+    }
+});
+
+// --- Git operations with a 2-second delay ---
+console.log(`\n⏳ Waiting for 2 seconds before running Git commands...`);
+
+setTimeout(() => {
+    try {
+        console.log(`\n⏳ Running Git commands...`);
+        
+        // Add the updated files to the staging area
+        const filesToAdd = filesToUpdate.map(file => path.relative(projectRoot, file.path)).join(' ');
+        execSync(`git add ${filesToAdd}`, { cwd: projectRoot, stdio: 'inherit' });
+        
+        // Commit the changes
+        execSync(`git commit -m "Release v${newVersion}"`, { cwd: projectRoot, stdio: 'inherit' });
+        console.log(`✅ Committed changes with message "Release v${newVersion}"`);
+
+        // Create a new Git tag
+        execSync(`git tag v${newVersion}`, { cwd: projectRoot, stdio: 'inherit' });
+        console.log(`✅ Created Git tag v${newVersion}`);
+
+    } catch (error) {
+        console.error(`❌ An error occurred during Git operations: ${error.message}`);
+        process.exit(1);
+    }
+}, 2000);
