@@ -15,6 +15,10 @@
  `npm run tauri android build`  or  
  `npm run tauri android build -- --apk` or  
  `npm run tauri android build -- --apk --split-per-abi`
+ - Release a new version  
+ `npm run gitRelease --version_tag=0.3.1`  
+  change version to new one. push the commit.  
+  `git push`
 
 ## UI
  - Tauri - Webview 
