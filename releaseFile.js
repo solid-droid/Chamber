@@ -105,6 +105,11 @@ function doGitOperations() {
         execSync(`git tag v${newVersion}`, { cwd: projectRoot, stdio: 'inherit' });
         console.log(`✅ Created Git tag v${newVersion}`);
 
+        // Push the commit and the tag to the remote repository
+        console.log(`\n⏳ Pushing commit and tag to remote...`);
+        execSync(`git push && git push origin v${newVersion}`, { cwd: projectRoot, stdio: 'inherit' });
+        console.log(`✅ Pushed tag v${newVersion} successfully.`);
+
     } catch (error) {
         console.error(`❌ An error occurred during Git operations: ${error.message}`);
         process.exit(1);
@@ -115,7 +120,7 @@ function doGitOperations() {
 
 // Set a timeout to run the git commands after 10 seconds
 setTimeout(() => {
-    console.log(`\n✅ Timeout reached (10 seconds). Proceeding with Git operations...`);
+    console.log(`\n✅  Timeout reached (10 seconds). Running Git operations.`);
     doGitOperations();
 }, 10000); // 10000 milliseconds = 10 seconds
 
