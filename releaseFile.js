@@ -1,13 +1,18 @@
-const fs = require('fs');
-const path = require('path');
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import fs from 'fs';
+import path from 'path';
 
-// Get the new version from the command-line arguments or npm config
-const newVersion = process.env.npm_config_v || process.argv[2];
+// Get the new version from the environment variables set by npm
+const newVersion = process.env.npm_config_version_tag;
 
 if (!newVersion) {
-    console.error('Error: You must provide a new version number (e.g., 1.0.1).');
+    console.error('Error: You must provide a new version number using the --version_tag flag (e.g., --version_tag=1.0.1).');
     process.exit(1);
 }
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // --- Update package.json ---
 const packageJsonPath = path.join(__dirname, 'package.json');
@@ -37,7 +42,7 @@ try {
     let cargoTomlContent = fs.readFileSync(cargoTomlPath, 'utf8');
     const newContent = cargoTomlContent.replace(
         /version = ".*?"/,
-        `version = "${newVersion}"`
+        `version = "version = "${newVersion}"`
     );
     fs.writeFileSync(cargoTomlPath, newContent);
     console.log(`✅ Updated version in Cargo.toml to ${newVersion}`);

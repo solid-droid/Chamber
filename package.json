@@ -8,9 +8,9 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "tauri": "tauri",
-    "package:nodejs": "npm --prefix src-nodejs run pkg && node src-nodejs/sidecar_relocate.js",
     "update:version": "node ./releaseFile.js",
-    "release": "npm run update:version --v=npm_config_v && git add package.json src-tauri/tauri.conf.json src-tauri/Cargo.toml && git commit -m 'Release v$npm_config_v' && git tag v$npm_config_v"
+    "version-and-tag": "npm run update:version --version_tag=npm_config_version_tag && git add package.json src-tauri/tauri.conf.json src-tauri/Cargo.toml && git commit -m 'Release vnpm_config_version_tag' && git tag v$npm_config_version_tag",
+    "gitRelease": "npm run version-and-tag"
   },
   "dependencies": {
     "@babylonjs/core": "8.9.0",
