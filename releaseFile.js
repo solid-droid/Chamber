@@ -115,7 +115,7 @@ function doGitOperations() {
 
 // Set a timeout to run the git commands after 10 seconds
 setTimeout(() => {
-    console.log(`\n⚠️  Timeout reached (10 seconds). Running Git operations without waiting for ${path.basename(cargoLockPath)}...`);
+    console.log(`\n✅ Timeout reached (10 seconds). Proceeding with Git operations...`);
     doGitOperations();
 }, 10000); // 10000 milliseconds = 10 seconds
 
