@@ -11,9 +11,9 @@ import { attachHeaderEvents } from "./Header/header";
 import { createWorkspace } from "./Runtime/Workspace.js";
 import { getNodeTree, getWorkspace } from './Runtime/global';
 import { loadTools } from './utils/loadTools.js';
+import { getEnvironment } from './utils/tauri.js';
 
 /* Window Variables */
-const { invoke } = window.__TAURI__.core;
 window.$ = $;
 window.monaco = monaco;
 window.JsonHandler = new JsonHandler();
@@ -25,11 +25,13 @@ let inspectMode = new State(false);
 init();
 
 async function init() {
-    window.isDev = await invoke('is_dev_mode');
-    try{
-        await checkForAppUpdates();
-    } catch(e){
-        console.log('check for update: '+e);
+    await getEnvironment();
+    if(window.isTauri){
+        try{
+            await checkForAppUpdates();
+        } catch(e){
+            console.log('check for update: '+e);
+        }
     }
     await loadTools();
 

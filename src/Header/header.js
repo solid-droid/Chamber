@@ -7,6 +7,7 @@ export async function attachHeaderEvents({
     devMode,
     remoteAccess
 }){
+    loadIcons();
     attachVersionFileInput();
     attachWindowButtons();
     // attachDevTools();
@@ -24,6 +25,22 @@ export async function attachHeaderEvents({
     showDevMode(devMode.value);
 }
 
+function loadIcons(){
+    if(window.isDesktop){
+        $('#head-tools .remoteAccess').show();
+        $('#head-tools .minimizeButton').show();
+        $('#head-tools .maximizeButton').show();
+        $('#head-tools .closeButton').show();
+    }
+    if(window.isMobile){
+
+    }
+    $('#head-tools .designMode').show();
+    $('#head-tools .restartApp').show();
+    $('#head-tools .loadWorkspace').show();
+    $('#head-tools .settingsButton').show();
+}
+
 function attachLayoutButton(){
     let layoutMenuState = false;
       $('#head-tools .layoutbutton').on('click',()=>{
@@ -31,35 +48,6 @@ function attachLayoutButton(){
         if(layoutMenuState){
             $('#head-tools .layoutSubMenu').show();
             $('#head-tools .layoutbutton').addClass('active');
-            let layout = getLayout();
-            let views = new Set([    
-                            "explorer", 
-                            "monitor",
-                            "viewPort",
-                            "blueprint",
-                            "focusView",
-                            "codeEditor",
-                            "configEditor"
-                        ]);
-            let list = getActiveViews(layout);
-            let activeViews = list.intersection(views);
-            [...views].forEach(x => {
-                $(`#head-tools .${x}`).removeClass('active');
-                $(`#head-tools .${x}`).off('click').on('click',()=>{
-                    if($(`#head-tools .${x}`).hasClass('active')){
-                        $(`#head-tools .${x}`).removeClass('active');
-                        removeView(x);
-                    } else {
-                        $(`#head-tools .${x}`).addClass('active');
-                        addView(x);
-                    }
-                    
-                })
-            });
-            [...activeViews].forEach(x =>{
-                $(`#head-tools .${x}`).addClass('active');
-            });
-
         } else {
             $('#head-tools .layoutSubMenu').hide();
             $('#head-tools .layoutbutton').removeClass('active');
@@ -67,6 +55,37 @@ function attachLayoutButton(){
         
     });
     
+}
+
+function attachLayoutControls(){
+        let layout = getLayout();
+        let views = new Set([    
+                        "explorer", 
+                        "monitor",
+                        "viewPort",
+                        "blueprint",
+                        "focusView",
+                        "codeEditor",
+                        "configEditor"
+                    ]);
+        let list = getActiveViews(layout);
+        let activeViews = list.intersection(views);
+        [...views].forEach(x => {
+            $(`#head-tools .${x}`).removeClass('active');
+            $(`#head-tools .${x}`).off('click').on('click',()=>{
+                if($(`#head-tools .${x}`).hasClass('active')){
+                    $(`#head-tools .${x}`).removeClass('active');
+                    removeView(x);
+                } else {
+                    $(`#head-tools .${x}`).addClass('active');
+                    addView(x);
+                }
+                
+            })
+        });
+        [...activeViews].forEach(x =>{
+            $(`#head-tools .${x}`).addClass('active');
+        });
 }
 
 function getActiveViews(layout, list = new Set()){
@@ -176,6 +195,7 @@ function showDevMode(value){
             $('#head-tools .designMode').addClass('active');
             $('#ViewPortContainer').hide();
             let BodyLayout = createLayout();
+            attachLayoutControls();
             setLayoutOBJ(BodyLayout);
             getWorkspace().updateSelectedNode(getWorkspace().SelectedNode);
         } else {

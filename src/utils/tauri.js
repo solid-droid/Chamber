@@ -4,6 +4,33 @@ import { ask, message } from '@tauri-apps/plugin-dialog';
 import { relaunch } from '@tauri-apps/plugin-process';
 import { Command } from '@tauri-apps/plugin-shell';
 
+async function getEnvironment() {
+    let isMobile = navigator.maxTouchPoints > 0 || /Android|iPhone|iPad/i.test(navigator.userAgent);
+    const isDesktop = !isMobile;
+    const isTauri = !!window.__TAURI__;
+
+    let isDev = false;
+    if (isTauri && typeof window.__TAURI__.core?.invoke === 'function') {
+        try {
+            isDev = await window.__TAURI__.core.invoke('is_dev_mode');
+        } catch (e) {
+            console.error('Failed to invoke is_dev_mode:', e);
+        }
+    }
+
+    window.isMobile = isMobile;
+    window.isDesktop = isDesktop;
+    window.isDev = isDev;
+    window.tauri = isTauri;
+
+    return {
+        isMobile,
+        isDesktop,
+        isDev,
+        isTauri
+    };
+}
+
 function getWindow() {
     return getCurrentWindow();
 }
@@ -54,5 +81,6 @@ export {
     checkForUpdate, 
     relaunchApp,
     sysMessage,
-    nodeJS_service
+    nodeJS_service,
+    getEnvironment
 };

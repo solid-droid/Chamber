@@ -31,7 +31,7 @@ export async function checkForAppUpdates(onUserClick = false) {
       await relaunchApp();
     }
   } else if (onUserClick) {
-    await sysMessage('You are on the latest version. Stay awesome!', { 
+    await sysMessage('You are on the latest version.', { 
       title: 'No Update Available',
       kind: 'info',
       okLabel: 'OK'
