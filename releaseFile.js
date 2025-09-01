@@ -72,6 +72,16 @@ filesToUpdate.forEach(file => {
     }
 });
 
+// --- Generate package-lock.json ---
+try {
+    console.log(`\n⏳ Generating package-lock.json...`);
+    execSync('npm install --no-audit --no-fund', { cwd: projectRoot, stdio: 'inherit' });
+    console.log(`✅ package-lock.json generated successfully.`);
+} catch (error) {
+    console.error(`❌ Failed to generate package-lock.json: ${error.message}`);
+    process.exit(1);
+}
+
 // --- Git operations on file change or after timeout ---
 const cargoLockPath = path.join(projectRoot, 'src-tauri', 'Cargo.lock');
 let isDone = false;
@@ -85,7 +95,7 @@ function doGitOperations() {
         
         // Add the updated files to the staging area
         const filesToAdd = filesToUpdate.map(file => path.relative(projectRoot, file.path)).join(' ');
-        execSync(`git add ${filesToAdd} ${path.relative(projectRoot, cargoLockPath)}`, { cwd: projectRoot, stdio: 'inherit' });
+        execSync(`git add ${filesToAdd} ${path.relative(projectRoot, cargoLockPath)} package-lock.json`, { cwd: projectRoot, stdio: 'inherit' });
         
         // Commit the changes
         execSync(`git commit -m "Release v${newVersion}"`, { cwd: projectRoot, stdio: 'inherit' });
@@ -103,7 +113,6 @@ function doGitOperations() {
     fs.unwatchFile(cargoLockPath);
 }
 
-console.log('\n⏳ Waiting for generation of lock file')
 // Set a timeout to run the git commands after 10 seconds
 setTimeout(() => {
     console.log(`\n⚠️  Timeout reached (10 seconds). Running Git operations without waiting for ${path.basename(cargoLockPath)}...`);
