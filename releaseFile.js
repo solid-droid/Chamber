@@ -5,7 +5,6 @@ import path from 'path';
 
 // Get the new version from the environment variables set by npm
 const newVersion = process.env.npm_config_version_tag;
-
 if (!newVersion) {
     console.error('Error: You must provide a new version number using the --version_tag flag (e.g., --version_tag=1.0.1).');
     process.exit(1);
@@ -29,7 +28,7 @@ try {
 const tauriConfPath = path.join(__dirname, 'src-tauri', 'tauri.conf.json');
 try {
     const tauriConf = JSON.parse(fs.readFileSync(tauriConfPath, 'utf8'));
-    tauriConf.package.version = newVersion;
+    tauriConf.version = newVersion;
     fs.writeFileSync(tauriConfPath, JSON.stringify(tauriConf, null, 2));
     console.log(`✅ Updated version in tauri.conf.json to ${newVersion}`);
 } catch (error) {
@@ -42,7 +41,7 @@ try {
     let cargoTomlContent = fs.readFileSync(cargoTomlPath, 'utf8');
     const newContent = cargoTomlContent.replace(
         /version = ".*?"/,
-        `version = "version = "${newVersion}"`
+        `version = "${newVersion}"`
     );
     fs.writeFileSync(cargoTomlPath, newContent);
     console.log(`✅ Updated version in Cargo.toml to ${newVersion}`);
