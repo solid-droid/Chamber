@@ -27,78 +27,89 @@ const projectDefault = [
      {name: 'secure.env', path: 'secure.env', type:'Secure Tokens', fileType:'env', tree_meta: { icon:'fa-solid fa-gears'}},
 ]
 const COMPONENTS = [
-    {name: 'Projects', path: 'Projects' },
-    {name: 'Canvas3D', path: 'Canvas3D' },
-    {name: 'Canvas2D', path: 'Canvas2D'},
-    {name: 'WebView', path: 'WebView'},
-    {name: 'Audio', path: 'Audio'},
-    {name: 'Datastore', path: 'Datastore'},        
-    {name: 'Scripts', path: 'Scripts'},
-    {name: 'Agent', path: 'Agent'},
+    {name: 'Projects', path: 'Projects', title:'Project Entry Point'},
+    {name: 'Scripts', path: 'Scripts', title:'Script Files'},
+    {name: 'Datastore', path: 'Datastore', title:'Data Management'},
+    {name: 'Automation', path: 'Automation', title:'Automation'},
+    {name: 'WebView', path: 'WebView', title:'Web View'},
+    {name: 'Audio', path: 'Audio', title:'Audio Processing'},
+    {name: 'Canvas3D', path: 'Canvas3D', title:'3D Canvas'},
+    {name: 'Canvas2D', path: 'Canvas2D', title:'2D Canvas'},
 ]
 const Canvas3D_entries = [
-    {name: 'Scene', path: 'Canvas3D/Scene'},
-    {name: 'Camera', path: 'Canvas3D/Camera'},
-    {name: 'Light', path: 'Canvas3D/Light'},
-    {name: 'Mesh', path: 'Canvas3D/Mesh'},
-    {name: 'Material', path: 'Canvas3D/Material'},
-    {name: 'Effects', path: 'Canvas3D/Effects'},
-    {name: 'Animation', path: 'Canvas3D/Animation'},
-    {name: 'Shaders', path: 'Canvas3D/Shaders'},
-    {name: 'Bones', path: 'Canvas3D/Bones'},
+    {name: 'Scene', path: 'Canvas3D/Scene', title:'Scene is the root container for all 3D objects'},
+    {name: 'Camera', path: 'Canvas3D/Camera', title: 'Camera defines the viewpoint and perspective of the 3D scene'},
+    {name: 'Light', path: 'Canvas3D/Light', title: 'Light is used to illuminate the 3D scene'},
+    {name: 'Mesh', path: 'Canvas3D/Mesh', title: 'Mesh is a 3D object made up of vertices, edges, and faces'},
+    {name: 'Material', path: 'Canvas3D/Material', title: 'Material defines the appearance of a 3D object'},
+    {name: 'Fx3D', path: 'Canvas3D/Fx3D', title: 'Fx3D are entities that add special effects to 3D objects'},
+    {name: 'Animation', path: 'Canvas3D/Animation', title: 'Animation is used to create movement and transformations of 3D objects'},
+    {name: 'Shaders', path: 'Canvas3D/Shaders', title: 'Shaders are programs that run on the GPU to control the rendering of 3D objects'},
+    {name: 'Bones', path: 'Canvas3D/Bones', title: 'Bones are used to create skeletal animations for 3D models'},
 ];
 
-const Canvas2D_entires = [
-    {name: 'Scene', path: 'Canvas2D/Scene'},
-    {name: 'Camera', path: 'Canvas2D/Camera'},
-    {name: 'Light', path: 'Canvas2D/Light'},
-    {name: 'Mesh', path: 'Canvas2D/Mesh'},
-    {name: 'Material', path: 'Canvas2D/Material'},
-    {name: 'Effects', path: 'Canvas2D/Effects'},
-    {name: 'Animation', path: 'Canvas2D/Animation'},
-    {name: 'Shaders', path: 'Canvas2D/Shaders'},
-    {name: 'Bones', path: 'Canvas2D/Bones'},
+const Canvas2D_entries = [
+    {name: 'Scene', path: 'Canvas2D/Scene', title: 'Scene is the root container for all 2D objects'},
+    {name: 'Camera', path: 'Canvas2D/Camera', title: 'Camera defines the viewpoint and perspective of the 2D scene'},
+    {name: 'Light', path: 'Canvas2D/Light', title: 'Light is used to illuminate the 2D scene'},
+    {name: 'Mesh', path: 'Canvas2D/Mesh', title: 'Mesh is a 2D object made up of vertices and edges'},
+    {name: 'Material', path: 'Canvas2D/Material', title: 'Material defines the appearance of a 2D object'},
+    {name: 'Fx2D', path: 'Canvas2D/Fx2D', title: 'Fx2D are entities that add special effects to 2D objects'},
+    {name: 'Animation', path: 'Canvas2D/Animation', title: 'Animation is used to create movement and transformations of 2D objects'},
+    {name: 'Shaders', path: 'Canvas2D/Shaders', title: 'Shaders are programs that run on the GPU to control the rendering of 2D objects'},
+    {name: 'Bones', path: 'Canvas2D/Bones', title: 'Bones are used to create skeletal animations for 2D models'},
 ]
 
 
 const WebView_entries = [
-    {name: 'JSX', path: 'WebView/JSX'},
-    {name: 'Media', path: 'WebView/Media'},
-    {name: 'Grid', path: 'WebView/Grid'},
-    {name: 'Chart', path: 'WebView/Chart'},
-    {name: 'Map', path: 'WebView/Map'},
+    {name: 'UI', path: 'WebView/UI' , title:'UI is the user interface for the web view'}, //HTML + CSS + JavaScript content
+    {name: 'Grid', path: 'WebView/Grid' , category:'widget', title:'Grid is a table widget for displaying data'}, //Table widget (data grids, etc...)
+    {name: 'Chart', path: 'WebView/Chart', category:'widget', title:'Chart is a widget for displaying data visualizations'}, //chart widgets (bar, line, pie, etc...)
+    {name: 'Canvas2D', path: 'WebView/Canvas2D', category:'widget', title:'Canvas2D is a 2D drawing surface to embed 2D content'}, //2D drawing surface
+    {name: 'Canvas3D', path: 'WebView/Canvas3D', category:'widget', title:'Canvas3D is a 3D drawing surface to embed 3D content'}, //3D drawing surface
+    {name: 'Player', path: 'WebView/Player', category:'widget', title:'Player is a widget for playing media content'}, // player (video, audio, etc...)
+    {name: 'Map', path: 'WebView/Map', category:'widget', title:'Map is a widget for displaying interactive maps'}, //interactive maps
 ];
 
 const Audio_entries = [
-    {name: 'Instrument', path: 'Audio/Instrument'},
-    {name: 'Soundtrack', path: 'Audio/Soundtrack'},
+    {name: 'Instrument', path: 'Audio/Instrument', title: 'Instrument is a category for synthesizers, samplers, and other sound sources'},
+    {name: 'Mixer', path: 'Audio/Mixer', title: 'Mixer is a mixing console for adjusting volume, pan, and effects'}, 
+    {name: 'Master', path: 'Audio/Master', title: 'Master is for mastering effects like compression and EQ'}, 
+    {name: 'Recorder', path: 'Audio/Recorder', title: 'Recorder is for audio recording from microphone or line-in'}, 
+    {name: 'Vocal', path: 'Audio/Vocal', title: 'Vocal is for processing vocals with effects like auto-tune and reverb'}, 
+    {name: 'FX', path: 'Audio/FX', title: 'FX is for sound effects like reverb, delay, and distortion'},
+    {name: 'Sound', path: 'Audio/Sound', title: 'Sound is for sound effects like UI sounds, footsteps, thunder, etc...'}, 
+    {name: 'Spatial', path: 'Audio/Spatial', title: 'Spatial is for 3D audio positioning and effects'}, 
+    {name: 'Ambience', path: 'Audio/Ambience', title: 'Ambience is for background sounds like wind and rain'},
+    {name: 'Soundtrack', path: 'Audio/Soundtrack', title: 'Soundtrack is for background music (loops, ambient, etc...)'},
+    {name: 'Voice', path: 'Audio/Voice', title: 'Voice is for text-to-speech and speech-to-text (AI voices, etc...)'},
 ]
 
 const Datastore_entries = [
-    {name: 'Signal', path: 'Datastore/Signal'},
-    {name: 'Table', path: 'Datastore/Table'},
-    {name: 'Graph', path: 'Datastore/Graph'},
-    {name: 'BigData', path: 'Datastore/BigData'},
-    {name: 'Cookie', path: 'Datastore/Cookie'},
-    {name: 'Local', path: 'Datastore/Local'},
-    {name: 'Cloud', path: 'Datastore/Cloud'},
+    {name: 'Signal', path: 'Datastore/Signal', title: 'Signal is for real-time data (sensors, web sockets, etc...)'},
+    {name: 'Table', path: 'Datastore/Table', title: 'Table is for structured data (sql, nosql, etc...)'},
+    {name: 'Files', path: 'Datastore/Files', title: 'Files is for file storage (local, cloud, etc...)'},
+    {name: 'Graph', path: 'Datastore/Graph', title: 'Graph is for Graph database (nodes and edges)'},
+    {name: 'Cloud', path: 'Datastore/Cloud', title: 'Cloud is for cloud storage (aws, gcp, azure, etc...)'},
+    {name: 'Session', path: 'Datastore/Session', title: 'Session is for user session data (cookies, local storage, etc...)'},
+    {name: 'Memory', path: 'Datastore/Memory', title: 'Memory is for in-memory data (caches, etc...)'},
 ]
 
 const Scripts_entries = [
-    {name: 'Functions', path: 'Scripts/Functions'},
-    {name: 'Workers', path: 'Scripts/Worker'},
-    {name: 'WASM', path: 'Scripts/WASM'},
-    {name: 'Events', path: 'Scripts/Events'},
-    {name: 'Network', path:'Scripts/Network'}
+    {name: 'Javascript', path: 'Scripts/Javascript', title: 'Javascript is for main thread scripting'},
+    {name: 'Workers', path: 'Scripts/Worker', title: 'Workers is for multi-threaded scripting (web workers, service workers, etc...)'},
+    {name: 'WASM', path: 'Scripts/WASM', title: 'WASM is for compiled binaries (wasm, rust, c, c++, etc...)'},
+    {name: 'Service', path: 'Scripts/Service', title: 'Service is for background services/external services (nodejs, python, etc...)'},
+    {name: 'Network', path:'Scripts/Network', title: 'Network is for network call scripts (REST, Websocket, WebRTC, Torrent, etc...)'}
 ]
 
-const Agent_entries = [
-    {name: 'Cognition', path: 'Agent/Cognition'},
-    {name: 'Workflow', path: 'Agent/Workflow'},
-    {name: 'Transformer', path: 'Agent/Transformer'},
-    {name: 'Crawler', path: 'Agent/Crawlers'},
-    {name: 'Scrapper', path: 'Agent/Scrappers'},
-    {name: 'Plugin', path: 'Agent/Plugin'},
+const Automation_entries = [
+    {name: 'Blueprint', path: 'Automation/Blueprint', title: 'Blueprint is for Visual Scripting (group and link scripts and components)'},
+    {name: 'Crawler', path: 'Automation/Crawlers', title: 'Crawler is for Automated web crawler scripts (SEO, site mapping, etc...)'},
+    {name: 'Scrapper', path: 'Automation/Scrappers', title: 'Scrapper is for Automated web scrapper scripts (data mining)'},
+    {name: 'Scheduler', path: 'Automation/Scheduler', title: 'Scheduler is for Task scheduler (cron jobs, etc...)'},
+    {name: 'Agent', path: 'Automation/Agent', title: 'Agent is for AI agents (connect to AI services or use local models)'},
+    {name: 'AI', path: 'Automation/AI', title: 'AI is for AI scripts (NLP, computer vision, etc...)'},
 ]
 
 const showHideTypes = ['Mesh']
@@ -108,11 +119,11 @@ export {
     projectDefault,
     COMPONENTS,
     Canvas3D_entries,
-    Canvas2D_entires,
+    Canvas2D_entries,
     WebView_entries,
     Audio_entries,
     Datastore_entries,
     Scripts_entries,
-    Agent_entries,
+    Automation_entries,
     showHideTypes
 }

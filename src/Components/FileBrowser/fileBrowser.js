@@ -1,3 +1,4 @@
+import { createWidgetList } from '../WidgetList/widgetList';
 import './fileBrowser.css';
 export class FileBrowser {
     constructor(element, options = {}) {
@@ -5,10 +6,12 @@ export class FileBrowser {
         this.containerElement.append($('#fileBrowserTemplate').html());
         this.data = options.data || [];
 
+        this.widgetMode = options.widgetMode || false;
         this.allowMultiSelect = options.allowMultiSelect || false;
         this.allowCheckbox = options.allowCheckbox || false;
         this.onSelect = options.onSelect || (()=>{});
         this.onExpandCollapse = options.onExpandCollapse || (()=>{});
+        this.onWidgetModeChange = options.onWidgetModeChange || (()=>{});
 
         this.container = this.containerElement.find('.fileTree');
         this.container.addClass('chamberFileBrowser');
@@ -16,6 +19,54 @@ export class FileBrowser {
         
         this.parseData();
         this.loadFiles();
+        createWidgetList(this.containerElement.find('.widgetContainer'), options.widgets);
+
+        this.containerElement.find('.search-input').on('input', (e) => {
+            let query = $(e.currentTarget).val().toLowerCase();
+            this.filterFiles(query);
+        });
+
+        if(this.widgetMode){
+            this.containerElement.find('.widgetButton').addClass('active');
+            this.containerElement.find('.widgetContainer').show();
+            this.containerElement.find('.fileTree').hide();
+        }
+
+        this.containerElement.find('.widgetButton').on('click', (e) => {
+            e.stopPropagation();
+            this.containerElement.find('.search-input').val('');
+            this.filterFiles('');
+            if(this.containerElement.find('.widgetButton').hasClass('active')) {
+                this.onWidgetModeChange(false);
+                this.containerElement.find('.widgetButton').removeClass('active');
+                this.containerElement.find('.widgetContainer').hide();
+                this.containerElement.find('.fileTree').show();
+            } else {
+                this.onWidgetModeChange(true);
+                this.containerElement.find('.widgetButton').addClass('active');
+                this.containerElement.find('.widgetContainer').show();
+                this.containerElement.find('.fileTree').hide();
+            }
+        });
+    }
+
+
+    filterFiles(query) {
+        let filteredKeys = new Set(Object.keys(this.dataMap)
+        .filter(key => key.includes(query))
+        .map(key => key.split('/'))
+        .flat(1));
+
+        this.container.find('.file-item').each((_, el) => {
+            let itemPath = $(el).data('path').split('/');
+            itemPath.forEach(item => {
+                if (filteredKeys.has(item)) {
+                    $(el).show();
+                } else {
+                    $(el).hide();
+                }
+            });
+        });
 
     }
 
@@ -144,7 +195,7 @@ export class FileBrowser {
 
             let _expanded = node.tree_meta.expanded ? 'expanded': '';
             let _selected = node.tree_meta.selected ? 'selected' : ''; 
-            let _nodeName = `<span class="file-name" title="${node.name}">${node.alias && node.alias.length ? node.alias : node.name}</span>`;
+            let _nodeName = `<span class="file-name" title="${node.title || node.name}">${node.alias && node.alias.length ? node.alias : node.name}</span>`;
             let _nodeIcon = node.tree_meta.icon ? `<i class="file-icon ${node.tree_meta.icon}"></i>` : '';
             let _caretIcon = node.children?.length ? !node.tree_meta.expanded ? '<i class="fa-solid fa-caret-right caret"></i>'  : '<i class="fa-solid fa-caret-down caret"></i>' : '<i class="caret"></i>';
             

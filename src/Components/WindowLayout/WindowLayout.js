@@ -18,7 +18,7 @@ export class WindowPane {
     this.name = this.config.name || crypto.randomUUID();
     this.isMinimized = !config.root;
     this.isFullscreen = false;
-
+    this.meta = this.config.meta || {};
     this.closeIcon = this.config.closeIcon ?? true;
     this.resizeIcon = this.config.resizeIcon ?? true;
 
@@ -64,7 +64,7 @@ export class WindowPane {
     this.createHeader();
     this.createBody();
     this.attachEvents();
-    this.onLoad(this.body);
+    this.onLoad(this.body, this.meta);
     WindowPane.panes[this.getLayoutID()][this.name] = this;
   }
 

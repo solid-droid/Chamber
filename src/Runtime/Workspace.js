@@ -7,12 +7,12 @@ import {
     projectDefault,
     COMPONENTS,
     Canvas3D_entries,
-    Canvas2D_entires,
+    Canvas2D_entries,
     WebView_entries,
     Audio_entries,
     Datastore_entries,
     Scripts_entries,
-    Agent_entries,
+    Automation_entries,
     showHideTypes
 } from './defaults';
 
@@ -69,12 +69,12 @@ export class Workspace{
         const systemNodes = [
             ...COMPONENTS.map(x => ({...x, type:'Component'})),
             ...Canvas3D_entries.map(x => ({...x, type:'Entity'})), 
-            ...Canvas2D_entires.map(x => ({...x,type:'Entity'})),
+            ...Canvas2D_entries.map(x => ({...x,type:'Entity'})),
             ...WebView_entries.map(x => ({...x, type:'Entity'})),
             ...Audio_entries.map(x => ({...x, type:'Entity'})),
             ...Datastore_entries.map(x => ({...x, type:'Entity'})),
             ...Scripts_entries.map(x => ({...x, type:'Entity'})),
-            ...Agent_entries.map(x => ({...x, type:'Entity'})),
+            ...Automation_entries.map(x => ({...x, type:'Entity'})),
         ];
         let allNodes = [...nodeArray,...systemNodes];
         if(!data['Projects']){

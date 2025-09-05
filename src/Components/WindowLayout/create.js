@@ -5,7 +5,8 @@ import { codeEditor } from "../CodeEditor/codeEditor";
 import { debounce } from "../../utils/utils";
 import { createBlueprint } from "../Blueprint/blueprint";
 import { createMonitorLogs } from "../Monitor/Monitor";
-
+import { getSession, setSession } from "../../Runtime/session";
+import { Audio_entries, Automation_entries, Datastore_entries, Scripts_entries, WebView_entries } from "../../Runtime/defaults";
 
 let configMap = {
     root: {
@@ -42,10 +43,16 @@ let configMap = {
         title: 'Explorer', 
         closeIcon:false,
         active:true,
-        onLoad: el => {
+        onLoad: (el, meta) => {
+            let widgetMode = (meta.widgetMode ?? getSession('widgetMode')) || false;
+            setSession('widgetMode', widgetMode);
             createNodeTree(el, {
                 data: getWorkspace().workspaceTree,
-                onSelect: node => getWorkspace().SelectedNode = node
+                onSelect: node => getWorkspace().SelectedNode = node,
+                widgetMode: widgetMode,
+                onWidgetModeChange: (mode) => {
+                    setSession('widgetMode', mode);
+                }
             });
         } 
     },
@@ -175,9 +182,9 @@ function findView(layout, view, _parent = null, _index = null){
 export function createLayout() {
     let layout = getLayout();
     if(!layout){
-        $('.designerPlaceholder').show();
-        layout = configMap.root;
-        // layout = getDefaultLayout();
+        // $('.designerPlaceholder').show();
+        // layout = configMap.root;
+        layout = getDefaultLayout();
         setLayout(layout);
     }
     let root =  WindowPane.createFromLayout(layout);
@@ -186,36 +193,13 @@ export function createLayout() {
 }
 
 function getDefaultLayout(){
+   $('.designerPlaceholder').hide();
   let layout = {
         ...configMap.root,
-        sizes:[20, 70, 30],
         children:[
             {
-               ...configMap.left,
-                children:[
-                    {...configMap.explorer},
-                    {...configMap.monitor}
-                ]
-            },
-            {
-               ...configMap.center,
-                children: [
-                    {...configMap.viewPort},
-                    {...configMap.blueprint}
-                ]
-            },
-            {
-                ...configMap.right,
-                children: [
-                    {...configMap.focusView},
-                    {
-                       ...configMap.rightBottom, 
-                        children:[
-                            {...configMap.codeEditor},
-                            {...configMap.configEditor}
-                        ]
-                    }
-                ]
+                ...configMap.explorer,
+                meta:{widgetMode:true},
             }
         ]
     }
@@ -289,7 +273,16 @@ function createNodeTree(element, options = {}){
     let _nodeTree = new FileBrowser(element, {
         data: options?.data || [],
         onSelect: options?.onSelect || (() => {}),
-        onExpandCollapse: options?.onExpandCollapse || (() => {})
+        onExpandCollapse: options?.onExpandCollapse || (() => {}),
+        widgetMode: options?.widgetMode || false,
+        onWidgetModeChange: options?.onWidgetModeChange || (() => {}),
+        widgets: [
+           ...WebView_entries,
+           ...Scripts_entries,
+           ...Automation_entries,
+           ...Audio_entries,
+           ...Datastore_entries
+        ]
     });
     setNodeTree(_nodeTree);
 }

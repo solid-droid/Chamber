@@ -116,7 +116,7 @@
         border: rgba(59, 59, 59, 0.402) 2px solid;
         border-radius: 5px;
         margin: 2px;
-        i{
+        .fa-magnifying-glass{
             color: #b7b7b7;
         }
         input{
@@ -127,6 +127,9 @@
         }
         .iconButton{
             font-size: 17px;
+        }
+        .widgetButton{
+            
         }
     }
 }
