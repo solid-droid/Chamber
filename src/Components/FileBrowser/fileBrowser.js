@@ -19,7 +19,7 @@ export class FileBrowser {
         
         this.parseData();
         this.loadFiles();
-        createWidgetList(this.containerElement.find('.widgetContainer'), options.widgets);
+        this.widgetList = createWidgetList(this.containerElement.find('.widgetContainer'), options.getWidgets);
 
         this.containerElement.find('.search-input').on('input', (e) => {
             let query = $(e.currentTarget).val().toLowerCase();

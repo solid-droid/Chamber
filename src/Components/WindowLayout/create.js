@@ -6,7 +6,7 @@ import { debounce } from "../../utils/utils";
 import { createBlueprint } from "../Blueprint/blueprint";
 import { createMonitorLogs } from "../Monitor/Monitor";
 import { getSession, setSession } from "../../Runtime/session";
-import { Audio_entries, Automation_entries, Datastore_entries, Scripts_entries, WebView_entries } from "../../Runtime/defaults";
+import { Audio_entries, Automation_entries, Canvas2D_entries, Canvas3D_entries, Datastore_entries, Scripts_entries, WebView_entries } from "../../Runtime/defaults";
 
 let configMap = {
     root: {
@@ -50,8 +50,9 @@ let configMap = {
                 data: getWorkspace().workspaceTree,
                 onSelect: node => getWorkspace().SelectedNode = node,
                 widgetMode: widgetMode,
-                onWidgetModeChange: (mode) => {
+                onWidgetModeChange: function(mode){
                     setSession('widgetMode', mode);
+                    this.widgetList.render();
                 }
             });
         } 
@@ -276,13 +277,20 @@ function createNodeTree(element, options = {}){
         onExpandCollapse: options?.onExpandCollapse || (() => {}),
         widgetMode: options?.widgetMode || false,
         onWidgetModeChange: options?.onWidgetModeChange || (() => {}),
-        widgets: [
-           ...WebView_entries,
-           ...Scripts_entries,
-           ...Automation_entries,
-           ...Audio_entries,
-           ...Datastore_entries
-        ]
+        getWidgets: () => {
+            let customWidgets = Object.keys(getWorkspace().treeMap).filter(x => x.split('/').length > 2 &&  x.split('/')[0] !== 'Projects');
+            let list =  [
+            ...WebView_entries,
+            ...Scripts_entries,
+            ...Datastore_entries,
+            ...Automation_entries,
+            ...Audio_entries,
+            ...Canvas2D_entries,
+            ...Canvas3D_entries
+            ].map(x => ({...x, category: x.category || x.path.split('/')[0]}));
+
+            return [...list, ...customWidgets.map(x => ({name: x.split('/').pop(), path: x, category:x.split('/')[0] , subCategories: ['Custom']}))];
+        },
     });
     setNodeTree(_nodeTree);
 }

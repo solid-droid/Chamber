@@ -37,38 +37,38 @@ const COMPONENTS = [
     {name: 'Canvas2D', path: 'Canvas2D', title:'2D Canvas'},
 ]
 const Canvas3D_entries = [
-    {name: 'Scene', path: 'Canvas3D/Scene', title:'Scene is the root container for all 3D objects'},
-    {name: 'Camera', path: 'Canvas3D/Camera', title: 'Camera defines the viewpoint and perspective of the 3D scene'},
-    {name: 'Light', path: 'Canvas3D/Light', title: 'Light is used to illuminate the 3D scene'},
-    {name: 'Mesh', path: 'Canvas3D/Mesh', title: 'Mesh is a 3D object made up of vertices, edges, and faces'},
-    {name: 'Material', path: 'Canvas3D/Material', title: 'Material defines the appearance of a 3D object'},
+    {name: 'Scene3D', path: 'Canvas3D/Scene3D', title:'Scene is the root container for all 3D objects'},
+    {name: 'Camera3D', path: 'Canvas3D/Camera3D', title: 'Camera defines the viewpoint and perspective of the 3D scene'},
+    {name: 'Light3D', path: 'Canvas3D/Light3D', title: 'Light is used to illuminate the 3D scene'},
+    {name: 'Mesh3D', path: 'Canvas3D/Mesh3D', title: 'Mesh is a 3D object made up of vertices, edges, and faces'},
+    {name: 'Material3D', path: 'Canvas3D/Material3D', title: 'Material defines the appearance of a 3D object'},
     {name: 'Fx3D', path: 'Canvas3D/Fx3D', title: 'Fx3D are entities that add special effects to 3D objects'},
-    {name: 'Animation', path: 'Canvas3D/Animation', title: 'Animation is used to create movement and transformations of 3D objects'},
-    {name: 'Shaders', path: 'Canvas3D/Shaders', title: 'Shaders are programs that run on the GPU to control the rendering of 3D objects'},
-    {name: 'Bones', path: 'Canvas3D/Bones', title: 'Bones are used to create skeletal animations for 3D models'},
+    {name: 'Animation3D', path: 'Canvas3D/Animation3D', title: 'Animation is used to create movement and transformations of 3D objects'},
+    {name: 'Shaders3D', path: 'Canvas3D/Shaders3D', title: 'Shaders are programs that run on the GPU to control the rendering of 3D objects'},
+    {name: 'Bones3D', path: 'Canvas3D/Bones3D', title: 'Bones are used to create skeletal animations for 3D models'},
 ];
 
 const Canvas2D_entries = [
-    {name: 'Scene', path: 'Canvas2D/Scene', title: 'Scene is the root container for all 2D objects'},
-    {name: 'Camera', path: 'Canvas2D/Camera', title: 'Camera defines the viewpoint and perspective of the 2D scene'},
-    {name: 'Light', path: 'Canvas2D/Light', title: 'Light is used to illuminate the 2D scene'},
-    {name: 'Mesh', path: 'Canvas2D/Mesh', title: 'Mesh is a 2D object made up of vertices and edges'},
-    {name: 'Material', path: 'Canvas2D/Material', title: 'Material defines the appearance of a 2D object'},
+    {name: 'Scene2D', path: 'Canvas2D/Scene2D', title: 'Scene is the root container for all 2D objects'},
+    {name: 'Camera2D', path: 'Canvas2D/Camera2D', title: 'Camera defines the viewpoint and perspective of the 2D scene'},
+    {name: 'Light2D', path: 'Canvas2D/Light2D', title: 'Light is used to illuminate the 2D scene'},
+    {name: 'Mesh2D', path: 'Canvas2D/Mesh2D', title: 'Mesh is a 2D object made up of vertices and edges'},
+    {name: 'Material2D', path: 'Canvas2D/Material2D', title: 'Material defines the appearance of a 2D object'},
     {name: 'Fx2D', path: 'Canvas2D/Fx2D', title: 'Fx2D are entities that add special effects to 2D objects'},
-    {name: 'Animation', path: 'Canvas2D/Animation', title: 'Animation is used to create movement and transformations of 2D objects'},
-    {name: 'Shaders', path: 'Canvas2D/Shaders', title: 'Shaders are programs that run on the GPU to control the rendering of 2D objects'},
-    {name: 'Bones', path: 'Canvas2D/Bones', title: 'Bones are used to create skeletal animations for 2D models'},
+    {name: 'Animation2D', path: 'Canvas2D/Animation2D', title: 'Animation is used to create movement and transformations of 2D objects'},
+    {name: 'Shaders2D', path: 'Canvas2D/Shaders2D', title: 'Shaders are programs that run on the GPU to control the rendering of 2D objects'},
+    {name: 'Bones2D', path: 'Canvas2D/Bones2D', title: 'Bones are used to create skeletal animations for 2D models'},
 ]
 
 
 const WebView_entries = [
     {name: 'UI', path: 'WebView/UI' , title:'UI is the user interface for the web view'}, //HTML + CSS + JavaScript content
-    {name: 'Grid', path: 'WebView/Grid' , category:'widget', title:'Grid is a table widget for displaying data'}, //Table widget (data grids, etc...)
-    {name: 'Chart', path: 'WebView/Chart', category:'widget', title:'Chart is a widget for displaying data visualizations'}, //chart widgets (bar, line, pie, etc...)
-    {name: 'Canvas2D', path: 'WebView/Canvas2D', category:'widget', title:'Canvas2D is a 2D drawing surface to embed 2D content'}, //2D drawing surface
-    {name: 'Canvas3D', path: 'WebView/Canvas3D', category:'widget', title:'Canvas3D is a 3D drawing surface to embed 3D content'}, //3D drawing surface
-    {name: 'Player', path: 'WebView/Player', category:'widget', title:'Player is a widget for playing media content'}, // player (video, audio, etc...)
-    {name: 'Map', path: 'WebView/Map', category:'widget', title:'Map is a widget for displaying interactive maps'}, //interactive maps
+    {name: 'Grid', path: 'WebView/Grid' , title:'Grid is a table widget for displaying data'}, //Table widget (data grids, etc...)
+    {name: 'Chart', path: 'WebView/Chart', title:'Chart is a widget for displaying data visualizations'}, //chart widgets (bar, line, pie, etc...)
+    {name: 'Canvas2D', path: 'WebView/Canvas2D', title:'Canvas2D is a 2D drawing surface to embed 2D content'}, //2D drawing surface
+    {name: 'Canvas3D', path: 'WebView/Canvas3D', title:'Canvas3D is a 3D drawing surface to embed 3D content'}, //3D drawing surface
+    {name: 'Player', path: 'WebView/Player', title:'Player is a widget for playing media content'}, // player (video, audio, etc...)
+    {name: 'Map', path: 'WebView/Map', title:'Map is a widget for displaying interactive maps'}, //interactive maps
 ];
 
 const Audio_entries = [
@@ -77,7 +77,7 @@ const Audio_entries = [
     {name: 'Master', path: 'Audio/Master', title: 'Master is for mastering effects like compression and EQ'}, 
     {name: 'Recorder', path: 'Audio/Recorder', title: 'Recorder is for audio recording from microphone or line-in'}, 
     {name: 'Vocal', path: 'Audio/Vocal', title: 'Vocal is for processing vocals with effects like auto-tune and reverb'}, 
-    {name: 'FX', path: 'Audio/FX', title: 'FX is for sound effects like reverb, delay, and distortion'},
+    {name: 'FxAudio', path: 'Audio/FxAudio', title: 'FX is for sound effects like reverb, delay, and distortion'},
     {name: 'Sound', path: 'Audio/Sound', title: 'Sound is for sound effects like UI sounds, footsteps, thunder, etc...'}, 
     {name: 'Spatial', path: 'Audio/Spatial', title: 'Spatial is for 3D audio positioning and effects'}, 
     {name: 'Ambience', path: 'Audio/Ambience', title: 'Ambience is for background sounds like wind and rain'},
