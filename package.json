@@ -28,6 +28,7 @@
     "jquery": "^3.7.1",
     "monaco-editor": "^0.52.2",
     "pako": "^2.1.0",
+    "quickjs-emscripten": "^0.31.0",
     "wait-on": "^8.0.3"
   },
   "devDependencies": {

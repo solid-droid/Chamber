@@ -12,6 +12,7 @@ import { createWorkspace } from "./Runtime/Workspace.js";
 import { getNodeTree, getWorkspace } from './Runtime/global';
 import { loadTools } from './utils/loadTools.js';
 import { getEnvironment } from './utils/tauri.js';
+import { testJavascript } from './Engine/engine.js';
 
 /* Window Variables */
 window.$ = $;
@@ -50,6 +51,7 @@ async function init() {
         onChange: () => {},
     });   
 
+    await testJavascript();
     getWorkspace().init();
 }
 

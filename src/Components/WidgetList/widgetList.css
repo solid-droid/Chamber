@@ -54,7 +54,13 @@
             border: 1px solid #eee;
             min-width: 150px;
             height: 90px;
-        
+            transition: 0.1s;
+            &:hover{
+                box-shadow: 0 0 5px 0px #aaa;
+                border: 1px solid #aaa;
+                cursor: pointer;
+                transform: translateY(3px) scale(1.02);
+            }
             .widget-item-name{
                 font-weight: bold;
             }

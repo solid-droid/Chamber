@@ -194,6 +194,7 @@ function showDevMode(value){
             $('#head-tools .chamber-devmode').css({'display':'flex'});
             $('#head-tools .designMode').addClass('active');
             $('#ViewPortContainer').hide();
+            $('#head-tools .layoutSubMenu').css({'display':'flex'});
             let BodyLayout = createLayout();
             attachLayoutControls();
             setLayoutOBJ(BodyLayout);
@@ -203,6 +204,7 @@ function showDevMode(value){
             $('#head-tools .designMode').removeClass('active');
             $('#ViewPortContainer').prependTo($('#BodyContainer')); 
             $('#ViewPortContainer').show();
+            $('#head-tools .layoutSubMenu').hide();
             setLayout(getLayoutOBJ().getLayout());
             getLayoutOBJ()?.destroy();
             $('#head-tools #selectedNode').hide();
