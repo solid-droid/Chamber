@@ -3,7 +3,6 @@ import { FileBrowser } from "../FileBrowser/fileBrowser";
 import { getLayout, getLayoutOBJ, getWorkspace, setCodeEditor, setLayout, setLayoutOBJ, setNodeTree } from "../../Runtime/global";
 import { codeEditor } from "../CodeEditor/codeEditor";
 import { debounce } from "../../utils/utils";
-import { createBlueprint } from "../Blueprint/blueprint";
 import { createMonitorLogs } from "../Monitor/Monitor";
 import { getSession, setSession } from "../../Runtime/session";
 import { Audio_entries, Automation_entries, Canvas2D_entries, Canvas3D_entries, Datastore_entries, Scripts_entries, WebView_entries } from "../../Runtime/defaults";
@@ -44,7 +43,7 @@ let configMap = {
         closeIcon:false,
         active:true,
         onLoad: (el, meta) => {
-            let widgetMode = (meta.widgetMode ?? getSession('widgetMode')) || false;
+            let widgetMode = (getSession('widgetMode') ?? meta.widgetMode) || false;
             setSession('widgetMode', widgetMode);
             createNodeTree(el, {
                 data: getWorkspace().workspaceTree,
@@ -75,12 +74,12 @@ let configMap = {
             $('#ViewPortContainer').show();
         }
     },
-    blueprint:{
+    toolsHub:{
         type: 'component', 
-        name: 'blueprint', 
-        title: 'Blueprint', 
+        name: 'toolsHub', 
+        title: 'Tools Hub', 
         closeIcon:false,
-        onLoad: el => createBlueprint(el)
+        onLoad: el => el.text('Tools Hub')
     },
     focusView:{
         type: 'component', 
@@ -237,7 +236,7 @@ function createDefaultLayout(){
         parent: center, 
     });
       new WindowPane({ 
-        ...configMap.blueprint,
+        ...configMap.toolsHub,
         parent: center, 
     });
 
@@ -280,16 +279,27 @@ function createNodeTree(element, options = {}){
         getWidgets: () => {
             let customWidgets = Object.keys(getWorkspace().treeMap).filter(x => x.split('/').length > 2 &&  x.split('/')[0] !== 'Projects');
             let list =  [
-            ...WebView_entries,
             ...Scripts_entries,
+            ...WebView_entries,
             ...Datastore_entries,
             ...Automation_entries,
             ...Audio_entries,
             ...Canvas2D_entries,
             ...Canvas3D_entries
             ].map(x => ({...x, category: x.category || x.path.split('/')[0]}));
+            console.log(getWorkspace().treeMap, customWidgets);
+            list = [...list, ...customWidgets.map(x => ({name: x.split('/').pop(), path: x, category:x.split('/')[0] , subCategories: ['Custom'], mainTag:getWorkspace().treeMap[x].mainTag}))];
+            return list.sort((a, b) => {
+                    const order = { 'Core': 1, 'Template': 2 };
+                    const aOrder = order[a.mainTag] || 3;
+                    const bOrder = order[b.mainTag] || 3;
 
-            return [...list, ...customWidgets.map(x => ({name: x.split('/').pop(), path: x, category:x.split('/')[0] , subCategories: ['Custom']}))];
+                    if (aOrder !== bOrder) {
+                        return aOrder - bOrder;
+                    }
+
+                    return a.mainTag?.localeCompare(b.mainTag || '') || 0;
+                })
         },
     });
     setNodeTree(_nodeTree);

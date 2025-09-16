@@ -247,7 +247,6 @@ export class Workspace{
         let parent = this.getParent(node.path);
         parent.children ??= [];
         parent.children.push(node);
-
         commit && this.workspace.commit(msg, this.cleanUp(this.treeMap), options); 
         getDevLog()?.loadChanges();
     }
@@ -299,6 +298,7 @@ export class Workspace{
                 path: value.path,
                 type: value.type,
                 fileType: value.fileType,
+                mainTag:value.mainTag
             };
             value.code && (_treeMap[key].code = value.code);
         });
@@ -357,6 +357,7 @@ Workspace.createNode = function(self, node){
         name: getUniqueName(),
         path: node.path + '/' + getUniqueName(),
         type: node.name,
+        mainTag:'Custom'
     }
 
     if(newNode.type === 'Projects'){
@@ -370,6 +371,7 @@ Workspace.createNode = function(self, node){
     } else {
         self.createNode(newNode, `Create ${newNode.type}`);
     }
+    console.log(newNode);
     self.createFileSystem();
     getNodeTree().reload(self.workspaceTree);
 }

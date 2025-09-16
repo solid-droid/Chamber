@@ -24,7 +24,7 @@ body{
     flex-direction: column;
     height: 100vh;
     #head-tools{
-position: fixed;
+        position: fixed;
         user-select: none;
         -webkit-app-region: drag;
         flex-shrink: 0;

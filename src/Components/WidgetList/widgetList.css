@@ -1,5 +1,27 @@
 .widgetContainer{
     height: calc(100% - 90px);
+    .widget-list-container{
+        overflow-y: auto;
+        max-height: 100%;  
+    .widgetList-horizontalLine{
+            display: flex;
+            width: 100%;
+            align-items: center;
+            font-size: 15px;
+            color: rgb(142, 142, 142);
+            .widgetList-mainTag{
+                margin-left: 10px;
+            }
+            .widgetList-hline{
+                margin-right: 20px;
+                margin-left: 10px;
+                background-color: rgb(142, 142, 142);
+                height: 2px;
+                flex-grow: 1;
+                transform: scaleY(0.3);
+            }
+        }
+    }
     .widget-category-List{
         display: flex;
         gap: 10px;
@@ -37,38 +59,32 @@
 
 .widget-list{
     margin-top: 5px;
-    padding: 0 5px 5px 5px;
+    padding: 5px 8px 8px 5px;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 12px;
-    overflow-y: auto;
-    height: calc(100% - 5px);
-    grid-auto-rows: 102px;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 7px;
     .widget-item-container{
         display: flex;
         width: 100%;
         align-items: center;
         justify-content: center;
-        .widget-item{
-            padding: 5px 0;
-            border: 1px solid #eee;
-            min-width: 150px;
-            height: 90px;
-            transition: 0.1s;
-            &:hover{
-                box-shadow: 0 0 5px 0px #aaa;
-                border: 1px solid #aaa;
-                cursor: pointer;
-                transform: translateY(3px) scale(1.02);
-            }
-            .widget-item-name{
-                font-weight: bold;
-            }
+        aspect-ratio: 1.8 / 1; 
+        border: 1.5px solid #3e3e3e;
+        border-radius: 7px;
+        margin-top: -3px;
+        background: #1b1b1b;
+        &:hover{
+            box-shadow: 0 0 3px 0px #515151;
+            cursor: pointer;
+            transform: scale(1.02);
+        }
+        .widget-item-name{
+            font-weight: bold;
+        }
 
-            .widget-item-content{
-                font-size: 12px;
-                color: #666;
-            }
+        .widget-item-content{
+            font-size: 12px;
+            color: #666;
         }
         
     }

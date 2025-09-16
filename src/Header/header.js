@@ -63,7 +63,7 @@ function attachLayoutControls(){
                         "explorer", 
                         "monitor",
                         "viewPort",
-                        "blueprint",
+                        "toolsHub",
                         "focusView",
                         "codeEditor",
                         "configEditor"

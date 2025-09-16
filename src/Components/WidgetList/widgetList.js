@@ -6,25 +6,36 @@ export class WidgetList {
   }
 
   render() {
-    console.log('Rendering widget list');
     this.element.empty();
     this.widgets = this.getWidgets() || [];
-    const list = $('<div class="widget-list"></div>');
+    let container = $('<div class="widget-list-container"></div>');
     let categories = new Set();
     let subCategories = new Set();
+    let prevTag = '';
+
+    let listTemplate = '<div class="widget-list"></div>';
+    let list;
     this.widgets.forEach(widget => {
+      if(prevTag !== widget.mainTag){
+        prevTag = widget.mainTag;
+        const horizontalLine = `<div class="widgetList-horizontalLine">
+          <span class="widgetList-mainTag">${widget.mainTag}</span>
+          <span class="widgetList-hline"></span>
+        </div>`
+        container.append(horizontalLine);
+        list = $(listTemplate);
+        container.append(list); 
+      }
       if (widget.category) categories.add(widget.category);
       if (widget.subCategories) widget.subCategories && subCategories.add(JSON.stringify(widget.subCategories));
       const listItem = $(
         `<div class="widget-item-container" data-category="${widget.category || ''}" data-subcategories='${JSON.stringify(widget.subCategories || [])}'>
-           <div class="widget-item">
             <div class="widget-item-name">${widget.name}</div>
             <div class="widget-item-content"></div>
-           </div>
         </div>`);
       list.append(listItem);
     });
-    this.element.append(list);
+    this.element.append(container);
     categories.size > 0 && this.element.prepend($(
       `<div class="widget-category-List">
         <div class="widget-category-item">All</div>
