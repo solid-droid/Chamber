@@ -62,7 +62,7 @@ const Canvas2D_entries = [
 
 
 const WebView_entries = [
-    {name: 'UI', path: 'WebView/UI' , title:'UI is the user interface for the web view', mainTag:'Core'}, //HTML + CSS + JavaScript content
+    {name: 'UI Node', path: 'WebView/UI Node' , title:'UI is the user interface for the web view', mainTag:'Core'}, //HTML + CSS + JavaScript content
     {name: 'Input', path: 'WebView/Input' , title:'Input is a widget for User Input', mainTag:'Template'}, //Table widget (data grids, etc...)
     {name: 'Grid', path: 'WebView/Grid' , title:'Grid is a table widget for displaying data', mainTag:'Template'}, //Table widget (data grids, etc...)
     {name: 'Chart', path: 'WebView/Chart', title:'Chart is a widget for displaying data visualizations', mainTag:'Template'}, //chart widgets (bar, line, pie, etc...)
@@ -101,7 +101,7 @@ const Scripts_entries = [
     {name: 'Workers', path: 'Scripts/Worker', title: 'Workers is for multi-threaded scripting (web workers, service workers, etc...)', mainTag:'Core'},
     {name: 'WASM', path: 'Scripts/WASM', title: 'WASM is for compiled binaries (wasm, rust, c, c++, etc...)', mainTag:'Core'},
     {name: 'Service', path: 'Scripts/Service', title: 'Service is for background services/external services (nodejs, python, etc...)', mainTag:'Core'},
-    {name: 'Network', path:'Scripts/Network', title: 'Network is for network call scripts (REST, Websocket, WebRTC, Torrent, etc...)', mainTag:'Core'}
+    {name: 'Network', path:'Scripts/Network', title: 'Network is for network call scripts (REST, Websocket, WebRTC, Torrent, etc...)', mainTag:'Template'}
 ]
 
 const Automation_entries = [

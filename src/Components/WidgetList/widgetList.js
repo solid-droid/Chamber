@@ -15,10 +15,12 @@ export class WidgetList {
 
     let listTemplate = '<div class="widget-list"></div>';
     let list;
+    this.tagList =  [];
     this.widgets.forEach(widget => {
       if(prevTag !== widget.mainTag){
         prevTag = widget.mainTag;
-        const horizontalLine = `<div class="widgetList-horizontalLine">
+        this.tagList.push(widget.mainTag);
+        const horizontalLine = `<div class="widgetList-horizontalLine" data-maintag="${widget.mainTag || ''}">
           <span class="widgetList-mainTag">${widget.mainTag}</span>
           <span class="widgetList-hline"></span>
         </div>`
@@ -29,13 +31,18 @@ export class WidgetList {
       if (widget.category) categories.add(widget.category);
       if (widget.subCategories) widget.subCategories && subCategories.add(JSON.stringify(widget.subCategories));
       const listItem = $(
-        `<div class="widget-item-container" data-category="${widget.category || ''}" data-subcategories='${JSON.stringify(widget.subCategories || [])}'>
+        `<div class="widget-item-container" title="${widget.title}" data-name="${widget.name}" data-category="${widget.category || ''}" data-subcategories='${JSON.stringify(widget.subCategories || [])}'>
             <div class="widget-item-name">${widget.name}</div>
             <div class="widget-item-content"></div>
         </div>`);
       list.append(listItem);
     });
     this.element.append(container);
+
+    this.element.find('.widget-item-container').off('click').on('click', el => {
+      alert( $(el.currentTarget).data('name'));
+    });
+
     categories.size > 0 && this.element.prepend($(
       `<div class="widget-category-List">
         <div class="widget-category-item">All</div>
@@ -45,6 +52,7 @@ export class WidgetList {
 
     this.element.find('.widget-category-item').on('click', (e) => {
         if($(e.currentTarget).hasClass('active')) return;
+        this.element.find('.widgetList-horizontalLine').show();
         const category = $(e.currentTarget).data('category');
         this.element.find('.widget-category-item').removeClass('active');
         $(e.currentTarget).addClass('active');
@@ -56,6 +64,21 @@ export class WidgetList {
               $(el).hide();
             }
           });
+
+          let tagMap = {};
+          this.tagList.forEach(x => tagMap[x] = false);
+          this.widgets.forEach(x => {
+            if(x.category !== category)
+              return;
+            tagMap[x.mainTag] = tagMap[x.mainTag] || true;
+          });
+
+          Object.entries(tagMap).forEach(([tag,exist])=>{
+            if(!exist){
+               this.element.find(`.widgetList-horizontalLine[data-maintag="${tag}"]`).hide();
+            }
+          })
+          
         } else {
           this.element.find('.widget-item-container').show();
         }

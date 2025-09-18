@@ -287,7 +287,6 @@ function createNodeTree(element, options = {}){
             ...Canvas2D_entries,
             ...Canvas3D_entries
             ].map(x => ({...x, category: x.category || x.path.split('/')[0]}));
-            console.log(getWorkspace().treeMap, customWidgets);
             list = [...list, ...customWidgets.map(x => ({name: x.split('/').pop(), path: x, category:x.split('/')[0] , subCategories: ['Custom'], mainTag:getWorkspace().treeMap[x].mainTag}))];
             return list.sort((a, b) => {
                     const order = { 'Core': 1, 'Template': 2 };
