@@ -12,6 +12,8 @@
     "core:window:allow-unmaximize",
     "core:window:allow-start-dragging",
     "shell:allow-execute",
+    "fs:allow-read-text-file",
+    "fs:allow-resource-read-recursive",
     {
       "identifier": "shell:allow-spawn",
       "allow": [

@@ -6,92 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Chamber</title>
   </head>
-  <link rel="stylesheet" href="/src/style.css" />
+  <link rel="stylesheet" href="/src/main.css" />
+  <script type="module" src="/src/main.js"></script>
   <body oncontextmenu="return false;">
-    <div id="head-tools"  data-tauri-drag-region>
-      <div class="leftBlock">
-        <span class="appName">CHAMBER</span>
-        <span class="version">v0.1.0</span>
-      </div>
-      <div class="centerBlock">
-        <span id="selectedNode" title="Active Node" style="display: none;"></span>
-      </div>
-      <div class="rightBlock">
-        <i class="fa-solid fa-laptop-code designMode" title="Design Mode" style="display: none;"></i>
-        <div class="chamber-devmode">
-          <!-- <i class="fa-solid fa-window-restore layoutbutton" title="Layout"></i> -->
-          <i class="fa-solid fa-file-import loadWorkspace" title="Import" style="display: none;"></i>
-          <i class="fa-solid fa-download exportButton" title="Export"></i>
-          <i class="fa-solid fa-box packagesButton" title="Package"></i>
-          <i class="fa-solid fa-rotate restartApp" title="Restart" style="display: none;"></i>
-        </div>
-        <i class="fa-solid fa-tower-cell remoteAccess" title="Expose" style="display: none;"></i>
-        <i class="fa-solid fa-gear settingsButton" title="Settings" style="display: none;"></i>
-        <i class="fa-solid fa-minus minimizeButton" title="Minimize" style="display: none;"></i>
-        <i class="fa-solid fa-window-maximize maximizeButton" title="Maximize / Resize" style="display: none;"></i>
-        <i class="fa-solid fa-xmark closeButton" title="Close" style="display: none;"></i>
-      </div>
-      <div class="layoutSubMenu">
-          <i class="fa-solid fa-folder-tree explorer"   title="Node Explorer"></i>
-          <i class="fa-solid fa-code codeEditor"   title="Node Code Editor"></i>
-          <i class="fa-solid fa-laptop-file focusView"   title="Node Focus View"></i>
-          <i class="fa-solid fa-gears configEditor"   title="Node Config Editor"></i>
-          <i class="fa-solid fa-mask monitor"    title="Monitor"></i>
-          <i class="fa-solid fa-cubes toolsHub" title="Tools Hub"></i>
-          <i class="fa-solid fa-laptop viewPort"   title="View Port"></i>
-      </div>
-    </div>
-    <div id="BodyContainer">
-      <div id="ViewPortContainer">
-        Welcome to Chamber!
-      </div>
-      <div id="EditorContainer">
-        <div class="designerPlaceholder">Chamber Design Mode.</span>
-      </div>
-    </div>
-    <script type="module" src="/src/main.js"></script>
-    <input type="file" id="versionFileInput" style="display: none" />
+    <div id="chamber-app"></div>
   </body>
-  <template id="fileBrowserTemplate">
-        <div class="filebrowserContainer glassEditor">
-            <!-- Header -->
-            <div class="filebrowser-toolbar">    
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="search" class="search-input" placeholder="Search..." />
-                <i class="fa-brands fa-hashnode widgetButton iconButton" title="Widget Mode"></i>
-            </div>
-            <!-- Body - tree -->
-            <div class="fileTree"></div>
-            <div class="widgetContainer" style="display: none;"></div>
-        </div>
-  </template>
-  <template id="editorTemplate">
-    <div class="editorContainer glassEditor">
-          <!-- Header -->
-          <div class="editor-options">
-              <div class="editor-info">
-                  <span class="editor-title">----</span>
-              </div>
-              <div class="editor-buttons">
-                  <i class="iconButton fa-solid fa-cube  focusButton" title="Focus View"></i>
-                  <i class="iconButton fa-solid fa-floppy-disk saveButton" title="Save"></i>
-                  <div class="entityType tag">-----</div>
-              </div>
-          </div>
-          <!-- Body -->
-          <div class="editor-body">
-            <!-- DebugView -->
-            <div id="isolateViewContainer">
-                <canvas id="chamber-editor-Canvas"></canvas>
-            </div>
-            <!-- Editor View -->
-            <div id="EditorContainer">
-                <div id="chamber-editor-CodeEditor"></div>
-            </div>
-          </div>
-        </div>
-  </template>
-  <template id="canvasTemplate">
-      <canvas id="canvas3D"></canvas>
-  </template>
 </html>

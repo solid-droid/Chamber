@@ -29,3 +29,4 @@ myapp.key
 upload-keystore.jks
 src-tauri/gen/android/keystore.properties
 upload-keystore.txt
+/public/Models
