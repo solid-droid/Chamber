@@ -1,14 +1,15 @@
-import '@fortawesome/fontawesome-free/css/all.css';
-import $ from 'jquery';
-import * as monaco from 'monaco-editor';
-import { LLM } from './Services/App/AI/AI-Interface.js';
+import './UI/Atomic/Atomic-UI.css';
+import { chamber, loadWindowVariables } from './Services/System/Framework/Common.js';
 
-/* Window Variables */
-window.$ = $;
-window.monaco = monaco;
+(async () => {
+    await loadWindowVariables();
+    chamber().device.IsDesktop && import('./Sources/Main-Desktop.js').then(({ Main_Desktop }) => {
+        //Desktop chamber editor and appViewer
+        Main_Desktop();
+    });
+    chamber().device.IsMobile && import('./Sources/Main-Mobile.js').then(({ Main_Mobile }) => {
+        // Mobile chamber editor and appViewer
+        Main_Mobile();
+    });
 
-// import testHtml from './test.html?raw';
-// document.getElementById('chamber-app').innerHTML = testHtml;
-
-/* Application Variables */
-window.brain = new LLM();
+})();

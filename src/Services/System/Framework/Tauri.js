@@ -1,4 +1,4 @@
-import { getCurrentWindow } from '@tauri-apps/api/window';
+import { getCurrentWindow, LogicalSize } from '@tauri-apps/api/window';
 import { check } from '@tauri-apps/plugin-updater';
 import { ask, message, open } from '@tauri-apps/plugin-dialog';
 import { relaunch } from '@tauri-apps/plugin-process';
@@ -18,16 +18,16 @@ async function getEnvironment() {
         }
     }
 
-    window.isMobile = isMobile;
-    window.isDesktop = isDesktop;
-    window.isDev = isDev;
+    window.IsMobile = isMobile;
+    window.IsDesktop = isDesktop;
+    window.IsDev = isDev;
     window.tauri = isTauri;
 
     return {
-        isMobile,
-        isDesktop,
-        isDev,
-        isTauri
+        IsMobile: isMobile,
+        IsDesktop: isDesktop,
+        IsDev: isDev,
+        IsTauri: isTauri
     };
 }
 
@@ -86,6 +86,23 @@ async function importFile(options = {}) {
     return file
 }
 
+async function resizeWindow(width, height) {
+  try {
+    const appWindow = getCurrentWindow();
+
+    // Create a new LogicalSize object with the desired width and height
+    const newSize = new LogicalSize(width, height);
+
+    // Set the window size
+    await appWindow.setSize(newSize);
+    await appWindow.center();
+
+    console.log(`Window resized to: ${width}x${height} logical pixels.`);
+  } catch (error) {
+    console.error("Failed to resize window:", error);
+  }
+}
+
 export { 
     getWindow, 
     checkForUpdate, 
@@ -93,5 +110,6 @@ export {
     sysMessage,
     nodeJS_service,
     getEnvironment,
-    importFile
+    importFile,
+    resizeWindow
 };

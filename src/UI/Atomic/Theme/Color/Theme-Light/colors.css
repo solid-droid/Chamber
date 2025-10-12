@@ -1,0 +1,10 @@
+.theme-light {
+    --color-background: #FFFFFF;
+    --color-foreground: #F5F5F5;
+    --color-primary: #6200EE;
+    --color-secondary: #03DAC6;
+    --color-text: #000000;
+    --color-text-secondary: #4D4D4D;
+    --color-border: #CCCCCC;
+    --color-accent: #3700B3;
+}

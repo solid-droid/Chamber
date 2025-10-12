@@ -11,7 +11,7 @@ import {
 } from './AI-Models.js';
 let modelBuffer = {};
 
-export class LLM {
+export class AI_Interface {
     constructor(options = {}) {
         this.onResult = options?.onResult || (() => { });
         this.onComplete = options?.onComplete || (() => { });
