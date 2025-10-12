@@ -32,5 +32,8 @@ function loadDesignLayout() {
 
     let PaneTop = new UI.Module.PaneTop({type: 'HeaderToolbar', isVisible: true, height: 20});
     Layout.addBlock(0, 0, 0, 3, PaneTop.element);
+
+    let PaneBottom = new UI.Module.PaneBottom({type: 'FooterToolbar', isVisible: true, height: 20});
+    Layout.addBlock(2, 2, 0, 3, PaneBottom.element);
 }
 export { Main_Desktop };

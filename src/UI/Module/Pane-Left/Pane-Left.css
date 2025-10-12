@@ -1,5 +1,5 @@
 .UI-Pane-Left{
-    background-color: rgb(43, 0, 0);
+    background-color: var(--color-gray-secondary);
     width: 50px;
     height: 100%;
     display: flex;
