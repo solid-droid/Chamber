@@ -1,32 +1,24 @@
 .UI-HeaderToolbar{
-    width: auto;
     height: 100%;
+    width: 100%;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 10px;
-    &:hover {
-        .UI-HeaderToolbar-Right i{
-            opacity: 1;
-        }
-    }
-    .UI-HeaderToolbar-Right{
+    flex-direction: column;
+    .header{
+        width: auto;
         display: flex;
         align-items: center;
-        gap: 10px;
-        height: 100%;
-        .fa-window-maximize{
-            transform: scale(0.85);
+        justify-content: space-between;
+        padding: 0 10px;
+        flex-grow: 1;
+        max-height: 30px;
+        .UI-HeaderToolbar-Right{
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            height: 100%;        
         }
-        i{
-            transition: 0.1s;
-            opacity: 0.5;
-            cursor: pointer;
-            font-size: var(--size-medium);
-            color: var(--color-text-secondary);
-            &:hover{
-                color: var(--color-text-primary);
-            }
-        }
+    }
+    .moreContent{
+        height: calc(100% - 30px);
     }
 }

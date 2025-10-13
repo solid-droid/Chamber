@@ -21,19 +21,66 @@ function loadDesignLayout() {
         height:'100%',
         width:'100%',
         gap:'0px',
-        rows: ['25px', '1fr', '20px'],
-        columns: ['200px', '1fr', '300px'],
+        rows: ['30px', '1fr', '25px'],
+        columns: ['40px', '1fr', '40px'],
     });
     root.append(Layout.element);
 
     //add left pane
-    let PaneLeft = new UI.Module.PaneLeft({type: 'MenuBar', isVisible: true, width: 200});
+    let PaneLeft = new UI.Module.PaneLeft({
+        type: 'MenuBar', 
+        isVisible: true,
+        minimized:true,
+        onResize: minimized =>{
+            if(minimized){
+                Layout.resizeColumn(0, '40px');
+            } else {
+                Layout.resizeColumn(0, '20%');
+            }
+        }
+    });
     Layout.addBlock(1, 2, 0, 1, PaneLeft.element);
 
-    let PaneTop = new UI.Module.PaneTop({type: 'HeaderToolbar', isVisible: true, height: 20});
+    let PaneRight = new UI.Module.PaneRight({
+        type: 'RightPaneToolbar', 
+        isVisible: true, 
+        minimized:true,
+        onResize: minimized =>{
+            if(minimized){
+                Layout.resizeColumn(2, '40px');
+            } else {
+                Layout.resizeColumn(2, '20%');
+            }
+        }
+    });
+    Layout.addBlock(1, 3, 2, 3, PaneRight.element);
+
+    let PaneTop = new UI.Module.PaneTop({
+        type: 'HeaderToolbar', 
+        isVisible: true,
+        minimized:true,
+        onResize: minimized =>{
+            if(minimized){
+                Layout.resizeRow(0, '30px');
+            } else {
+                Layout.resizeRow(0, '20%');
+            }
+        }
+    });
     Layout.addBlock(0, 0, 0, 3, PaneTop.element);
 
-    let PaneBottom = new UI.Module.PaneBottom({type: 'FooterToolbar', isVisible: true, height: 20});
+    let PaneBottom = new UI.Module.PaneBottom({
+        type: 'FooterToolbar', 
+        isVisible: true,
+        minimized:true,
+        onResize: minimized =>{
+            if(minimized){
+                Layout.resizeRow(2, '20px');
+            } else {
+                Layout.resizeRow(2, '20%');
+            }
+        }
+    });
     Layout.addBlock(2, 2, 0, 3, PaneBottom.element);
 }
 export { Main_Desktop };

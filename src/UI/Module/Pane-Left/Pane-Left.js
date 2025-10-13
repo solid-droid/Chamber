@@ -7,19 +7,19 @@ export class PaneLeft {
     this.class = params.class ?? '';
     this.element = $(`<div class="${this.identifier} ${this.class}"></div>`);
     this.isVisible = params.isVisible ?? true;
-    this.width = params.width ?? 300; 
     this.type = params.type ?? 'empty'; // 'empty', 'menu-bar', etc.
+    this.params = params;
     this.setPaneWidget(this.type);
     this.render();
   }
 
     setPaneWidget(type) {
        let widget = { 
-        'Empty': el => new Empty(el),
-        'MenuBar': el => new MenuBar(el),
+        'Empty': (el,params) => new Empty(el,params),
+        'MenuBar': (el,params) => new MenuBar(el,params),
         }[type];
 
-        this.widget = widget ? widget(this.element) : new Empty(this.element);
+        this.widget = widget ? widget(this.element, this.params) : new Empty(this.element, this.params);
 
     }
 

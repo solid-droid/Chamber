@@ -1,0 +1,5 @@
+.UI-Pane-Right{
+    background-color: var(--color-gray-secondary);
+    min-width: 20px;
+    height: 100%;
+}

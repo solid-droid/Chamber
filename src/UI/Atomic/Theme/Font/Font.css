@@ -1,4 +1,4 @@
-body{
+.theme-dark, .theme-light {
     --size-small: 12px;
     --size-medium: 14px;
     --size-large: 16px;

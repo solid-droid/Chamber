@@ -11,6 +11,7 @@ export class Layout_Grid {
 
   render() {
     this.element.css({
+      transition: '0.2s',
       display: 'grid',
       height: this.height,
       width: this.width,
@@ -34,6 +35,16 @@ export class Layout_Grid {
       gridRow: `${rowStart + 1} / ${rowEnd + 1}`,
       gridColumn: `${colStart + 1} / ${colEnd + 1}`,
     });
+  }
+
+  resizeColumn(columnIndex, newSize) {
+    this.columns[columnIndex] = newSize;
+    this.render();
+  }
+
+  resizeRow(rowIndex, newSize) {
+    this.rows[rowIndex] = newSize;
+    this.render();
   }
 
 }

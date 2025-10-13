@@ -1,0 +1,18 @@
+.RightPaneToolbar{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 5px;
+    .header{
+        display: grid;
+        width: 100%;
+        align-items: center;
+        grid-template-columns: auto 1fr;
+        .more{
+            margin: 0 7px;
+        }
+        .paneHeaderText{
+            text-align: right;
+        }
+    }
+}

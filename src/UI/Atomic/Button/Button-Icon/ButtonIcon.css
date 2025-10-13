@@ -1,0 +1,21 @@
+.UI-ButtonIcon{
+    width: var(--size-large);
+    height: var(--size-large);
+    background-size: contain;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-light);
+    /* background-color: var(--color-gray-tertiary); */
+    transition: background-color 0.2s ease-in-out;
+    i{
+        font-size: var(--size-medium);
+    }
+    &:hover{
+        background-color: var(--color-gray-tertiary-hover);
+        color: var(--color-text-light-hover);
+    }
+}
