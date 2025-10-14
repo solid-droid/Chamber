@@ -21,8 +21,8 @@ function loadDesignLayout() {
         height:'100%',
         width:'100%',
         gap:'0px',
-        rows: ['30px', '1fr', '28px'],
-        columns: ['40px', '1fr', '40px'],
+        rows: ['30px', '1fr', '25px'],
+        columns: ['38px', '1fr', '38px'],
     });
     root.append(Layout.element);
 
@@ -75,7 +75,7 @@ function loadDesignLayout() {
         minimized:true,
         onResize: minimized =>{
             if(minimized){
-                Layout.resizeRow(2, '28px');
+                Layout.resizeRow(2, '25px');
             } else {
                 Layout.resizeRow(2, '20%');
             }

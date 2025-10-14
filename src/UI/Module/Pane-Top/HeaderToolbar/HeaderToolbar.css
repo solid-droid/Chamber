@@ -15,7 +15,7 @@
         justify-content: space-between;
         padding: 0 10px;
         flex-grow: 1;
-        height: 28px;
+        height: 25px;
         border-bottom: 2px solid var(--color-background);
         .UI-HeaderToolbar-Right{
             display: flex;
