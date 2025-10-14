@@ -1,15 +1,26 @@
 .RightPaneToolbar{
+
+    background-color: var(--color-gray-secondary);
+    height: calc(100% - 4px);
+    margin-right: 1px;
+    border-top: solid 2px var(--color-background);
+    border-right: solid 2px var(--color-background);
+
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 5px;
+
     .header{
         display: grid;
         width: 100%;
         align-items: center;
+        height: 30px;
+        overflow: hidden;
         grid-template-columns: auto 1fr;
+        border-bottom: solid 2px var(--color-background);
+        align-items: center;
         .more{
-            margin: 0 7px;
+            margin-left: 10px;
         }
         .paneHeaderText{
             text-align: right;

@@ -41,11 +41,13 @@ export class HeaderToolbar {
 
   setState(self = this){
     if(self.params.minimized){
-      self.element.find('.expanded').hide();
+      self.element.find('.expanded').fadeOut();
+            self.element.find(`.${self.widgetName}`).removeClass('ExpandedMode');
       self.element.find('.more > i').removeClass('fa-caret-up')
       self.element.find('.more > i').addClass('fa-caret-down')
     } else {
-      self.element.find('.expanded').delay(200).fadeIn(100);
+      self.element.find('.expanded').fadeIn(100);
+            self.element.find(`.${self.widgetName}`).addClass('ExpandedMode');
       self.element.find('.more > i').removeClass('fa-caret-down')
       self.element.find('.more > i').addClass('fa-caret-up')
     }

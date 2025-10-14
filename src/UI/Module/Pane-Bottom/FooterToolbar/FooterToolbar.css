@@ -1,6 +1,16 @@
 .UI-FooterToolbar{
-    height: 100%;
-    width: 100%;
+    background-color: var(--color-gray-primary);
+    height: calc(100% - 1px);
+    width: calc(100% - 5px);
+    
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius:6px;
+
+    background-color: var(--color-gray-secondary);
+    border: solid 2px var(--color-background);
+    border-top: none;
+    border-bottom: none;
+
     display: flex;
     flex-direction: column;
     .header{
@@ -10,7 +20,10 @@
         justify-content: space-between;
         padding: 0 10px;
         flex-grow: 1;
-        max-height: 30px;
+        height: 25px;
+        border-bottom: solid 2px var(--color-background);
+        border-bottom-left-radius: 6px;
+        border-bottom-right-radius:6px;
         .UI-HeaderToolbar-Right{
             display: flex;
             align-items: center;
@@ -20,5 +33,14 @@
     }
     .moreContent{
         height: calc(100% - 30px);
+    }
+}
+
+.UI-FooterToolbar.ExpandedMode{
+    height: calc(100% - 3px);
+    border-bottom: solid 2px var(--color-background);
+    .header{
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius:0;
     }
 }

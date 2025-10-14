@@ -21,7 +21,7 @@ function loadDesignLayout() {
         height:'100%',
         width:'100%',
         gap:'0px',
-        rows: ['30px', '1fr', '25px'],
+        rows: ['30px', '1fr', '28px'],
         columns: ['40px', '1fr', '40px'],
     });
     root.append(Layout.element);
@@ -53,7 +53,7 @@ function loadDesignLayout() {
             }
         }
     });
-    Layout.addBlock(1, 3, 2, 3, PaneRight.element);
+    Layout.addBlock(1, 2, 2,3, PaneRight.element);
 
     let PaneTop = new UI.Module.PaneTop({
         type: 'HeaderToolbar', 
@@ -75,7 +75,7 @@ function loadDesignLayout() {
         minimized:true,
         onResize: minimized =>{
             if(minimized){
-                Layout.resizeRow(2, '20px');
+                Layout.resizeRow(2, '28px');
             } else {
                 Layout.resizeRow(2, '20%');
             }
