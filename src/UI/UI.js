@@ -1,10 +1,5 @@
-import { AtomicUI } from "./Atomic/Atomic-UI";
-import { ModuleUI } from "./Module/Module-UI";
+import { init_AtomicUI } from "./Atomic/Atomic-UI";
 
-export const UI = {};
-
-UI.Atomic = AtomicUI;
-UI.Module = ModuleUI;
-
-
-
+export function init_webcomponents(){
+    init_AtomicUI();
+}

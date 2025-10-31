@@ -1,0 +1,36 @@
+.button-container{
+    
+    width: fit-content;
+    height: 25px;
+    padding: 0 5px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+
+    border:solid 1px var(--color-button-border);
+    border-radius: 2px;
+    color: var(--color-button-text);
+
+
+    user-select: none;
+    cursor: pointer;
+
+    &:hover{
+        background-color: var(--color-button-background-hover);
+    }
+}
+
+.primary{
+    background-color: var(--color-button-background);
+}
+
+.secondary{
+    background-color: transparent;
+}
+
+.tertiary{
+    background-color: transparent;
+    border:none;
+}

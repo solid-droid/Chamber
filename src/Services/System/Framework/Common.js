@@ -1,4 +1,3 @@
-import '@fortawesome/fontawesome-free/css/all.css';
 import $ from 'jquery';
 import * as monaco from 'monaco-editor';
 import { AI_Interface } from '../../App/AI/AI-Interface.js';
@@ -23,15 +22,25 @@ async function loadWindowVariables() {
     _chamber.device = {};
     _chamber.device = await getEnvironment();
 
+    _chamber.theme = 'dark';
+
 }
 
 function chamber() {
     return _chamber;
 }
 
-function loadWindowSize() {
-    
+function toggleTheme() {
+    $('body').removeClass('theme-light');
+    $('body').removeClass('theme-dark');
+
+    _chamber.theme = _chamber.theme === 'dark' ? 'light' : 'dark';
+    if (_chamber.theme === 'dark') {
+        $('body').addClass('theme-dark');
+    } else {
+        $('body').addClass('theme-light');
+    }
 }
 
 
-export { loadWindowVariables, chamber };
+export { loadWindowVariables, chamber, toggleTheme };

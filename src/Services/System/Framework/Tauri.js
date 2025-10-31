@@ -31,6 +31,16 @@ async function getEnvironment() {
     };
 }
 
+function closeApp() {
+    const appWindow = getCurrentWindow();
+    appWindow.close();
+}
+
+function minimizeApp() {
+    const appWindow = getCurrentWindow();
+    appWindow.minimize();
+}
+
 function getWindow() {
     return getCurrentWindow();
 }
@@ -99,12 +109,14 @@ async function resizeWindow(width, height) {
 
     console.log(`Window resized to: ${width}x${height} logical pixels.`);
   } catch (error) {
-    console.error("Failed to resize window:", error);
+    console.warn("Failed to resize window:", error);
   }
 }
 
 export { 
     getWindow, 
+    closeApp,
+    minimizeApp,
     checkForUpdate, 
     relaunchApp,
     sysMessage,

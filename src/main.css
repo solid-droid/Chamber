@@ -17,10 +17,4 @@
     font-family: 'Roboto', sans-serif;
     height: 100vh;
     width: 100vw;
-    #chamber-app{
-        height: 100%;
-        width: 100%;
-        background-color: var(--color-background);
-        color: var(--color-text);
-    }   
 }
