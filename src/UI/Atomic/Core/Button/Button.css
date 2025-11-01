@@ -7,7 +7,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 3px;
+    gap: 5px;
 
     border:solid 1px var(--color-button-border);
     border-radius: 2px;

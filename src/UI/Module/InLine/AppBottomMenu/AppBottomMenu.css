@@ -2,7 +2,7 @@
     height: 100%;
     display: grid;
     align-items: center;
-    grid-template-columns: 100px 1fr 100px;
+    grid-template-columns: 300px 1fr 300px;
     background-color: var( --color-background-secondary);
     padding-left: 1px;
     padding-right: 1.5px;
@@ -24,5 +24,7 @@
     .center{
         display: flex;
         justify-content: center;
+        align-items: center;
+        gap: 5px;
     }
 }
