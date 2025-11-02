@@ -1,6 +1,6 @@
-import * as Template from './AppBottomMenu.html?raw';
-import './AppBottomMenu.css';
-export class AppBottomMenu{
+import * as Template from './AppRightMenu.html?raw';
+import './AppRightMenu.css';
+export class AppRightMenu {
     constructor(element, options = {}){
         this.dom = $(Template.default);
         this.element = element;
@@ -12,13 +12,13 @@ export class AppBottomMenu{
 
     }
 
+
     render(){
 
     }
 
     bindEvents(){
         const self = this;
-
-
+        
     }
 }

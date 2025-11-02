@@ -22,6 +22,10 @@
     }
 }
 
+.active{
+    background-color: var(--color-button-background-hover) !important;
+}
+
 .primary{
     background-color: var(--color-button-background);
 }

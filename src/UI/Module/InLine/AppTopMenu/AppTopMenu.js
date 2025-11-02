@@ -38,5 +38,48 @@ export class AppTopMenu{
             }
         });
 
+        this.dom.find('ui-button.projects').on('click', function(){
+            self.options.onProjects();
+        });
+
+        this.dom.find('ui-button.nodes').on('click', function(){
+            self.options.onNodes();
+        });
+
+        this.dom.find('ui-button.datastore').on('click', function(){
+            self.options.onDatastore();
+        });
+
+        this.dom.find('ui-button.services').on('click', function(){
+            self.options.onServices();
+        });
+        this.dom.find('ui-button.packages').on('click', function(){
+            self.options.onPackages()
+        });
+
+        this.dom.find('ui-button.workflow').on('click', function(){
+            self.options.onWorkflow()
+        });
+    }
+
+    markButtonActive(buttonName, active = true){
+        this.dom.find(`ui-button.${buttonName}`).toggleClass('active', active);
+    }
+
+    markAllMenuButton(active = false){
+        this.markAllLeftMenuButton(active);
+        this.markAllRightMenuButton(active);
+    }
+
+    markAllRightMenuButton(active = false){
+        this.dom.find('ui-button.workflow').toggleClass('active', active);
+    }
+
+    markAllLeftMenuButton(active = false){
+        this.dom.find('ui-button.projects').toggleClass('active', active);
+        this.dom.find('ui-button.nodes').toggleClass('active', active);
+        this.dom.find('ui-button.datastore').toggleClass('active', active);
+        this.dom.find('ui-button.services').toggleClass('active', active);
+        this.dom.find('ui-button.packages').toggleClass('active', active);
     }
 }
