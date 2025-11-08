@@ -18,6 +18,17 @@ export class AppLeftMenu {
         this.detachEvents();
         this.element.find('.AppLeftMenu').remove();
         this.element.append(this.dom);
+        if(this.entity === 'project'){
+            this.element.find('ui-layout-tree')[0].data([
+                {icon: "fa-solid fa-ticket", label:'Project1', type:'project', expanded:true,
+                    children:[
+                        {icon: "fa-solid fa-cube", label:'node1', type:'node'},
+                        {icon: "fa-solid fa-cube", label:'node2', type:'node'},
+                    ]
+                },
+                {icon: "fa-solid fa-ticket", label:'project2',  type:'project'}
+            ])
+        }
         this.attachEvents();
     }
 

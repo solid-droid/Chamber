@@ -12,6 +12,7 @@ export function HTML(htmlText, data) {
         }
     };
 
+    htmlText = htmlText && htmlText.default ? htmlText.default : htmlText;
     let result = htmlText;
     let changed;
 
