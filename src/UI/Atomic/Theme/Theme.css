@@ -1,2 +1,27 @@
-@import "./Color/Theme-Light/Theme-Light.css";
-@import "./Color/Theme-Dark/Theme-Dark.css";
+@import "./Color/Theme-Light/colors.css";
+@import "./Color/Theme-Dark/colors.css";
+
+body{
+  --color-background-1: var(--color-gray-1);
+  --color-background-2: var(--color-gray-3);
+  --color-background-3: var(--color-gray-4);
+
+  --color-text-1: var(--color-gray-31);
+  --color-text-2: var(--color-gray-28);
+
+  --color-border-1: var(--color-gray-8);
+  --color-border-2: var(--color-gray-6);
+
+  /* Button */
+  --color-button-background: var(--color-gray-5);
+  --color-button-background-hover: var(--color-gray-10);
+  --color-button-text: var(--color-text);
+  --color-button-border: var(--color-border);
+
+  /* Input */
+  --color-input-background: var(--color-gray-8);
+  --color-input-value:var(--color-text);
+
+  /* Resize handle */
+  --color-resize-handle: var(--color-gray-6);
+}

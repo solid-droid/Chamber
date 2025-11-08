@@ -1,4 +1,4 @@
-import { HTML } from '../../../HTML';
+import { HTML } from '../../../Helper/HTML';
 import * as templateHtml from './Icon.html?raw';
 import * as styleText from './Icon.css?raw';
 

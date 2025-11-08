@@ -1,6 +1,6 @@
  html{
-    --color-background: #121212;
-    --color-text: #ffffff;
+    --color-background-1: #121212;
+    --color-text-1: #ffffff;
     #Loading-Screen{
         position: fixed;
         top: 50%;

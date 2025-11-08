@@ -1,4 +1,4 @@
-import { HTML } from '../../../HTML';
+import { HTML } from '../../../Helper/HTML';
 import * as styleText from './Button.css?raw';
 import * as templateHtml from './Button.html?raw';
 

@@ -38,11 +38,11 @@ export class AppTopMenu{
             }
         });
 
-        this.dom.find('ui-button.projects').on('click', function(){
+        this.dom.find('ui-button.project').on('click', function(){
             self.options.onProjects();
         });
 
-        this.dom.find('ui-button.nodes').on('click', function(){
+        this.dom.find('ui-button.node').on('click', function(){
             self.options.onNodes();
         });
 
@@ -50,10 +50,10 @@ export class AppTopMenu{
             self.options.onDatastore();
         });
 
-        this.dom.find('ui-button.services').on('click', function(){
+        this.dom.find('ui-button.service').on('click', function(){
             self.options.onServices();
         });
-        this.dom.find('ui-button.packages').on('click', function(){
+        this.dom.find('ui-button.package').on('click', function(){
             self.options.onPackages()
         });
 
@@ -76,10 +76,10 @@ export class AppTopMenu{
     }
 
     markAllLeftMenuButton(active = false){
-        this.dom.find('ui-button.projects').toggleClass('active', active);
-        this.dom.find('ui-button.nodes').toggleClass('active', active);
+        this.dom.find('ui-button.project').toggleClass('active', active);
+        this.dom.find('ui-button.node').toggleClass('active', active);
         this.dom.find('ui-button.datastore').toggleClass('active', active);
-        this.dom.find('ui-button.services').toggleClass('active', active);
-        this.dom.find('ui-button.packages').toggleClass('active', active);
+        this.dom.find('ui-button.service').toggleClass('active', active);
+        this.dom.find('ui-button.package').toggleClass('active', active);
     }
 }

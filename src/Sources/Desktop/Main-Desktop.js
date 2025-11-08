@@ -41,20 +41,29 @@ const RESIZABLE = {
 
 const MENU_STATE = {
     //left menu
-    projects: false,
-    nodes: false,
+    project: false,
+    node: false,
     datastore: false,
-    services: false,
-    packages: false,
+    service: false,
+    package: false,
     //right menu
     workflow: false
 }
 
 function loadDesignLayout() {
+    //html structure/layout
     initHTMLStructure();
+
+    //making left and right nav resizable
     initResizableLayout();
+
+    //default left and right Nav sizes
     setLeftAndRightNav({});
+
+    //menu content
     initMenuContent();
+
+    //main content
 }
 
 
@@ -100,19 +109,19 @@ function initMenuContent(){
         onTheme: () => toggleTheme(),
         //left menu options
         onProjects: () => {
-           toggleLeftMenu('projects');
+           toggleLeftMenu('project');
         },
         onNodes: () => {
-            toggleLeftMenu('nodes');
+            toggleLeftMenu('node');
         },
         onDatastore: () => {
             toggleLeftMenu('datastore');
         },
         onServices: () => {
-            toggleLeftMenu('services');
+            toggleLeftMenu('service');
         },
         onPackages: () => {
-            toggleLeftMenu('packages');
+            toggleLeftMenu('package');
         },
         //right menu options
         onRun: () => {
@@ -134,6 +143,8 @@ function initMenuContent(){
     INSTANCE.AppRightMenu = new AppRightMenu(DOM.rightMenu,{
         
     })
+
+    toggleLeftMenu('project');
 }
 
 function toggleLeftMenu(buttonName){
@@ -142,6 +153,7 @@ function toggleLeftMenu(buttonName){
     MENU_STATE[buttonName] = state;
     INSTANCE.AppTopMenu.markAllLeftMenuButton(false);
     INSTANCE.AppTopMenu.markButtonActive(buttonName, MENU_STATE[buttonName]);
+    INSTANCE.AppLeftMenu.activate(buttonName);
     setLeftAndRightNav({leftNav: MENU_STATE[buttonName]});
 }
 
@@ -159,18 +171,18 @@ function resetRightMenuButtons(){
 }
 
 function resetLeftMenuButtons(){
-    MENU_STATE.projects = false;
-    MENU_STATE.nodes = false;
+    MENU_STATE.project = false;
+    MENU_STATE.node = false;
     MENU_STATE.datastore = false;
-    MENU_STATE.services = false;
-    MENU_STATE.packages = false;
+    MENU_STATE.service = false;
+    MENU_STATE.package = false;
 }
 
 function setLeftAndRightNav({leftNav, rightNav}) {
     LAYOUT.leftNav = leftNav ?? LAYOUT.leftNav;
     LAYOUT.rightNav = rightNav ?? LAYOUT.rightNav;
     if(LAYOUT.leftNav){
-        DOM.leftMenu.width(Math.max(DOM.leftMenu.width(),300)+'px');
+        DOM.leftMenu.width(Math.max(DOM.leftMenu.width(),200)+'px');
         DOM.leftMenu.find('.resize-handle').show();
         DOM.leftMenu.addClass('open');
         setTimeout(()=> DOM.leftMenu.css('transition','none'), 100);
@@ -182,7 +194,7 @@ function setLeftAndRightNav({leftNav, rightNav}) {
     }
 
     if(LAYOUT.rightNav){
-        DOM.rightMenu.width(Math.max(DOM.rightMenu.width(),300)+'px');
+        DOM.rightMenu.width(Math.max(DOM.rightMenu.width(),200)+'px');
         DOM.rightMenu.find('.resize-handle').show();
         DOM.rightMenu.addClass('open');
         setTimeout(()=> DOM.rightMenu.css('transition','none'), 100);

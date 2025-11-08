@@ -60,6 +60,9 @@ export function HTML(htmlText, data) {
 }
 
 // --- Example Usage ---
+// variable     => ${title}
+// if condition => {% if products.length > 0 %} ....  {% endif %}
+// for loop     => {% for product in products %} ... {% endfor %}
 
 // const templateData = {
 //     title: 'Product Catalog',

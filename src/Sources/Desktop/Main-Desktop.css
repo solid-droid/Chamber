@@ -1,8 +1,8 @@
 #chamber-app{
     height: 100%;
     width: 100%;
-    background-color: var(--color-background);
-    color: var(--color-text);
+    background-color: var(--color-background-1);
+    color: var(--color-text-1);
     display: grid;
     grid-template-rows: 28px 1fr 28px;
     .app-header{

@@ -16,7 +16,7 @@
     }
 
     .resize-handle{
-        background: #272727;
+        background: var(--color-resize-handle);
         position: absolute;
         z-index: 100;
     }

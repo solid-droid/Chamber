@@ -4,7 +4,7 @@
     display: grid;
     align-items: center;
     grid-template-columns: 150px 1fr 150px;
-    background-color: var( --color-background-secondary);
+    background-color: var( --color-background-2);
     padding-left: 1px;
     padding-right: 1.5px;
     border-top-left-radius: 10px;
@@ -31,6 +31,6 @@
     .appname{
         font-weight: 600;
         transform: scaleX(1.5);
-        color: var(--color-text-secondary);
+        color: var(--color-text-2);
     }
 }

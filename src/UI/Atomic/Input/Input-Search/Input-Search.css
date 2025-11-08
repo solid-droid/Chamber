@@ -1,0 +1,17 @@
+.input-search-container{
+    ui-input{
+        display: flex;
+        margin: 0 2px 0px 1px;
+        width: -webkit-fill-available;
+        input{
+            width: 100%;
+            padding-right: 30px;
+            height: 20px;
+        }
+    }
+    ui-icon{
+        position: absolute;
+        right: 5px;
+        top:1px;
+    }
+}

@@ -59,7 +59,7 @@ export class Layout_Resizable{
         if(this.options.bottom) this.resizeObserve('bottom');
         if(this.options.right) this.resizeObserve('right');
        $(window).on('resize', () => {
-            
+            this.sync();
         });
     }
 
@@ -86,6 +86,47 @@ export class Layout_Resizable{
       $(document).on('mouseup', e => this.onPointerUp(e, side));
       $(document).on('touchmove',  e => this.onPointerMove(e, side), {passive:false});
       $(document).on('touchend',  e => this.onPointerUp(e, side));
+    }
+
+    sync(){
+        const box = this.element[0];
+        const rect = box.getBoundingClientRect();
+
+        // 🛑 Skip sync if element is hidden or collapsed
+        if (rect.width === 0) return;
+
+        let changed = false;
+
+        // Handle width (left/right)
+        if (this.options.left || this.options.right) {
+            const { min, max } = this.minmax(this.options.right ? 'right' : 'left');
+            const currentWidth = rect.width;
+            const clampedWidth = this.clamp(currentWidth, min, max);
+            if (currentWidth !== clampedWidth) {
+                box.style.width = clampedWidth + 'px';
+                changed = true;
+            }
+        }
+
+        // Handle height (top/bottom)
+        if (this.options.top || this.options.bottom) {
+            const { min, max } = this.minmax(this.options.bottom ? 'bottom' : 'top');
+            const currentHeight = rect.height;
+            const clampedHeight = this.clamp(currentHeight, min, max);
+            if (currentHeight !== clampedHeight) {
+                box.style.height = clampedHeight + 'px';
+                changed = true;
+            }
+        }
+
+        // Trigger resize callback if adjusted
+        if (changed) {
+            this.resize({
+                element: this.element,
+                width: box.offsetWidth,
+                height: box.offsetHeight
+            });
+        }
     }
 
     onPointerMove(e, side){

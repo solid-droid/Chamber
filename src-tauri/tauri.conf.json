@@ -17,6 +17,8 @@
         "title": "chamber",
         "width": 300,
         "height": 100,
+        "minWidth": 300,
+        "minHeight": 100,
         "decorations": false,
         "transparent": false,
         "visible": true,
