@@ -12,6 +12,11 @@
         width: 100%;
     }
     ui-layout-tree{
-        width: 100%;
+        margin-top: 5px;
+        margin-bottom: 5px;
+        width: calc(100% - 4px);
+        overflow: hidden;
+        overflow-y: auto;
+        padding-bottom: 30px;
     }
 }

@@ -9,8 +9,8 @@
         {% if item.icon %}
             <ui-icon class="tree-item-icon" icon="${item.icon}"></ui-icon>
         {% endif %}
-        {% if item.label %}
-            <div class="tree-item-label">${item.label}</div>
+        {% if item.alias || item.name %}
+            <div class="tree-item-label">${item.alias || item.name}</div>
         {% endif %}
     </div>
     {% if item.expanded && item.children && item.children.length %}

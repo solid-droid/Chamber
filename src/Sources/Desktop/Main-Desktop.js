@@ -7,6 +7,7 @@ import { AppBottomMenu } from "../../UI/Module/InLine/AppBottomMenu/AppBottomMen
 import { AppLeftMenu } from "../../UI/Module/InLine/AppLeftMenu/AppLeftMenu.js";
 import { AppRightMenu } from "../../UI/Module/InLine/AppRightMenu/AppRightMenu.js";
 import { Layout_Resizable } from "../../UI/Atomic/Layout/Layout-Resizable/Layout-Resizable.js";
+import { generateTestTree } from "../../UI/Helper/Test.js";
 async function Main_Desktop() {
     //desktop specific code here
     log("Desktop Detected");
@@ -144,7 +145,14 @@ function initMenuContent(){
         
     })
 
+    loadData();
     toggleLeftMenu('project');
+}
+
+function loadData(){
+    INSTANCE.AppLeftMenu.data({
+        project:generateTestTree(100, 10, 10, 10)
+    })
 }
 
 function toggleLeftMenu(buttonName){
