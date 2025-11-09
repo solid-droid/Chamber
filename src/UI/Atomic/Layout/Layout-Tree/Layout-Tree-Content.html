@@ -1,5 +1,5 @@
 <div class="tree-item ${item.expanded && item.children && item.children.length ? 'expanded' : ''}">
-    <div class="tree-item-main" data-path="${item.path}">
+    <div class="tree-item-main" data-path="${item.path}" title="${item.alias || item.name}">
         {% if item.children && item.children.length %}
             <ui-icon class="tree-collapse-expand" icon="fa-solid ${item.expanded ? 'fa-caret-down' : 'fa-caret-right'}"></ui-icon>
         {% endif %}

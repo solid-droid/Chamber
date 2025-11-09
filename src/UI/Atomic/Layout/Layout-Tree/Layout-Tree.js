@@ -176,7 +176,6 @@ export class Layout_Tree extends HTMLElement {
         this.#lazyStateMap = {};
 
         const stylesheet = `<style>${styleText.default}</style>`;
-        let now = performance.now();
         
         // Root level (path is null) initial rendering
         this.content = this._initialRenderBatch(this.#dataArr, null);
@@ -187,8 +186,6 @@ export class Layout_Tree extends HTMLElement {
         });
 
         this.innerHTML = innerHtml + stylesheet; 
-        
-        console.log('dom',performance.now() - now)
     }
 
     // --- Event Handling (Surgical Update) ---

@@ -31,7 +31,7 @@ function generateTestTree(count = 30, ...entries) {
 
 
     for (let i = 1; i <= count; i++) {
-        const projectName = `Project${i}`;
+        const projectName = `Project asdsa sadasdaf adsad${i}`;
 
         const rootChildren = createChildren(0);
 
