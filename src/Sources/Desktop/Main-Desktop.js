@@ -151,7 +151,7 @@ function initMenuContent(){
 
 function loadData(){
     INSTANCE.AppLeftMenu.data({
-        project:generateTestTree(100, 10, 10, 10)
+        project:generateTestTree(10,10, 10)
     })
 }
 

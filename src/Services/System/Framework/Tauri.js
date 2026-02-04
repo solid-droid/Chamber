@@ -5,9 +5,9 @@ import { relaunch } from '@tauri-apps/plugin-process';
 import { Command } from '@tauri-apps/plugin-shell';
 
 async function getEnvironment() {
-    let isMobile = navigator.maxTouchPoints > 0 || /Android|iPhone|iPad/i.test(navigator.userAgent);
+    let isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
     const isDesktop = !isMobile;
-    const isTauri = !!window.__TAURI__;
+    const isTauri = window.__TAURI__;
 
     let isDev = false;
     if (isTauri && typeof window.__TAURI__.core?.invoke === 'function') {

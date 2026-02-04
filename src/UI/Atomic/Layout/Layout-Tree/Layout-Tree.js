@@ -9,12 +9,12 @@ export class Layout_Tree extends HTMLElement {
         lazy: 'false',
     }
     #dataArr = [];
-    #dataMap = {};
+    #dataMap = {}; // Memory-lazy map: Stores only currently visible/expanded nodes
     #initialCount = 100;
     #loadIncrement = 50;
     
-    // New state map to track lazy loading for any node by its path
-    #lazyStateMap = {}; // Stores { path: { renderedCount: number, observer: IntersectionObserver | null, totalCount: number } }
+    // State map to track lazy loading for any node by its path
+    #lazyStateMap = {}; // Stores { path: { loadedCount: number, observer: IntersectionObserver | null, total: number } }
 
     constructor() {
         super();
@@ -42,28 +42,29 @@ export class Layout_Tree extends HTMLElement {
 
     // --- Core Lazy Loading Logic ---
 
-    // Helper to get the data array and the associated container element by path
+    // Standardizing root path to '' (empty string)
     _getDataInfoByPath(path) {
+        // Root path is ''
         if (!path) {
             return { 
                 data: this.#dataArr, 
                 container: $(this).find('.Layout-Tree'),
-                totalCount: this.#dataArr.length
+                total: this.#dataArr.length
             };
         }
         
         const item = this.#dataMap[path];
-        if (item && item.children) {
+        if (item && item.children && Array.isArray(item.children)) {
             // Find the correct .tree-item-children container for this path
             const $item = $(this).find(`.tree-item-main[data-path="${path}"]`).parent();
             const $container = $item.children('.tree-item-children');
             return { 
                 data: item.children, 
                 container: $container,
-                totalCount: item.children.length
+                total: item.children.length
             };
         }
-        return { data: [], container: $(), totalCount: 0 };
+        return { data: [], container: $(), total: 0 };
     }
 
     loadMore(path) {
@@ -71,7 +72,7 @@ export class Layout_Tree extends HTMLElement {
         if (!isLazy) return;
 
         const info = this.#lazyStateMap[path];
-        if (!info || info.renderedCount >= info.totalCount) {
+        if (!info || info.loadedCount >= info.total) {
             this.disconnectObserver(path);
             return;
         }
@@ -79,20 +80,17 @@ export class Layout_Tree extends HTMLElement {
         const { data, container } = this._getDataInfoByPath(path);
         if (!container.length) return;
 
-        const start = info.renderedCount;
-        const end = Math.min(info.totalCount, start + this.#loadIncrement);
+        const start = info.loadedCount;
+        const end = Math.min(info.total, start + this.#loadIncrement);
         
-        // Slice the next batch of nodes
         const newNodes = data.slice(start, end);
-        // Generate content without lazy loading children recursively (that's handled on expand)
-        const newHtml = Layout_Tree.generateContent(newNodes, this.#dataMap, path);
+        const newHtml = this._generateBatchContent(newNodes, path);
         
-        // Append new HTML to the specific container
         container.append(newHtml);
         
-        info.renderedCount = end;
+        info.loadedCount = end;
         
-        if (info.renderedCount < info.totalCount) {
+        if (info.loadedCount < info.total) {
              this.setupObserver(path);
         } else {
              this.disconnectObserver(path);
@@ -111,28 +109,23 @@ export class Layout_Tree extends HTMLElement {
         this.disconnectObserver(path);
 
         const info = this.#lazyStateMap[path];
-        if (!info || info.renderedCount >= info.totalCount) return;
+        if (!info || info.loadedCount >= info.total) return;
 
         const { container } = this._getDataInfoByPath(path);
         if (!container.length) return;
 
-        // The root element for the observer is the specific parent container
-        const rootElement = container[0];
-
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
-                // If the sentinel (last item) is visible, load more
                 if (entry.isIntersecting) {
                     this.loadMore(path);
                 }
             });
         }, {
-            root: rootElement.parentElement.parentElement, // Use the component root for observing (to ensure one scrollbar)
+            root: this,
             rootMargin: '0px',
             threshold: 0.1
         });
         
-        // Find the last item that was just appended inside the specific container
         const $lastItem = container.children('.tree-item').last();
         if ($lastItem.length) {
             observer.observe($lastItem[0]);
@@ -140,45 +133,98 @@ export class Layout_Tree extends HTMLElement {
         }
     }
 
+    // --- Content Generation (Clones item before decoration) ---
+
+    // Maps the nodes in 'tree' to #dataMap and generates HTML for the batch
+    _generateBatchContent(tree, parentPath=''){ 
+        if(!tree || !Array.isArray(tree) || !tree.length)
+            return '';
+
+        let content = '';
+        tree.forEach(item => {
+            // Path creation
+            let _path = parentPath ? parentPath + '/' + item.name : item.name; 
+            
+            // 1. Store the reference to the original item in the map (MEMORY/DATA-LAZY)
+            this.#dataMap[_path] = item; 
+            
+            const isExpanded = item.expanded === true;
+            const isSelected = item.selected === true;
+            
+            // 2. Create a shallow copy (templateData) for rendering properties.
+            const templateData = { ...item }; 
+
+            templateData.path = _path;
+            templateData.expandedClass = isExpanded ? 'expanded' : '';
+            templateData.selectedClass = isSelected ? 'selected' : '';
+
+            // 3. Populate childContent on the templateData object.
+            let childContentHtml = '';
+
+            // STATE RESTORATION: Controlled recursion to restore visible children
+            if (isExpanded && item.children && Array.isArray(item.children) && item.children.length) {
+                // Call batch renderer for the children. This is the only place recursion happens on load.
+                const childrenBatchContent = this._initialRenderBatch(item.children, _path);
+                
+                // Content is unwrapped here, relying on contentTemplateHtml to wrap it during full render.
+                childContentHtml = childrenBatchContent; 
+            }
+
+            templateData.childContent = childContentHtml;
+            
+            let itemHTML = HTML(contentTemplateHtml.default, {item: templateData});
+            content+=itemHTML;
+        });
+        return content;
+    }
+
     // --- Rendering and Initialization ---
 
-    _initialRenderBatch(dataArr, path) {
+    // Entry point for initial render and state restoration of an expanded branch
+    _initialRenderBatch(dataArr, path = '') { 
+        if (!dataArr || !Array.isArray(dataArr) || !dataArr.length) {
+            return '';
+        }
+
         const isLazy = this.#propertyList.lazy === 'true';
         const totalCount = dataArr.length;
         let initialData = dataArr;
-        let renderedCount = totalCount;
+        let loadedCount = totalCount;
 
         if (isLazy && totalCount > this.#initialCount) {
             initialData = dataArr.slice(0, this.#initialCount);
-            renderedCount = initialData.length;
+            loadedCount = initialData.length;
         }
         
-        // Update the lazy state map
+        // Setup state map for the current level (path)
         this.#lazyStateMap[path] = {
-            renderedCount: renderedCount,
+            loadedCount: loadedCount,
             observer: null,
-            totalCount: totalCount
+            total: totalCount
         };
 
-        const content = Layout_Tree.generateContent(initialData, this.#dataMap, path); 
+        // Generates HTML and maps the batch of nodes currently being rendered
+        const content = this._generateBatchContent(initialData, path); 
 
-        // Set up observer if lazy loading is active and more nodes exist
-        if (isLazy && renderedCount < totalCount) {
-            setTimeout(() => this.setupObserver(path), 0); // Need to wait for DOM insertion
+        // Set up observer only if more data needs to be loaded
+        if (isLazy && loadedCount < totalCount) {
+            // Deferred setup to ensure DOM is ready
+            setTimeout(() => this.setupObserver(path), 0);
         }
 
         return content;
     }
 
     render(change = null) {
-        // Disconnect all existing observers on full render
+        // Disconnect all observers and clear maps before full re-render
         Object.keys(this.#lazyStateMap).forEach(p => this.disconnectObserver(p));
         this.#lazyStateMap = {};
+        this.#dataMap = {}; // CRITICAL: Enforce data-laziness by clearing all indexed nodes
 
         const stylesheet = `<style>${styleText.default}</style>`;
         
-        // Root level (path is null) initial rendering
-        this.content = this._initialRenderBatch(this.#dataArr, null);
+        // Root level (path is '') initial rendering
+        this.content = this._initialRenderBatch(this.#dataArr, '');
 
         const innerHtml = HTML(templateHtml.default, {
             className: this.#propertyList.class,
@@ -193,6 +239,7 @@ export class Layout_Tree extends HTMLElement {
     attachEvents(){
         const self = this;
 
+        // Delegated click handler for expand/collapse
         $(self).on('click', '.tree-collapse-expand', function(e){
             const $target = $(e.currentTarget);
             const $main = $target.parent();
@@ -208,10 +255,12 @@ export class Layout_Tree extends HTMLElement {
                 $target.attr('icon', 'fa-solid fa-caret-down');
 
                 // Check if children exist and have NOT been rendered yet
-                if (entry.children && entry.children.length && !$childrenContainer.length) {
+                if (entry.children && Array.isArray(entry.children) && entry.children.length && !$childrenContainer.length) {
                     
-                    // 🚀 INITIAL LAZY LOAD FOR CHILDREN
+                    // INITIAL LAZY LOAD FOR CHILDREN (This indexes the children into #dataMap)
                     const newChildContent = self._initialRenderBatch(entry.children, path);
+                    
+                    // The click handler must manually add the wrapper for surgical DOM update.
                     const childrenHtml = `<div class="tree-item-children">${newChildContent}</div>`;
                     $item.append(childrenHtml);
                 }
@@ -221,9 +270,11 @@ export class Layout_Tree extends HTMLElement {
                 $target.attr('icon', 'fa-solid fa-caret-right');
                 $childrenContainer.remove();
                 
-                // 🛑 CLEAN UP: Disconnect observer and remove state when collapsing
+                // CLEAN UP: Disconnect observer and remove state when collapsing
                 self.disconnectObserver(path);
                 delete self.#lazyStateMap[path];
+                // Note: Children are *not* removed from #dataMap here for speed, 
+                // but are guaranteed to be cleared on the next full render().
             }
 
             const changeDetail = { expanded: entry.expanded };
@@ -231,6 +282,7 @@ export class Layout_Tree extends HTMLElement {
             self.dispatchEvent(new CustomEvent('change', { detail: { item: entry, path: path, change: changeDetail } }));
         });
 
+        // Delegated click handler for selection
         $(self).on('click', '.tree-item-label', function(e){
             const $main = $(e.currentTarget).parent();
             let path = $main.data().path;
@@ -245,39 +297,13 @@ export class Layout_Tree extends HTMLElement {
         });
     }
 
-    // --- Content Generation (No Lazy Slicing Here) ---
-    static generateContent(tree, dataMap, parentPath=null){
-        if(!tree || !tree.length)
-            return '';
-
-        let content = '';
-        tree.forEach(item => {
-            let _path = parentPath ? parentPath + '/' + item.name : item.name;
-            if (dataMap) {
-                dataMap[_path] = item;
-            }
-            
-            // Only generate children content if the item is explicitly expanded
-            // This is for efficiency, as the expand handler will render the actual lazy content
-            let childContent = item.expanded ? Layout_Tree.generateContent(item.children, dataMap, _path) : '';
-            
-            item.childContent = childContent;
-            item.path = _path;
-            
-            let itemHTML = HTML(contentTemplateHtml.default, {item});
-            item.html = itemHTML;
-            content+=itemHTML;
-        });
-        return content;
-    }
-
     data(arr = [], map={}){
         this.#dataArr = arr;
-        this.#dataMap = map;
+        // The component builds its internal map (#dataMap) based on the visible nodes in the array.
         this.render();
     }
 
     select(path = ''){
-        
+        // Placeholder for future programmatic select functionality
     }
 }
