@@ -1,6 +1,5 @@
 import $ from 'jquery';
 import * as monaco from 'monaco-editor';
-import { AI_Interface } from '../../App/AI/AI-Interface.js';
 import { Store } from '../../App/Store/Store.js';
 import { Version_Control } from '../../App/Version/Version_Control.js';
 import { getEnvironment } from './Tauri.js';
@@ -17,7 +16,6 @@ async function loadWindowVariables() {
     window.log = log;
 
     _chamber.services = {};
-    _chamber.services.AI_Interface = new AI_Interface();
     _chamber.services.Store = new Store();
     _chamber.services.Version_Control = new Version_Control();
 
