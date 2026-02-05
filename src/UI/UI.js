@@ -1,5 +1,2 @@
-import { init_AtomicUI } from "./Atomic/Atomic-UI";
-
-export function init_webcomponents(){
-    init_AtomicUI();
-}
+import './Core/Theme/Theme.css';
+import './Core/Theme/Theme.js';

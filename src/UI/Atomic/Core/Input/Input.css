@@ -1,7 +1,0 @@
-.ui-input{
-    outline: none;
-    background-color: var(--color-input-background);
-    color:var(--color-input-value);
-    box-shadow: none;
-    border: none;
-}

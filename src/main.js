@@ -1,32 +1,16 @@
-import './UI/Atomic/Atomic-UI.css';
+import './UI/UI.js';
 import { chamber, loadWindowVariables } from './Services/System/Framework/Common.js';
 import { resizeWindow } from './Services/System/Framework/Tauri.js';
-import { init_webcomponents } from './UI/UI.js';
+
 
 (async () => {
     await loadWindowVariables();
-    init_webcomponents();
-
-    let demoMode = false;
-
-    demoMode && import('./Sources/Demo/Main-Demo.js').then(({ Main_Demo }) => {
-        resize();
-        Main_Demo();
+    let isDesktop = chamber().device.IsDesktop;
+    let isMobile = chamber().device.IsMobile;
+    import('./Sources/main.js').then(async ({ start }) => {
+        await resize();
+        await start();
     });
-
-    if(demoMode){
-        return;
-    }
-
-    chamber().device.IsDesktop && import('./Sources/Desktop/Main-Desktop.js').then(({ Main_Desktop }) => {
-        resize();
-        Main_Desktop();
-    });
-    chamber().device.IsMobile && import('./Sources/Mobile/Main-Mobile.js').then(({ Main_Mobile }) => {
-        resize();
-        Main_Mobile();
-    });
-
 })();
 
 

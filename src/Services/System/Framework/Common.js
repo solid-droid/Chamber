@@ -4,6 +4,7 @@ import { AI_Interface } from '../../App/AI/AI-Interface.js';
 import { Store } from '../../App/Store/Store.js';
 import { Version_Control } from '../../App/Version/Version_Control.js';
 import { getEnvironment } from './Tauri.js';
+import { log } from '../Framework/logger.js';
 
 let _chamber = {};
 async function loadWindowVariables() {
@@ -13,6 +14,7 @@ async function loadWindowVariables() {
     window.$ = $;
     window.jQuery = $;
     window.monaco = monaco;
+    window.log = log;
 
     _chamber.services = {};
     _chamber.services.AI_Interface = new AI_Interface();
