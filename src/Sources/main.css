@@ -10,6 +10,7 @@
         width: 100%;
         display: flex;
         align-items: center;
+        justify-content: center;
         overflow: hidden;
         background-color: var(--color-background-3);
     }
@@ -19,6 +20,7 @@
         width: 100%;
         display: flex;
         align-items: center;
+        justify-content: center;
         overflow: hidden;
         background-color: var(--color-background-3);
     }
@@ -26,6 +28,9 @@
     .app-body{
         height: 100%;
         width: calc(100% - 2px);
+        display: flex;
+        justify-content: center;
+        align-items: center;
         overflow: hidden;
         position: relative;
         border: 1px solid red;
