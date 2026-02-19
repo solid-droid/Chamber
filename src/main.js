@@ -1,13 +1,13 @@
 import './UI/UI.js';
-import { chamber, loadWindowVariables } from './Services/System/Framework/Common.js';
-import { resizeWindow } from './Services/System/Framework/Tauri.js';
+import { loadGlobals } from './Services/Framework/Common.js';
+import { resizeWindow } from './Services/Framework/Tauri.js';
 
 
 (async () => {
-    await loadWindowVariables();
-    let isDesktop = chamber().device.IsDesktop;
-    let isMobile = chamber().device.IsMobile;
-    import('./Sources/main.js').then(async ({ start }) => {
+    await loadGlobals();
+    let isDesktop = CHAMBER.device.IsDesktop;
+    let isMobile = CHAMBER.device.IsMobile;
+    import('./Sources/app.js').then(async ({ start }) => {
         await resize();
         await start();
     });

@@ -1,4 +1,5 @@
-import './main.css';
+import './app.css';
+import { Designer } from './Designer/designer';
 
 export async function start() {
     createBasicUI();
@@ -20,6 +21,11 @@ function createBasicUI() {
     
     DOM.body = $('<div class="app-body">Body</div>');
     DOM.root.append(DOM.body);
+
+    let _designerView = $('<canvas class="designer-view"></canvas>');
+    DOM.body.empty();
+    DOM.body.append(_designerView);
+    new Designer(_designerView);
 
     DOM.footer = $('<div class="app-footer">Footer</div>');
     DOM.root.append(DOM.footer);
