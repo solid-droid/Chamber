@@ -56,7 +56,7 @@ Don't pass data manually. Use the Store and subscribe to changes.
 ```JavaScript
 // Component A
 Store.subscribe('user', (name) => {
-    UI.Log.info(`User is now: ${name}`);
+    Log.info(`User is now: ${name}`);
 });
 
 // Component B
