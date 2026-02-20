@@ -31,11 +31,26 @@ export const Store = new Proxy(StoreBase, {
     },
     set(target, prop, value) {
         if (prop === 'subscribe' || prop === 'clear') return false;
+
         const prev = _data.get(prop);
-        if (prev === value) return true;
-        _data.set(prop, value);
+        
+        // Create a deep copy if value is an object/array to break memory reference
+        const newValue = (value && typeof value === 'object') 
+            ? structuredClone(value) 
+            : value;
+
+        // Simple identity check. Note: for deep objects, 
+        // this checks if the reference is the same unless you add a deepEqual helper.
+        if (prev === newValue) return true;
+
+        _data.set(prop, newValue);
+
         const list = _listeners.get(prop);
-        if (list) list.forEach(cb => cb(value, prev));
+        if (list) {
+            // Callback now receives (current_copy, previous_copy)
+            list.forEach(cb => cb(newValue, prev));
+        }
+        
         return true;
     }
 });
