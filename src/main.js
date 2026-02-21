@@ -1,12 +1,11 @@
-import { UI } from './UI/UI.js';
-import { Store } from './Services/Framework/Store/Store.js';
-import { Tauri } from './Services/Framework/Tauri/Tauri.js';
-import { loadGlobals } from './Services/Framework/Globals/Globals.js';
+import { UI } from '@UI';
+import { Store } from '@Store';
+import { Tauri } from '@Tauri';
+import { loadGlobals } from '@Globals';
 
 
 (async () => {
     await loadGlobals();
-    await UI.Canvas3D.loadGlobals();
     
     Store.theme = 'theme-dark';
     UI.init().setTheme(Store.theme);

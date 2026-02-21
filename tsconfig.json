@@ -1,24 +1,22 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "useDefineForClassFields": true,
     "module": "ESNext",
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "skipLibCheck": true,
+    
+    /* THE KEY CHANGES */
+    "allowJs": true,           // Allows TS to read your JS files
+    "checkJs": false,          // STOPS the error reporting/linting in JS
+    "noEmit": true,            // Vite handles the build, not TS
+    
+    /* Maintain your path aliases */
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["src/*"]
+    },
 
-    /* Bundler mode */
     "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-
-    /* Linting */
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "skipLibCheck": true
   },
-  /* add this to include typescript */
-  // "include": ["src"]
+  "include": ["src/**/*", "types.d.ts"] // Keeps your types in scope
 }

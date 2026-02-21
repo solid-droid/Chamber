@@ -1,19 +1,45 @@
 [Go back to Canvas3D](../Canvas3D.md)
 
-```javascript
-// loads BabylonJS dependencies
-await UI.Canvas3D.loadGlobals();
-//
-// add Initialization Logic...
-//
-// global disposal - clean exit
-UI.Canvas3D.dispose();
+## Initialization & Engine
+```javascript 
+await Canvas3D.loadGlobals();
+
+const engine = await Canvas3D.engine({ 
+    powerPreference: "high-performance" // default
+});
 ```
+
+### Canvas Plugin:
+The Canvas plugin handles WebGPU/WebGL initialization, the render loop, and performance scaling. Because WebGPU is asynchronous, creating a canvas must be awaited.
+```javascript
+let canvas = await engine.add.canvas("#renderCanvas")
+```
+```
+.quality(level) - Sets hardware scaling (e.g., 0.5 is supersampling, 2.0 is lower res).
+
+.AutoPerformanceMode(enabled, targetFps) - Dynamically scales resolution if FPS drops below target.
+
+.pause() - Pauses the Babylon render loop to save battery/CPU.
+
+.resume() - Resumes the render loop.
+
+.dispose() - Destroys the engine and all attached scenes.
+```
+
+### Scene Plugin
+[Go To Scene Plugin Docs](./Scene.md)  
+The Scene plugin acts as a container for your meshes, lights, and cameras. A Canvas will automatically render all attached scenes as long as they have an active camera.
+```javascript
+let myScene = canvas.add.scene("mainRoom", { 
+    clearColor: "#111111" // Hex string background color
+});
+```
+
 ## Initialization Logic
 ### 1. High-Fidelity Desktop (WebGPU First)
 ```javascript
 // High-End Desktop Setup
-await UI.Canvas3D.canvas("#renderCanvas", {
+let canvas = await engine.add.canvas("#renderCanvas", {
     antialias: true,
     options: {
         powerPreference: "high-performance",
@@ -27,7 +53,7 @@ console.log(`Running on: ${UI.Canvas3D.status}`); // Should be "webgpu"
 ```
 ### 2. Physics & Simulation Profile (Deterministic)
 ```javascript
-await UI.Canvas3D.canvas("#renderCanvas", {
+let canvas = await engine.add.canvas("#renderCanvas", {
     options: {
         deterministicLockstep: true,
         lockstepMaxSteps: 4,
@@ -38,7 +64,7 @@ await UI.Canvas3D.canvas("#renderCanvas", {
 ```
 ### 3. Mobile Performance Profile (Battery Saver)
 ```javascript
-await UI.Canvas3D.canvas("#renderCanvas", {
+let canvas = await engine.add.canvas("#renderCanvas", {
     adaptToDeviceRatio: true, 
     options: {
         powerPreference: "low-power", // Suggests using the integrated/mobile GPU
@@ -50,34 +76,32 @@ await UI.Canvas3D.canvas("#renderCanvas", {
 
 // Force the resolution down even further if the device is ultra-high DPI
 // 2.0 is a good "sweet spot" for Retina displays
-UI.Canvas3D.setQuality(2.0);
+canvas.quality(2.0);
 ```
 ### 4. Mid-Game Performance "Panic" Switch
 ```javascript
 // This function can be tied to a "Low Graphics" button in your UI
 function optimizeForLag() {
-    // 1.0 = Native Resolution
-    // 2.0 = Half Resolution (Huge performance gain)
-    // 4.0 = Quarter Resolution (Very blurry, but very fast)
-    UI.Canvas3D.setQuality(2.0); 
+    // 1.0 = Native Resolution, 2.0 = Half Resolution, 4.0 = Quarter Resolution
+    canvasInstance.quality(2.0); 
     
     // Disable heavy engine features
-    UI.Canvas3D.engine.renderEvenInBackground = false; // Save CPU when tab is hidden
+    canvasInstance.engine.renderEvenInBackground = false; // Save CPU when tab is hidden
 }
 ```
 
 ### 5.Dynamic "Auto-Mode" (Performance Scaling)
 ```javascript
-await UI.Canvas3D.canvas("#renderCanvas");
+let canvas = await engine.add.canvas("#renderCanvas");
 
 // Enable Auto-Mode: If FPS drops below 45, it will downscale.
 // If FPS stays above 55, it will try to sharpen the image again.
-UI.Canvas3D.AutoPerformanceMode(true, 45);
+canvas.AutoPerformanceMode(true, 45);
 ```
 
 ### 6.The "Photo Mode" / Utility Profile
 ```javascript
-await UI.Canvas3D.canvas("#renderCanvas", {
+let canvas = await engine.add.canvas("#renderCanvas", {
     options: {
         preserveDrawingBuffer: true, // Required for .toDataURL()
         stencil: true
@@ -86,7 +110,7 @@ await UI.Canvas3D.canvas("#renderCanvas", {
 
 // Take a screenshot from the engine canvas
 function captureImage() {
-    const data = UI.Canvas3D.engine.getRenderingCanvas().toDataURL("image/png");
+    const data = canvas.engine.getRenderingCanvas().toDataURL("image/png");
     const link = document.createElement('a');
     link.download = 'screenshot.png';
     link.href = data;
@@ -96,7 +120,7 @@ function captureImage() {
 
 ### 7. VR / AR (WebXR) Profile
 ```javascript
-await UI.Canvas3D.canvas("#renderCanvas", {
+let canvas = await engine.add.canvas("#renderCanvas", {
     options: {
         xrCompatible: true,
         powerPreference: "high-performance"

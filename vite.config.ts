@@ -12,16 +12,13 @@ export default defineConfig(async () => ({
     viteStaticCopy({
       targets: [
         {
-          // Copy from the actual source
           src: 'node_modules/@babylonjs/havok/lib/esm/HavokPhysics.wasm',
-          // This puts it in the root of your 'dist' (and serves it at /HavokPhysics.wasm)
           dest: './' 
         }
       ]
     })
   ],
 
-  // 1. FIX: Prevent Vite from trying to bundle Havok into .vite/deps
   optimizeDeps: {
     exclude: ['@babylonjs/havok']
   },
@@ -41,7 +38,6 @@ export default defineConfig(async () => ({
     watch: {
       ignored: ["**/src-tauri/**"],
     },
-    // 2. FIX: In Vite, the 'mimeTypes' key is plural (though usually not needed if optimizeDeps is set)
     mimeTypes: {
       'application/wasm': ['wasm']
     }
@@ -49,6 +45,15 @@ export default defineConfig(async () => ({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),
+      '@Log': path.resolve(__dirname, 'src/Services/Framework/Log/Log.js'),
+      '@Store': path.resolve(__dirname, 'src/Services/Framework/Store/Store.js'),
+      '@Tauri': path.resolve(__dirname, 'src/Services/Framework/Tauri/Tauri.js'),
+      '@Globals': path.resolve(__dirname, 'src/Services/Framework/Globals/Globals.js'),
+
+      '@Utility': path.resolve(__dirname, 'src/Services/Utility'),
+
+      '@UI': path.resolve(__dirname, 'src/UI/UI.js'),
+      '@Canvas3D': path.resolve(__dirname, 'src/UI/Canvas3D'),
     },
   },
 }));

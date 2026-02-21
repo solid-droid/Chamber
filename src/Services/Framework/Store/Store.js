@@ -16,6 +16,9 @@ const StoreBase = {
             }
         };
     },
+    inspect() {
+        return Object.fromEntries(_data);
+    },
     clear() {
         _data.clear();
         _listeners.clear();
