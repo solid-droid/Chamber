@@ -1,4 +1,4 @@
-import { ModuleCore } from '@Utility/ModuleCore.js';
+import { ModuleCore } from '@Utility/Plugin/ModuleCore.js';
 import { Camera } from './Camera.js';
 import { Light } from './Light.js';
 import { Mesh } from './Mesh.js';

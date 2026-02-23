@@ -1,10 +1,9 @@
-import { ModuleCore } from '@Utility/ModuleCore.js';
+import { ModuleCore } from '@Utility/Plugin/ModuleCore.js';
 import { Scene } from './Scene.js';
 import { Log } from '@Log';
 
 export class Canvas extends ModuleCore {
     constructor(identifier, options = {}, parentWrapper) {
-        // Resolve the identifier (string vs HTML element)
         const isString = typeof identifier === 'string';
         const name = isString ? identifier : (identifier.id || identifier.dataset?.coreId || 'canvas_auto');
 
@@ -16,11 +15,11 @@ export class Canvas extends ModuleCore {
         this._autoModeInterval = null;
         this.isPaused = false;
         
-        // Ported original defaults
         this.defaults = {
             selector: isString ? identifier : null,
             antialias: true,
             adaptToDeviceRatio: true,
+            activeScene: null, // Tracks which scene is currently rendering
             options: {
                 preserveDrawingBuffer: false,
                 stencil: true,                 
@@ -40,41 +39,31 @@ export class Canvas extends ModuleCore {
 
         this.options = { ...this.defaults, ...options, options: { ...this.defaults.options, ...(options.options || {}) } };
 
-        // Define the render loop function so it can be added/removed cleanly
+        // Smart render loop with Active Scene switching support
         this._renderLoop = () => {
             if (!this.engine || !this.engine.scenes) return;
             
             this.engine.scenes.forEach(scene => {
+                // Skip rendering if we set an active scene and this isn't it
+                if (this.options.activeScene && scene.name !== this.options.activeScene) return;
+
                 if (scene.activeCamera) {
                     scene.render();
                 }
             });
         };
 
-        // Register allowed children
         this.registerPlugin('scene', Scene);
-
-        // Store the initialization promise so Core.js can await it
         this.ready = this._initEngine();
     }
 
     async _initEngine() {
         let domElement = this.domElement;
 
-        // 1. Try treating string as a CSS selector (e.g., '#myCanvas' or '.render-canvas')
         if (!domElement && this.options.selector) {
-            try {
-                domElement = document.querySelector(this.options.selector);
-            } catch (e) {
-                // Ignore invalid CSS selector syntax errors
-            }
+            try { domElement = document.querySelector(this.options.selector); } catch (e) {}
         }
-
-        // 2. Fallback to using the string directly as an ID
-        if (!domElement) {
-            domElement = document.getElementById(this.name);
-        }
-
+        if (!domElement) domElement = document.getElementById(this.name);
         if (!domElement) return Log.error(`Canvas DOM element not found for '${this.name}'`);
 
         const BABYLON = window.BABYLON;
@@ -109,11 +98,28 @@ export class Canvas extends ModuleCore {
             if (this.engine) this.engine.resize();
         });
 
-        // Automatically start the render loop for all attached scenes
         this.engine.runRenderLoop(this._renderLoop);
     }
 
-    // --- Render Controls ---
+    // --- Core Operations ---
+    
+    switchScene(sceneName) {
+        this.options.activeScene = sceneName;
+        
+        if (!this.engine) return this._proxy;
+
+        this.engine.scenes.forEach(scene => {
+            if (scene.name !== sceneName && scene.activeCamera) {
+                scene.activeCamera.detachControl();
+            }
+            if (scene.name === sceneName && scene.activeCamera) {
+                scene.activeCamera.attachControl(this.domElement, true);
+            }
+        });
+        
+        Log.info(`Canvas '${this.name}' switched to scene: ${sceneName}`);
+        return this._proxy; 
+    }
 
     pause() {
         if (this.engine && !this.isPaused) {
@@ -121,7 +127,7 @@ export class Canvas extends ModuleCore {
             this.isPaused = true;
             Log.info(`Canvas '${this.name}' paused.`);
         }
-        return this._proxy; // Chainable
+        return this._proxy; 
     }
 
     resume() {
@@ -130,17 +136,15 @@ export class Canvas extends ModuleCore {
             this.isPaused = false;
             Log.info(`Canvas '${this.name}' resumed.`);
         }
-        return this._proxy; // Chainable
+        return this._proxy; 
     }
-
-    // --- Performance Controls ---
 
     quality(level = 1.0) {
         if (this.engine) {
             this.engine.setHardwareScalingLevel(level);
             this.performance.currentScaling = level;
         }
-        return this._proxy; // Chainable
+        return this._proxy; 
     }
 
     AutoPerformanceMode(enabled = true, threshold = 40) {
@@ -151,30 +155,28 @@ export class Canvas extends ModuleCore {
             if (this._autoModeInterval) clearInterval(this._autoModeInterval);
             
             this._autoModeInterval = setInterval(() => {
-                if (!this.engine || !this.performance.isAuto || this.isPaused) return; // Skip if paused
+                if (!this.engine || !this.performance.isAuto || this.isPaused) return; 
                 const fps = this.engine.getFps();
                 
                 if (fps < this.performance.fpsThreshold && this.performance.currentScaling < this.performance.maxScaling) {
                     this.performance.currentScaling += 0.2;
                     this.quality(this.performance.currentScaling);
-                    Log.warn(`Auto-Mode: FPS low (${fps.toFixed(0)}). Scaling set to ${this.performance.currentScaling.toFixed(1)}`);
                 } else if (fps > 55 && this.performance.currentScaling > this.performance.minScaling) {
                     this.performance.currentScaling -= 0.1;
                     this.quality(this.performance.currentScaling);
-                    Log.info(`Auto-Mode: Performance headroom detected. Scaling set to ${this.performance.currentScaling.toFixed(1)}`);
                 }
             }, 3000);
         } else {
             clearInterval(this._autoModeInterval);
             this._autoModeInterval = null;
         }
-        return this._proxy; // Chainable
+        return this._proxy; 
     }
 
     update(options) {
         if (!options) return;
         this.options = { ...this.options, ...options };
-        // Apply immediate updates if necessary
+        if (options.activeScene) this.switchScene(options.activeScene);
     }
 
     dispose() {

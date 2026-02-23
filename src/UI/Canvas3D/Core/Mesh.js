@@ -1,4 +1,4 @@
-import { ModuleCore } from '@Utility/ModuleCore.js';
+import { ModuleCore } from '@Utility/Plugin/ModuleCore.js';
 import { Log } from '@Log';
 
 export class Mesh extends ModuleCore {

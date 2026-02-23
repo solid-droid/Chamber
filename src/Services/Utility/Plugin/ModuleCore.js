@@ -38,11 +38,22 @@ export class ModuleCore {
 
                 // 2. Intercept registered plugins (e.g., .scene, .canvas)
                 if (typeof prop === 'string' && target._pluginClasses.has(prop)) {
-                    return (name, options) => {
+                    const pluginExecuteFn = (name, options = {}) => {
                         const action = target._action || 'smart';
                         target._action = null; // Reset for next chain link
                         return target._executePlugin(prop, action, name, options);
                     };
+
+                    // NEW: Return a Proxy so we can chain a subtype! (e.g., .add.light.hemispheric)
+                    return new Proxy(pluginExecuteFn, {
+                        get: (targetFn, subType) => {
+                            // If they chain a subtype, return a new function that injects the type into options
+                            return (name, options = {}) => {
+                                options.type = subType;
+                                return targetFn(name, options);
+                            };
+                        }
+                    });
                 }
 
                 // 3. Fallback to native class methods/properties
@@ -60,6 +71,10 @@ export class ModuleCore {
     registerPlugin(name, pluginClass) {
         this._pluginClasses.set(name, pluginClass);
         return this._proxy; 
+    }
+
+    plugin(name) {
+        return this._pluginClasses.get(name);
     }
 
     _executePlugin(pluginName, action, identifier, options) {

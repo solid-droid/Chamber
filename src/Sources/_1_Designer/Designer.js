@@ -10,19 +10,16 @@ export class Designer {
     async init() {
         await Canvas3D.loadGlobals();
         
-        let engine = await Canvas3D.engine({ powerPreference: "high-performance" });
+        let engine = await Canvas3D.engine();
+        let myCanvas = await engine.add.canvas(this.DOM[0]);
 
-        let myCanvas = await engine.add.canvas(this.DOM[0], { antialias: true });
-        myCanvas.quality(1);
-
+   
         let myScene = myCanvas.add.scene("mainRoom", { clearColor: "#111111" });
-
-
-        myScene.add.light("sun", { type: "hemispheric", intensity: 0.8 });
-        
-
+      
+        myScene.add.light.hemispheric("sun", { intensity: 0.8 });     
         myScene.add.camera("playerCam", { type: "arc", position: [0, 5, -10], target: [0, 1, 0] });
-
+  
+        console.log(Store.inspect()); // Logs: ['hemispheric', 'directional', 'point']
  
         myScene.mesh("ground", { type: "ground", size: 5 })
         myScene.add.mesh("player", { type: "box", size: 2, position: [0, 1, 0] })

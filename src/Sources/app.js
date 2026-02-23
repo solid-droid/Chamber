@@ -1,5 +1,5 @@
 import './app.css';
-import { Designer } from './Designer/Designer';
+import { Designer } from './_1_Designer/Designer';
 
 export async function start() {
     createBasicUI();

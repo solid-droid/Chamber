@@ -1,7 +1,8 @@
-import { ModuleCore } from '@Utility/ModuleCore.js';
+import { ModuleCore } from '@Utility/Plugin/ModuleCore.js';
 import { Canvas } from './Core/Canvas.js';
 import { Log } from '@Log';
 import { UI } from '../UI.js';
+import { registerStandardPlugins } from './PluginRegister.js';
 
 /// Root wrapper that manages the initial "add.canvas" chain
 class EngineWrapper extends ModuleCore {
@@ -30,6 +31,8 @@ const Canvas3D = {
             window.BABYLON_HELPER = { 
                 GUI, DEBUGER, INSPECTOR, MATERIALS: { GridMaterial } 
             };
+
+            await registerStandardPlugins();
 
             Log.done('Canvas3D-Globals-Load').success("Babylon.js globals loaded.");
         } catch (err) {
