@@ -15,6 +15,7 @@
             "options": {},
         },
         "@design": [
+            //UI structure, styling, transitions and animation
             {
                 "Ref":"@defaults/ButtonPrimary",
                 "options":{}
