@@ -23,8 +23,7 @@ dist-ssr
 *.sln
 *.sw?
 
-myapp.key
-*.pass
+~/*
 /src-tauri/binaries
 upload-keystore.jks
 src-tauri/gen/android/keystore.properties

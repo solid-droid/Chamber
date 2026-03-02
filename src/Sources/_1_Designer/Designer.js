@@ -12,13 +12,13 @@ export class Designer {
         
         let engine = await Canvas3D.engine();
         let myCanvas = await engine.add.canvas(this.DOM[0]);
-
+            myCanvas.quality(0.8); 
    
         let myScene = myCanvas.add.scene("mainRoom", { clearColor: "#111111" });
       
         myScene.add.light.hemispheric("sun", { intensity: 0.8 });     
         myScene.add.camera("playerCam", { type: "arc", position: [0, 5, -10], target: [0, 1, 0] });
-  
+        
         console.log(Store.inspect()); // Logs: ['hemispheric', 'directional', 'point']
  
         myScene.mesh("ground", { type: "ground", size: 5 })

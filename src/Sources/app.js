@@ -1,5 +1,6 @@
 import './app.css';
 import { Designer } from './_1_Designer/Designer';
+import { Blueprint } from './_4_Blueprint/Blueprint';
 
 export async function start() {
     createBasicUI();
@@ -26,6 +27,11 @@ function createBasicUI() {
     DOM.body.empty();
     DOM.body.append(_designerView);
     new Designer(_designerView);
+
+    // let _blueprintView = $('<div class="blueprint-view"></div>');
+    // DOM.body.empty();
+    // DOM.body.append(_blueprintView);
+    // new Blueprint(_blueprintView);
 
     DOM.footer = $('<div class="app-footer">Footer</div>');
     DOM.root.append(DOM.footer);
