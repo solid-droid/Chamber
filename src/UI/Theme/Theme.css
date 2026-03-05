@@ -1,5 +1,5 @@
-@import "./Color/Theme-Light/colors.css";
-@import "./Color/Theme-Dark/colors.css";
+@import "./Theme-Light/colors.css";
+@import "./Theme-Dark/colors.css";
 
 body{
   --color-background-1: var(--color-gray-1);

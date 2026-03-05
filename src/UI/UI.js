@@ -1,2 +1,2 @@
-import './Core/Theme/Theme.css';
-import './Core/Theme/Theme.js';
+import './Theme/Theme.css';
+import './Theme/Theme.js';
