@@ -1,12 +1,9 @@
-import './UI/UI.js';
-import { chamber, loadWindowVariables } from './Services/System/Framework/Common.js';
-import { resizeWindow } from './Services/System/Framework/Tauri.js';
-
+import { Tauri } from '@Tauri';
+import { loadGlobals } from '@Globals';
 
 (async () => {
-    await loadWindowVariables();
-    let isDesktop = chamber().device.IsDesktop;
-    let isMobile = chamber().device.IsMobile;
+    await loadGlobals();
+
     import('./Sources/main.js').then(async ({ start }) => {
         await resize();
         await start();
@@ -15,7 +12,9 @@ import { resizeWindow } from './Services/System/Framework/Tauri.js';
 
 
 async function resize(){
-    await resizeWindow(900, 650);
+    Tauri.resize(900, 650).then(() => {
+        console.log('Window resized to 900x650');
+    });
     $('#Loading-Screen').fadeOut(500, function() {
         $(this).remove();
     });
